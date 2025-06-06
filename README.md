@@ -15,6 +15,7 @@ There are also service team asking to build their own agent or dashboard to view
 
 ## Why build MCP server instead of using PowerBI copilot?
 
-1. General questions like: summarize Java sdk usage,, you will need to query different tables and return the aggregated result, copilot instruction can't do this
-2. Scalability on data source: support query usage data from different data source. Summarize and aggregate the result from different table together. Copilot instruction has limitation on character length, it's hard for it to understand all of our data and do the correct query by using instruction only.
+1. General questions like: summarize Java sdk usage,, you will need to query different tables and return the aggregated result, copilot instruction can't do this, as it has limitation on character length, it's hard for it to understand all of our data and do the correct query accordingly
+2. Scalability on data source: we can support adding different data sources in the future, summarize and aggregate the result from different sources
 3. Support different user entry points beside pbi UI, e.g. teams agent
+4. Easy to integrate the data with other agents, e.g. service team's agent to view specific data, PM agent etc.
