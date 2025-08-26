@@ -1,6 +1,44 @@
-# Host remote MCP servers built with official MCP SDKs on Azure Functions
+# SQL Query MCP Server for Azure Functions
 
-This repo contains instructions and sample for running MCP server built with the Python MCP SDK on Azure Functions. The repo uses the weather sample server to demonstrate how this can be done. You can clone to run and test the server locally, follow by easy deploy with `azd up` to have it in the cloud in a few minutes.
+This repo contains a refactored MCP server that provides intelligent SQL querying capabilities for Azure SQL Server data. The server accepts natural language questions and converts them into appropriate SQL queries, making database interactions more accessible to users.
+
+## Features
+
+### 🤖 Natural Language Querying
+- Ask questions in plain English: "Show me the top 10 customers by request count"
+- Automatic table and column detection based on question context
+- Smart filtering and sorting based on query intent
+
+### 📊 Multiple Query Methods
+- **Natural Language**: `sqlQuery()` - For everyday users
+- **Table Discovery**: `listTables()` - Explore available data structures  
+- **Custom SQL**: `executeCustomSQL()` - For advanced users with safety checks
+
+### 🔒 Security & Safety
+- SQL injection protection
+- Azure AD authentication
+- Read-only access (SELECT statements only)
+- Comprehensive error handling
+
+### 📈 Enhanced Responses
+- Structured JSON responses with metadata
+- Row counts and execution details
+- Helpful error messages and suggestions
+
+## Quick Start Examples
+
+```python
+# Natural language queries
+await sqlQuery("Show me the top 10 customers by request count")
+await sqlQuery("What products were used in 2024-01?") 
+await sqlQuery("Which customers have more than 1000 requests?")
+
+# Discover available data
+await listTables()
+
+# Advanced custom SQL (with safety checks)
+await executeCustomSQL("SELECT TOP 5 CustomerName, RequestCount FROM AMEConciseFiteredNewProductCCIDCustomer ORDER BY RequestCount DESC")
+```
 
 ## Running MCP server as custom handler on Azure Functions
 
