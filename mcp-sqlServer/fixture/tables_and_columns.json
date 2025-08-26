@@ -1,0 +1,666 @@
+[
+  {
+    "TableName": "AMEConciseFiteredNewProductCCIDCustomer",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "CustomerName"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "CCID"
+      },
+      {
+        "ColumnName": "RequestCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseFiteredNewProductCCIDCustomerSubscriptionId",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "CCID"
+      },
+      {
+        "ColumnName": "CustomerName"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "SubscriptionId"
+      },
+      {
+        "ColumnName": "RequestCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseFiteredNewProductCCIDCustomerSubscriptionIdProductVersion",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "CCID"
+      },
+      {
+        "ColumnName": "CustomerName"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "SubscriptionId"
+      },
+      {
+        "ColumnName": "ProductVersion"
+      },
+      {
+        "ColumnName": "RequestCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConcisenewProductTrackCCIDCurrentMonth",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "CCID"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseReqCountByMonthProductCustomerNameSubscriptionId",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "CustomerName"
+      },
+      {
+        "ColumnName": "SubscriptionId"
+      },
+      {
+        "ColumnName": "SubscriptionName"
+      },
+      {
+        "ColumnName": "RequestCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseReqCountByMonthProductResourceCustomerNameTop",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "Resource"
+      },
+      {
+        "ColumnName": "CustomerName"
+      },
+      {
+        "ColumnName": "RequestCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProduct",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductApiVersion",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "ApiVersion"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductCustomerName",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "CustomerName"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductCustomerNameTrack2",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "CustomerName"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductHttpMethod",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "HttpMethod"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductOS",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "OS"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductProvider",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderApiVersion",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "ApiVersion"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderPUT",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "ApiVersion"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductResource",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "Provider"
+      },
+      {
+        "ColumnName": "Resource"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCCIDCountByMonthProductTrackInfo",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "CCIDCount"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCountByMonthProductLanguageVersion",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "LanguageVersion"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "SubscriptionID"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCountByMonthProductMinorLanguageVersion",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "MinorLanguageVersion"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEConciseSubReqCountByMonthProductPatchLanguageVersion",
+    "Columns": [
+      {
+        "ColumnName": "Month"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      },
+      {
+        "ColumnName": "Product"
+      },
+      {
+        "ColumnName": "TrackInfo"
+      },
+      {
+        "ColumnName": "PatchLanguageVersion"
+      },
+      {
+        "ColumnName": "MinorLanguageVersion"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEGoSDKReqCountBySubscriptionIdCustomerDateVersion",
+    "Columns": [
+      {
+        "ColumnName": "RequestCounts"
+      },
+      {
+        "ColumnName": "RequestsDate"
+      },
+      {
+        "ColumnName": "SubscriptionID"
+      },
+      {
+        "ColumnName": "GoVersion"
+      },
+      {
+        "ColumnName": "PackageName"
+      },
+      {
+        "ColumnName": "PackageVersion"
+      },
+      {
+        "ColumnName": "IsTrack2"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEGoSDKReqCountBySubscriptionIdCustomerDateVersionNew",
+    "Columns": [
+      {
+        "ColumnName": "RequestsDate"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      },
+      {
+        "ColumnName": "GoVersion"
+      },
+      {
+        "ColumnName": "PackageName"
+      },
+      {
+        "ColumnName": "PackageVersion"
+      },
+      {
+        "ColumnName": "IsTrack2"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEGoSDKReqCountCustomerDataByMonth",
+    "Columns": [
+      {
+        "ColumnName": "RequestsDate"
+      },
+      {
+        "ColumnName": "RequestCount"
+      },
+      {
+        "ColumnName": "GoVersion"
+      },
+      {
+        "ColumnName": "PackageName"
+      },
+      {
+        "ColumnName": "PackageVersion"
+      },
+      {
+        "ColumnName": "IsTrack2"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEGoSDKSubCountCustomerDataByMonthPackageName",
+    "Columns": [
+      {
+        "ColumnName": "RequestsDate"
+      },
+      {
+        "ColumnName": "PackageName"
+      },
+      {
+        "ColumnName": "PackageVersion"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEGoSDKSubCountCustomerDataByMonthTrackInfo",
+    "Columns": [
+      {
+        "ColumnName": "RequestsDate"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      },
+      {
+        "ColumnName": "IsTrack2"
+      }
+    ]
+  },
+  {
+    "TableName": "AMEGoSDKSubCountCustomerDataByMonthVersion",
+    "Columns": [
+      {
+        "ColumnName": "RequestsDate"
+      },
+      {
+        "ColumnName": "SubscriptionCount"
+      },
+      {
+        "ColumnName": "GoVersion"
+      }
+    ]
+  }
+]

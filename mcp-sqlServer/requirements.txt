@@ -1,0 +1,4 @@
+httpx
+mcp[cli]>=1.5.0
+pyodbc
+azure-identity
