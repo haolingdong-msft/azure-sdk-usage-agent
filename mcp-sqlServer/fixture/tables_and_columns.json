@@ -2,7 +2,8 @@
   "Tables": [
     {
       "TableName": "AMEConciseFiteredNewProductCCIDCustomer",
-      "Description": "Filtered Azure SDK usage data by product, customer, and CCID with request counts",
+      "enabled": "false",
+      "Description": "Filtered Azure SDK usage data by product with request counts",
       "Columns": [
         {
           "ColumnName": "Month",
@@ -13,16 +14,8 @@
           "$ref": "#/definitions/Product"
         },
         {
-          "ColumnName": "CustomerName",
-          "$ref": "#/definitions/CustomerName"
-        },
-        {
           "ColumnName": "TrackInfo",
           "$ref": "#/definitions/TrackInfo"
-        },
-        {
-          "ColumnName": "CCID",
-          "$ref": "#/definitions/CCID"
         },
         {
           "ColumnName": "RequestCount",
@@ -32,7 +25,8 @@
     },
     {
       "TableName": "AMEConciseFiteredNewProductCCIDCustomerSubscriptionId",
-      "Description": "Filtered Azure SDK usage data by product, customer, CCID, and subscription ID",
+      "enabled": "true",
+      "Description": "Filtered Azure SDK usage data by product, and subscription ID",
       "Columns": [
         {
           "ColumnName": "Month",
@@ -41,14 +35,6 @@
         {
           "ColumnName": "Product",
           "$ref": "#/definitions/Product"
-        },
-        {
-          "ColumnName": "CCID",
-          "$ref": "#/definitions/CCID"
-        },
-        {
-          "ColumnName": "CustomerName",
-          "$ref": "#/definitions/CustomerName"
         },
         {
           "ColumnName": "TrackInfo",
@@ -66,6 +52,7 @@
     },
     {
       "TableName": "AMEConciseFiteredNewProductCCIDCustomerSubscriptionIdProductVersion",
+      "enabled": "false",
       "Description": "Filtered Azure SDK usage data by product, customer, CCID, subscription ID, and product version",
       "Columns": [
         {
@@ -75,14 +62,6 @@
         {
           "ColumnName": "Product",
           "$ref": "#/definitions/Product"
-        },
-        {
-          "ColumnName": "CCID",
-          "$ref": "#/definitions/CCID"
-        },
-        {
-          "ColumnName": "CustomerName",
-          "$ref": "#/definitions/CustomerName"
         },
         {
           "ColumnName": "TrackInfo",
@@ -104,6 +83,7 @@
     },
     {
       "TableName": "AMEConcisenewProductTrackCCIDCurrentMonth",
+      "enabled": "false",
       "Description": "Current month Azure SDK usage data by product, track, and CCID",
       "Columns": [
         {
@@ -117,15 +97,12 @@
         {
           "ColumnName": "TrackInfo",
           "$ref": "#/definitions/TrackInfo"
-        },
-        {
-          "ColumnName": "CCID",
-          "$ref": "#/definitions/CCID"
         }
       ]
     },
     {
       "TableName": "AMEConciseReqCountByMonthProductCustomerNameSubscriptionId",
+      "enabled": "false",
       "Description": "Request counts by month, product, customer name, and subscription ID",
       "Columns": [
         {
@@ -135,10 +112,6 @@
         {
           "ColumnName": "Product",
           "$ref": "#/definitions/Product"
-        },
-        {
-          "ColumnName": "CustomerName",
-          "$ref": "#/definitions/CustomerName"
         },
         {
           "ColumnName": "SubscriptionId",
@@ -156,6 +129,7 @@
     },
     {
       "TableName": "AMEConciseReqCountByMonthProductResourceCustomerNameTop",
+      "enabled": "false",
       "Description": "Top request counts by month, product, resource, and customer name",
       "Columns": [
         {
@@ -175,10 +149,6 @@
           "$ref": "#/definitions/Resource"
         },
         {
-          "ColumnName": "CustomerName",
-          "$ref": "#/definitions/CustomerName"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         }
@@ -186,6 +156,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProduct",
+      "enabled": "true",
       "Description": "Subscription, request, and CCID counts by month and product",
       "Columns": [
         {
@@ -195,10 +166,6 @@
         {
           "ColumnName": "Product",
           "$ref": "#/definitions/Product"
-        },
-        {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
         },
         {
           "ColumnName": "RequestCount",
@@ -212,6 +179,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductApiVersion",
+      "enabled": "false",
       "Description": "Subscription, request, and CCID counts by month, product, and API version",
       "Columns": [
         {
@@ -227,10 +195,6 @@
           "$ref": "#/definitions/ApiVersion"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -242,6 +206,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductCustomerName",
+      "enabled": "false",
       "Description": "Subscription, request, and CCID counts by month, product, and customer name",
       "Columns": [
         {
@@ -251,10 +216,6 @@
         {
           "ColumnName": "Product",
           "$ref": "#/definitions/Product"
-        },
-        {
-          "ColumnName": "CustomerName",
-          "$ref": "#/definitions/CustomerName"
         },
         {
           "ColumnName": "RequestCount",
@@ -268,6 +229,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductCustomerNameTrack2",
+      "enabled": "false",
       "Description": "Track 2 subscription, request, and CCID counts by month, product, and customer name",
       "Columns": [
         {
@@ -277,10 +239,6 @@
         {
           "ColumnName": "Product",
           "$ref": "#/definitions/Product"
-        },
-        {
-          "ColumnName": "CustomerName",
-          "$ref": "#/definitions/CustomerName"
         },
         {
           "ColumnName": "RequestCount",
@@ -294,6 +252,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductHttpMethod",
+      "enabled": "true",
       "Description": "Subscription, request, and CCID counts by month, product, and HTTP method",
       "Columns": [
         {
@@ -309,10 +268,6 @@
           "$ref": "#/definitions/HttpMethod"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -324,6 +279,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductOS",
+      "enabled": "true",
       "Description": "Subscription, request, and CCID counts by month, product, and operating system",
       "Columns": [
         {
@@ -339,10 +295,6 @@
           "$ref": "#/definitions/OS"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -354,6 +306,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductProvider",
+      "enabled": "false",
       "Description": "Subscription, request, and CCID counts by month, product, and provider",
       "Columns": [
         {
@@ -369,10 +322,6 @@
           "$ref": "#/definitions/Provider"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -384,6 +333,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderApiVersion",
+      "enabled": "false",
       "Description": "Subscription, request, and CCID counts by month, product, provider, and API version",
       "Columns": [
         {
@@ -403,10 +353,6 @@
           "$ref": "#/definitions/ApiVersion"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -418,6 +364,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderPUT",
+      "enabled": "false",
       "Description": "PUT operation subscription, request, and CCID counts by month, product, and provider",
       "Columns": [
         {
@@ -433,10 +380,6 @@
           "$ref": "#/definitions/Provider"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -448,6 +391,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo",
+      "enabled": "true",
       "Description": "Subscription, request, and CCID counts by month, product, provider, and track info",
       "Columns": [
         {
@@ -467,10 +411,6 @@
           "$ref": "#/definitions/TrackInfo"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -482,6 +422,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion",
+      "enabled": "true",
       "Description": "Subscription, request, and CCID counts by month, product, provider, track info, and API version",
       "Columns": [
         {
@@ -505,10 +446,6 @@
           "$ref": "#/definitions/ApiVersion"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -520,6 +457,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT",
+      "enabled": "true",
       "Description": "PUT operation subscription, request, and CCID counts by month, product, provider, and track info",
       "Columns": [
         {
@@ -539,10 +477,6 @@
           "$ref": "#/definitions/TrackInfo"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -554,6 +488,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductResource",
+      "enabled": "false",
       "Description": "Subscription, request, and CCID counts by month, product, and resource",
       "Columns": [
         {
@@ -573,10 +508,6 @@
           "$ref": "#/definitions/Resource"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -588,6 +519,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCCIDCountByMonthProductTrackInfo",
+      "enabled": "true",
       "Description": "Subscription, request, and CCID counts by month, product, and track info",
       "Columns": [
         {
@@ -603,10 +535,6 @@
           "$ref": "#/definitions/TrackInfo"
         },
         {
-          "ColumnName": "CCIDCount",
-          "$ref": "#/definitions/CCIDCount"
-        },
-        {
           "ColumnName": "RequestCount",
           "$ref": "#/definitions/RequestCount"
         },
@@ -618,6 +546,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCountByMonthProductLanguageVersion",
+      "enabled": "false",
       "Description": "Subscription and request counts by month, product, language version, and track info",
       "Columns": [
         {
@@ -648,6 +577,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCountByMonthProductMinorLanguageVersion",
+      "enabled": "true",
       "Description": "Subscription and request counts by month, product, track info, and minor language version",
       "Columns": [
         {
@@ -678,6 +608,7 @@
     },
     {
       "TableName": "AMEConciseSubReqCountByMonthProductPatchLanguageVersion",
+      "enabled": "true",
       "Description": "Subscription and request counts by month, product, track info, patch, and minor language versions",
       "Columns": [
         {
@@ -712,6 +643,7 @@
     },
     {
       "TableName": "AMEGoSDKReqCountBySubscriptionIdCustomerDateVersion",
+      "enabled": "false",
       "Description": "Go SDK request counts by subscription ID, customer, date, and version details",
       "Columns": [
         {
@@ -746,6 +678,7 @@
     },
     {
       "TableName": "AMEGoSDKReqCountBySubscriptionIdCustomerDateVersionNew",
+      "enabled": "false",
       "Description": "Go SDK request and subscription counts by date and version details (new version)",
       "Columns": [
         {
@@ -780,6 +713,7 @@
     },
     {
       "TableName": "AMEGoSDKReqCountCustomerDataByMonth",
+      "enabled": "true",
       "Description": "Go SDK customer request counts aggregated by month",
       "Columns": [
         {
@@ -810,6 +744,7 @@
     },
     {
       "TableName": "AMEGoSDKSubCountCustomerDataByMonthPackageName",
+      "enabled": "true",
       "Description": "Go SDK subscription counts by month and package name",
       "Columns": [
         {
@@ -832,6 +767,7 @@
     },
     {
       "TableName": "AMEGoSDKSubCountCustomerDataByMonthTrackInfo",
+      "enabled": "true",
       "Description": "Go SDK subscription counts by month and track info",
       "Columns": [
         {
@@ -850,6 +786,7 @@
     },
     {
       "TableName": "AMEGoSDKSubCountCustomerDataByMonthVersion",
+      "enabled": "true",
       "Description": "Go SDK subscription counts by month and Go version",
       "Columns": [
         {
@@ -869,32 +806,56 @@
   ],
   "definitions": {
     "Month": {
-      "title": "The month of the data in YYYY-MM format",
-      "description": "The month of the data in YYYY-MM format"
+      "title": "The month of the data in YYYY-MM-01 format",
+      "description": "The month of the data in YYYY-MM-01 format",
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-01$"
     },
     "Product": {
       "title": "Product",
-      "description": "Azure SDK product name"
-    },
-    "CustomerName": {
-      "title": "Customer Name", 
-      "description": "Name of the customer organization"
+      "description": "Azure SDK product name",
+      "type": "string",
+      "enum": [
+        ".Net Code-gen",
+        ".Net Fluent",
+        "Ansible",
+        "AzureCLI",
+        "AzurePowershell",
+        "Go-SDK",
+        "Java Fluent Lite",
+        "Java Fluent Premium",
+        "JavaScript",
+        "JavaScript (Node.JS)",
+        "JavaScript RLC",
+        "PHP-SDK",
+        "Python-SDK",
+        "Ruby-SDK",
+        "Rust",
+        "Terraform",
+        "VS Code Azure Extension"
+      ]
     },
     "TrackInfo": {
       "title": "Track Info",
-      "description": "SDK track information (Track 1 or Track 2)"
-    },
-    "CCID": {
-      "title": "CCID",
-      "description": "Customer Correlation ID for tracking"
+      "description": "SDK track information (Track 1 or Track 2)",
+      "type": "string",
+      "enum": [
+        "Track1",
+        "Track2"
+      ]
     },
     "RequestCount": {
       "title": "Request Count",
-      "description": "Number of API requests made"
+      "description": "Number of API requests made",
+      "type": "integer",
+      "minimum": 0
     },
     "SubscriptionId": {
       "title": "Subscription ID",
-      "description": "Azure subscription identifier"
+      "description": "Azure subscription identifier",
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
     },
     "SubscriptionName": {
       "title": "Subscription Name",
@@ -906,31 +867,82 @@
     },
     "Provider": {
       "title": "Provider",
-      "description": "Azure resource provider name"
+      "description": "Azure resource provider name",
+      "type": "string",
+      "enum": [
+        "Microsoft.Compute",
+        "Microsoft.Storage",
+        "Microsoft.Network",
+        "Microsoft.Web",
+        "Microsoft.Sql",
+        "Microsoft.KeyVault",
+        "Microsoft.Resources",
+        "Microsoft.ContainerService",
+        "Microsoft.DocumentDB",
+        "Microsoft.Authorization"
+      ]
     },
     "Resource": {
       "title": "Resource",
-      "description": "Azure resource type"
-    },
-    "CCIDCount": {
-      "title": "CCID Count",
-      "description": "Number of unique Customer Correlation IDs"
+      "description": "Azure resource type",
+      "type": "string",
+      "enum": [
+        "virtualMachines",
+        "storageAccounts",
+        "virtualNetworks",
+        "webApps",
+        "sqlServers",
+        "keyVaults",
+        "resourceGroups",
+        "kubernetesClusters",
+        "cosmosDbAccounts",
+        "roleAssignments"
+      ]
     },
     "SubscriptionCount": {
       "title": "Subscription Count",
-      "description": "Number of unique subscriptions"
+      "description": "Number of unique subscriptions",
+      "type": "integer",
+      "minimum": 0
     },
     "ApiVersion": {
       "title": "API Version",
-      "description": "Version of the Azure API being used"
+      "description": "Version of the Azure API being used",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(-preview)?$",
+      "enum": [
+        "2021-04-01",
+        "2021-02-01",
+        "2020-12-01",
+        "2020-06-01",
+        "2019-08-01",
+        "2018-06-01"
+      ]
     },
     "HttpMethod": {
       "title": "HTTP Method",
-      "description": "HTTP method used for the request (GET, POST, PUT, etc.)"
+      "description": "HTTP method used for the request (GET, POST, PUT, etc.)",
+      "type": "string",
+      "enum": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS"
+      ]
     },
     "OS": {
       "title": "Operating System",
-      "description": "Operating system of the client making the request"
+      "description": "Operating system of the client making the request",
+      "type": "string",
+      "enum": [
+        "Windows",
+        "Linux",
+        "MacOS",
+        "Unknown"
+      ]
     },
     "LanguageVersion": {
       "title": "Language Version",
@@ -958,19 +970,35 @@
     },
     "IsTrack2": {
       "title": "Is Track 2",
-      "description": "Boolean indicating if this is Track 2 SDK"
+      "description": "Boolean indicating if this is Track 2 SDK",
+      "type": "boolean"
     },
     "RequestsDate": {
       "title": "Requests Date",
-      "description": "Date when the requests were made"
+      "description": "Date when the requests were made in YYYY-MM-01 format",
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-01$"
     },
     "RequestCounts": {
       "title": "Request Counts",
-      "description": "Number of API requests made (alternative name)"
+      "description": "Number of API requests made (alternative name)",
+      "type": "integer",
+      "minimum": 0
     },
     "SubscriptionID": {
       "title": "Subscription ID",
       "description": "Azure subscription identifier (alternative format)"
+    },
+    "CCID": {
+      "title": "CCID",
+      "description": "Customer Correlation ID for tracking"
+    },
+    "CCIDCount": {
+      "title": "CCID Count",
+      "description": "Number of unique Customer Correlation IDs",
+      "type": "integer",
+      "minimum": 0
     }
   }
 }
