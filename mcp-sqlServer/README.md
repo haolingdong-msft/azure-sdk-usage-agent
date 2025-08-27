@@ -1,42 +1,22 @@
-# SQL Query MCP Server for Azure Functions
+# Azure SQL MCP Server - Intelligent Natural Language Database Querying
 
-This repo contains a refactored MCP server that provides intelligent SQL querying capabilities for Azure SQL Server data. The server accepts natural language questions and converts them into appropriate SQL queries, making database interactions more accessible to users.
+This repository contains a sophisticated Model Context Protocol (MCP) server that provides intelligent SQL querying capabilities for Azure SQL Server data. The server accepts natural language questions and converts them into appropriate SQL queries, making database interactions accessible to users without SQL expertise.
 
-## 🚀 新功能亮点：验证优先查询流程
+### 🔄 Work Flow 
 
-### ⚡ 核心改进
-- **🔍 预验证机制**: 先验证SQL生成，再连接数据库
-- **🚀 快速失败**: 无效查询立即返回，无需等待数据库连接
-- **💡 智能建议**: 提供具体的查询改进建议和示例
-- **📊 详细分析**: 显示表选择、列选择、过滤条件等详细信息
-
-### 🔄 流程对比
-
-**传统流程:**
+**Validation-First Flow:**
 ```
-用户问题 → 解析SQL → 连接数据库 → 执行查询 → 返回结果
-          ↘ 如果失败 → 浪费连接时间
+User Question → 🔍 Validate & Generate SQL → ✅ Pass → 🔗 Connect to Database → Execute Query → Return Results
+                                        ↘ ❌ Fail → Immediately Return Error & Suggestions
 ```
 
-**验证优先流程:**
-```
-用户问题 → 🔍验证&生成SQL → ✅通过 → 🔗连接数据库 → 执行查询 → 返回结果
-                          ↘ ❌失败 → 立即返回错误和建议
-```
+## 🤖 Natural Language Querying
 
-## 📚 完整文档
-
-- 📖 **[验证优先流程详细说明](README_VALIDATION_FLOW.md)** - 深入了解新架构
-- 🚀 **[快速开始指南](QUICK_START.md)** - 立即开始使用
-- 🧪 **[功能演示](demo_validation_flow.py)** - 运行完整功能演示
-
-## Features
-
-### 🤖 Natural Language Querying
+### Intelligent Query Processing
 - Ask questions in plain English: "Show me the top 10 customers by request count"
 - Automatic table and column detection based on question context
 - Smart filtering and sorting based on query intent
-- **NEW**: 预验证机制确保查询正确性
+- Pre-validation mechanism ensures query correctness
 
 ### 📊 Multiple Query Methods
 - **Natural Language**: `mssqlQuery()` - For everyday users (with validation)
@@ -45,180 +25,543 @@ This repo contains a refactored MCP server that provides intelligent SQL queryin
 - **Custom SQL**: `executeCustomSQLMSSQL()` - For advanced users with safety checks
 - **Auth Validation**: `validateAzureAuthMSSQL()` - Check Azure authentication
 
-### 🔒 Security & Safety
-- SQL injection protection
-- Azure AD authentication
-- Read-only access (SELECT statements only)
-- **NEW**: Pre-execution validation and error prevention
-- Comprehensive error handling
-
-### 📈 Enhanced Responses
-- Structured JSON responses with metadata
-- Row counts and execution details
-- **NEW**: Validation information and pre-check details
-- Helpful error messages and suggestions
-
 ## 🎯 Quick Start Examples
 
-### 验证优先查询（推荐）
+### Natural Language Query Examples
 ```python
-# 1. 先验证查询（快速，无需连接数据库）
-validation = await validateQueryMSSQL("Show me Go-SDK request counts this month")
-if validation['valid']:
-    print(f"Generated SQL: {validation['generated_sql']}")
-    
-    # 2. 验证通过后执行查询
-    result = await mssqlQuery("Show me Go-SDK request counts this month")
-    print(f"Data: {result['data']}")
-```
-
-### 自然语言查询示例
-```python
-# Go SDK 专用查询
+# Go SDK specific queries
 await mssqlQuery("Show me Go-SDK request counts this month")
 await mssqlQuery("Top Go packages by usage")
 
-# 产品对比分析
+# Product comparison analysis
 await mssqlQuery("Top 10 Azure SDKs by request count")
 await mssqlQuery("Python-SDK vs Java-SDK usage comparison")
 
-# 时间序列分析
+# Time series analysis
 await mssqlQuery("Request trends for 2024")
 await mssqlQuery("This month vs last month Azure SDK usage")
 
-# 多维度过滤
+# Multi-dimensional filtering
 await mssqlQuery("Windows users of Python-SDK")
 await mssqlQuery("GET requests for JavaScript SDK")
 ```
 
-### 其他功能
+### Additional Features
 ```python
-# 发现可用数据
+# Discover available data
 await listTablesMSSQL()
 
-# 验证Azure认证
+# Validate Azure authentication
 await validateAzureAuthMSSQL()
 
-# 高级自定义SQL（带安全检查）
+# Advanced custom SQL (with safety checks)
 await executeCustomSQLMSSQL("SELECT TOP 5 Product, RequestCount FROM AMEConciseSubReqCCIDCountByMonthProduct ORDER BY RequestCount DESC")
 ```
 
-### 🧪 测试新功能
-```bash
-# 运行验证流程测试
-python test_validation_flow.py
+## 🔧 Technical Implementation
 
-# 运行完整功能演示
-python demo_validation_flow.py
+### REST API Architecture (ODBC-Free)
+
+This implementation is completely **ODBC-free** and uses REST APIs for Azure SQL connectivity:
+
+#### 🔐 Azure AD Authentication
+- **Password-Free Access**: Uses DefaultAzureCredential
+- **Multiple Auth Methods**: Supports Managed Identity, Azure CLI, environment variables
+- **High Security**: No need to store passwords in code
+
+### Available Tools
+
+#### 1. `sqlQueryREST` / `mssqlQuery`
+**Execute natural language SQL queries**
+
+```python
+# Example usage
+result = await mssqlQuery("Show Python-SDK usage this month")
 ```
 
-## Running MCP server as custom handler on Azure Functions
+**Features**:
+- Parses natural language questions
+- Automatically generates SQL queries
+- Executes queries and returns results
+- Intelligently handles product, time, and Track filtering conditions
 
-Recently Azure Functions released the [Functions MCP extension](https://techcommunity.microsoft.com/blog/appsonazureblog/build-ai-agent-tools-using-remote-mcp-with-azure-functions/4401059), allowing developers to build MCP servers using Functions programming model, which is essentially Function's event-driven framework, and host them remotely on the serverless platform.
+#### 2. `listTablesREST` / `listTablesMSSQL`
+**List all available tables and their structure**
 
-For those who have already built servers with [Anthropic's MCP SDKs](https://github.com/modelcontextprotocol/servers?tab=readme-ov-file#model-context-protocol-servers), it's also possible to host the servers on Azure Functions by running them as _custom handlers_, which are lightweight web servers that receive events from the Functions host. They allow you to host your already-built MCP servers with minimal code change and benefit from Function's bursty scale, serverless pricing model, and security features.
+```python
+# Example usage
+result = await listTablesMSSQL()
+```
 
-This repo focuses on the second hosting scenario:  
+**Features**:
+- Shows all enabled tables
+- Detailed column information and types
+- Available enumeration values (products, providers, operating systems, etc.)
 
-<div align="center">
-  <img src="./media/weather_server.png" alt="Diagram showing hosting of weather server built with official MCP SDKs." width="500">
-</div>
+#### 3. `validateAzureAuthREST` / `validateAzureAuthMSSQL`
+**Validate Azure AD authentication**
 
-More generally speaking, you can leverage custom handlers to host apps built with your choice of frameworks and SDKs on Azure Functions:
+```python
+# Example usage
+result = await validateAzureAuthMSSQL()
+```
 
-<div align="center">
-  <img src="./media/function_hosting.png" alt="Diagram showing hosting of Function app and custom handler apps." width="500">
-</div>
+**Features**:
+- Tests SQL database access tokens
+- Tests Azure Management API tokens
+- Provides authentication troubleshooting suggestions
 
-## Prerequisites
+#### 4. `executeCustomSQLREST` / `executeCustomSQLMSSQL`
+**Execute custom SQL queries**
 
-You'll need an [Azure subscription](../guides/developer/azure-developer-guide.md#understanding-accounts-subscriptions-and-billing). If you don't already have an account, [create a free one](https://azure.microsoft.com/free/dotnet/) before you begin.
+```python
+# Example usage
+result = await executeCustomSQLMSSQL("SELECT TOP 10 Product, RequestCount FROM AMEConciseSubReqCCIDCountByMonthProduct ORDER BY RequestCount DESC")
+```
 
-Ensure you have the following installed:
+**Features**:
+- Directly executes SQL SELECT statements
+- SQL injection protection
+- Only allows SELECT operations
 
-* [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
-* [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript)
-* [Visual Studio Code](https://code.visualstudio.com/)
-* [Azure Functions extension on Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
+## 🛠️ Installation and Setup
 
-### Run the server locally
+### Prerequisites
+- Python 3.8+
+- Azure subscription with SQL Database access
+- Azure CLI (for development) or appropriate service principal (for production)
 
-1. Clone the repo and open the sample in Visual Studio Code
+### Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-    ```shell
-    git clone https://github.com/Azure-Samples/mcp-sdk-functions-hosting-python.git
-    ```
+**Key dependencies:**
+- `httpx` - HTTP client for REST API calls
+- `azure-identity` - Azure AD authentication
+- `mcp[cli]>=1.5.0` - Model Context Protocol framework
 
-1. Create a virtual environment and install the packages in requirements.txt. On Visual Studio Code, this can be done easily by opening command palette (`Ctrl+Shift+P` / `Cmd+Shift+P`), searching for **Python: Create Environment**, and selecting **Venv**
-1. In the root directory, activate the virtual environment
+### Environment Variables
+```bash
+export SQL_SERVER="azuresdkbi-server.database.windows.net"
+export SQL_DATABASE="azuresdkbi"
+export AZURE_SUBSCRIPTION_ID="your-subscription-id"
+export AZURE_RESOURCE_GROUP="your-resource-group"
+export FUNCTIONS_CUSTOMHANDLER_PORT="8080"
+```
 
-    **macOS/Linux:**
+### Authentication Setup
 
-    ```bash
-    source .venv/bin/activate
-    ```
+#### For Development (Azure CLI)
+```bash
+az login
+```
 
-   **Windows Command Prompt:**
-  
-   ```cmd
-   .venv\Scripts\activate.bat
-   ```
+#### For Production (Environment Variables)
+```bash
+export AZURE_TENANT_ID="your-tenant-id"
+export AZURE_CLIENT_ID="your-client-id"
+export AZURE_CLIENT_SECRET="your-client-secret"
+```
 
-1. Run `func start`
-1. Open _mcp.json_ (in the _vscode_ directory)
-1. Start the server by selecting the _Start_ button above the **local-mcp-server**
-1. Click on the Copilot icon at the top to open chat, and then change to _Agent_ mode in the question window.
-1. Ask "What is the weather in NYC?" Copilot should call one of the weather tools to help answer this question.
+#### For Azure Functions (Managed Identity)
+- No additional configuration needed
+- Azure Functions automatically provides Managed Identity
 
-### Deploy
+## 🚀 Deployment Options
 
-In the root directory, and run `azd up`. This command will create and deploy the app, plus other required resources.
+### 1. Local Development
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-When the command finishes, your terminal will display output similar to the following:
+# Start the server
+func start
+# or
+python mssql_query_server.py
+```
 
-  ```shell
-  (✓) Done: Deploying service api
-  - Endpoint: https://{functionapp-name}.azurewebsites.net/
-  ```
+### 2. Azure Functions
+```bash
+# Deploy using Azure Functions Core Tools
+func azure functionapp publish <your-function-app-name>
+```
 
-### Connect to server on Visual Studio Code
+### 3. Azure Developer CLI (Recommended)
+```bash
+# One-command deployment
+azd up
+```
 
-1. After deployment completes, navigate to the Function App resource in the Azure portal, as you will need the key from there.
-1. Open _mcp.json_ in VS Code.
-1. Stop the local server by selecting the _Stop_ button above the **local-mcp-server**
-1. Start the remote server by selecting the _Start_ button above the **remote-mcp-server**
-1. VS Code will prompt you for the Function App name. Copy it from either the terminal output or the Portal.
-1. VS Code will next prompt you for the Function App key. Copy that from the _default_ key on the **Functions** -> **App keys** page in the Azure portal.
+This creates and deploys:
+- Function App with the MCP server
+- Required Azure resources
+- Proper networking and security configurations
 
->[!TIP]
->In addition to starting an MCP server in _mcp.json_, you can see output of a server by clicking _More..._ -> _Show Output_. The output provides useful information like why a connection might've failed.
+## 📊 Supported Query Types & Examples
 
-## Server authorization using Azure API Management (APIM)
+### Product-Related Queries
+```python
+# SDK usage analysis
+"Show me request counts for Go-SDK"
+"Top 10 products by usage" 
+"Python-SDK usage in 2024"
+"Compare Track1 vs Track2 for Python-SDK"
+```
 
-In addition to protecting server access through function keys, you can also add APIM in front of the Function app to add an extra layer of security. This sample leverages APIM's policy feature to redirect a client to authenticate with Entra ID before connecting to the MCP server. Specifically, this is achieved by creating two policies on the APIM resource that follow the [MCP authorization specification](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization#authorization-server-discovery). One policy checks access tokens from incoming requests, and if validation fails, returns a 404 with header containining the path to Protected Resource Metadata (PRM). Another policy returns the PRM, which a client can use to figure out the authorization server (Entra ID in this case) that provides access tokens to the MCP server.
+### Time-Based Filtering
+```python
+# Temporal analysis
+"Data for this month"
+"Usage in 2024-01"
+"Latest request counts"
+"Request trends for 2024"
+```
 
-To see the above in action, test connecting to the server using the APIM endpoint instead of the Function app endpoint:
+### Aggregation and Sorting
+```python
+# Statistical queries
+"Top 10 customers by requests"
+"Lowest usage products"
+"Most active subscriptions"
+"Which customers have more than 1000 requests?"
+```
 
-1. Open _mcp.json_ in VS Code
-1. Stop the **remote-mcp-server** or **local-mcp-server** servers if still running
-1. Start the **remote-mcp-server-apim** server
-1. VS Code will prompt you for the APIM resource name
-1. Click **Allow** when a window pops up saying the MCP Server wants to authenticate to Microsoft.
-1. Sign into your Microsoft account to connect to the server  
+### Multi-Dimensional Filtering
+```python
+# Complex filtering
+"Windows users of Python-SDK"
+"POST requests for Java SDK"
+"Microsoft.Compute provider usage"
+"JavaScript SDK usage by operating system"
+```
 
-### Support for other clients
+### Validation Examples
 
-Since Entra ID doesn't provide native support for DCR (Dynamic Client Registration) and PKCE (Proof Key for Code Exchange) today,the above authorization flow is only supported on VS Code. If you use other clients (like Claude or Cursor), the easier option is to access the MCP server using the Function App endpoint and access key. The other option is to try out an [experimental approach](https://github.com/localden/remote-auth-mcp-apim-py/) that provides a workaround, which also leverages APIM.
+#### Successful Validation
+```python
+# Query: "Show me Go-SDK request counts this month"
+{
+  "valid": true,
+  "generated_sql": "SELECT RequestsDate, RequestCount, PackageName, PackageVersion, IsTrack2 FROM AMEGoSDKReqCountCustomerDataByMonth WHERE RequestsDate LIKE '2025-08%' ORDER BY RequestCount DESC",
+  "table_used": "AMEGoSDKReqCountCustomerDataByMonth",
+  "columns_selected": ["RequestsDate", "RequestCount", "PackageName", "PackageVersion", "IsTrack2"],
+  "filters_applied": "RequestsDate LIKE '2025-08%'",
+  "ordering": "ORDER BY RequestCount DESC"
+}
+```
 
-## Next steps
+#### Failed Validation
+```python
+# Query: "Invalid query with nonsense"
+{
+  "valid": false,
+  "error": "Could not identify relevant filters for your question",
+  "suggestions": [
+    "Try asking about products, customers, or request counts",
+    "Include specific dates like '2024-01' or time periods",
+    "Mention specific products like 'Python-SDK' or 'Java Fluent Premium'",
+    "Ask for top/bottom N results"
+  ]
+}
+```
 
-### Find this sample in other languages
+## 🔍 Available Data Tables
 
-| Language (Stack) | Repo Location |
-|------------------|---------------|
-| C# (.NET) | [mcp-sdk-functions-hosting-dotnet](https://github.com/Azure-Samples/mcp-sdk-functions-hosting-dotnet) |
-| Node | [mcp-sdk-functions-hosting-node](https://github.com/Azure-Samples/mcp-sdk-functions-hosting-node) |
+The system supports multiple Azure SDK usage data tables:
 
-### Bring-your-own MCP server
+### 1. **AMEGoSDKReqCountCustomerDataByMonth**
+- **Purpose**: Go SDK specific request data
+- **Key Columns**: RequestsDate, RequestCount, PackageName, PackageVersion, IsTrack2
+- **Use Cases**: Go SDK usage analysis, Track2 migration tracking
 
-If you've already built an MCP server, follow the instructions in the document [Host bring-your-own (BYO) MCP servers on Azure Functions](https://github.com/Azure-Samples/mcp-sdk-functions-hosting-python/blob/main/BYOServer.md).
+### 2. **AMEConciseSubReqCCIDCountByMonthProduct** 
+- **Purpose**: Subscription and request statistics by product
+- **Key Columns**: Month, Product, RequestCount, SubscriptionCount
+- **Use Cases**: Product comparison, usage trends
+
+### 3. **AMEConciseSubReqCCIDCountByMonthProductOS**
+- **Purpose**: Usage statistics by operating system
+- **Key Columns**: Month, Product, OperatingSystem, RequestCount
+- **Use Cases**: OS-specific usage analysis
+
+### 4. **AMEConciseSubReqCCIDCountByMonthProductHttpMethod**
+- **Purpose**: Request statistics by HTTP method
+- **Key Columns**: Month, Product, HttpMethod, RequestCount
+- **Use Cases**: API usage pattern analysis
+
+### 5. **Additional Tables**
+- Support for API versions, providers, resource types, and other dimensions
+- Complete schema available via `listTablesMSSQL()` tool
+
+## 📈 Response Format
+
+### Successful Query Response
+```json
+{
+  "success": true,
+  "query": "SELECT Month, Product, RequestCount FROM AMEConciseSubReqCCIDCountByMonthProduct WHERE Month LIKE '2025-08%' AND Product = 'Python-SDK' ORDER BY RequestCount DESC",
+  "data": [
+    {
+      "Month": "2025-08-01",
+      "Product": "Python-SDK", 
+      "RequestCount": 15420
+    }
+  ],
+  "row_count": 4,
+  "table_used": "AMEConciseSubReqCCIDCountByMonthProduct",
+  "validation_info": {
+    "pre_validated": true,
+    "columns_selected": ["Month", "Product", "RequestCount"],
+    "filters_applied": "Month LIKE '2025-08%' AND Product = 'Python-SDK'",
+    "ordering": "ORDER BY RequestCount DESC"
+  },
+  "connection_method": "REST API",
+  "server": "azuresdkbi-server.database.windows.net",
+  "database": "azuresdkbi"
+}
+```
+
+### Error Response
+```json
+{
+  "error": "Query validation failed",
+  "validation_error": "Could not identify relevant table for your question",
+  "suggestions": [
+    "Try asking about products, customers, or request counts",
+    "Include specific dates like '2024-01' or time periods", 
+    "Mention specific products like 'Python-SDK' or 'Go-SDK'",
+    "Ask for top/bottom N results"
+  ]
+}
+```
+
+## 🛡️ Security Features
+
+### SQL Injection Protection
+- Only SELECT statements allowed in custom SQL
+- Dangerous keywords (DROP, DELETE, INSERT, etc.) are blocked  
+- Parameterized query building for natural language queries
+- Input validation and sanitization
+
+### Azure AD Authentication
+- Password-free database access using DefaultAzureCredential
+- Support for multiple authentication methods:
+  - Managed Identity (recommended for production)
+  - Azure CLI (for development)
+  - Service Principal (environment variables)
+  - User-assigned managed identity
+
+### Access Control
+- Read-only database access (SELECT operations only)
+- Proper connection cleanup and resource management
+- Secure token-based authentication
+- Connection timeout and retry mechanisms
+
+## 📊 Performance Optimizations
+
+### Validation-First Benefits
+1. **Fast Failure**: Invalid queries return immediately without resource waste
+2. **Smart Caching**: Table structure information cached locally
+3. **Connection Reuse**: REST API connection optimization  
+4. **Step-by-Step Processing**: Clear processing stages for optimization
+
+### Connection Strategies
+- **Primary**: Direct Azure SQL Database REST API
+- **Fallback**: Azure Management API
+- **Emergency**: Mock data for service availability
+- **Intelligent Routing**: Automatic selection of best connection method
+
+## 🧪 Testing and Validation
+
+### Running Tests
+```bash
+# Test validation flow
+python test_validation_flow.py
+
+# Run complete feature demonstration  
+python demo_validation_flow.py
+
+# Validate Azure authentication
+curl -X POST "http://localhost:8080/validateAzureAuthMSSQL"
+
+# List available tables
+curl -X POST "http://localhost:8080/listTablesMSSQL"
+
+# Validate query without execution
+curl -X POST "http://localhost:8080/validateQueryMSSQL" \
+  -d '{"user_question": "Show me top 10 products"}'
+```
+
+### Debug Tools
+```bash
+# Check authentication status
+await validateAzureAuthMSSQL()
+
+# Explore available data
+await listTablesMSSQL()
+
+# Validate before execution
+await validateQueryMSSQL("your query here")
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Validation Failed | Query semantics unclear | Reference examples, use standard format |
+| Connection Failed | Azure authentication issue | Run `az login` to re-authenticate |
+| Permission Error | Database access rights | Check Azure RBAC settings |
+| Empty Results | Filters too restrictive | Simplify query conditions |
+
+### Error Categories
+
+#### Authentication Errors
+```bash
+# Re-authenticate with Azure CLI
+az login
+
+# Check subscription access
+az account show
+
+# Verify SQL server permissions
+az sql server show --name <server-name> --resource-group <rg-name>
+```
+
+#### Query Validation Errors
+- **Unclear Intent**: Rephrase question with specific keywords
+- **Table Not Found**: Use `listTablesMSSQL()` to see available tables
+- **Invalid Filters**: Check date formats and product names
+
+#### Connection Issues
+- **Network Problems**: Verify connectivity to Azure
+- **Firewall Rules**: Ensure SQL server allows your IP
+- **Service Outages**: Check Azure status page
+
+### Best Practices
+
+1. **Always Validate First**: Use `validateQueryMSSQL()` before executing
+2. **Check Suggestions**: Review `suggestions` field when validation fails
+3. **Use Standard Names**: Reference products as "Python-SDK", "Go-SDK", etc.
+4. **Date Formats**: Use "2024-01" or "this month" format
+5. **Clear Intent**: Include keywords like "top 10", "count", "usage"
+
+
+
+### VS Code Integration
+
+1. **Local Development**: Start server locally with `func start`
+2. **MCP Configuration**: Configure in `.vscode/mcp.json`
+3. **Agent Mode**: Use Copilot in Agent mode to interact with the server
+4. **Remote Deployment**: Deploy to Azure and connect remotely
+
+### APIM Integration (Optional)
+
+For additional security, deploy with Azure API Management (APIM):
+- **Entra ID Authentication**: Redirects clients to authenticate before connecting
+- **Protected Resource Metadata**: Follows MCP authorization specification
+- **Policy-Based Security**: Custom policies for access control
+
+## 🔗 Integration Examples
+
+### VS Code Copilot Integration
+```json
+{
+  "mcpServers": {
+    "local-mcp-server": {
+      "command": "func",
+      "args": ["start"],
+      "env": {
+        "FUNCTIONS_CUSTOMHANDLER_PORT": "8080"
+      }
+    }
+  }
+}
+```
+
+### Claude Desktop Integration
+```json
+{
+  "mcpServers": {
+    "azure-sql": {
+      "command": "python",
+      "args": ["mssql_query_server.py"],
+      "env": {
+        "SQL_SERVER": "your-server.database.windows.net",
+        "SQL_DATABASE": "your-database"
+      }
+    }
+  }
+}
+```
+
+## 📚 Additional Resources
+
+### Documentation Links
+- [Azure Functions Custom Handlers](https://docs.microsoft.com/azure/azure-functions/functions-custom-handlers)
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/)
+- [Azure SQL Database REST API](https://docs.microsoft.com/rest/api/sql/)
+- [Azure AD Authentication](https://docs.microsoft.com/azure/active-directory/develop/)
+
+### Sample Queries for Testing
+```python
+# Basic usage queries
+"Show me Python-SDK usage this month"
+"Top 10 products by request count"
+"Go SDK request trends for 2024"
+
+# Comparative analysis
+"Compare Python-SDK vs Java-SDK usage"
+"Track1 vs Track2 adoption rates"
+"Windows vs Linux usage patterns"
+
+# Time-based analysis  
+"Request counts for January 2024"
+"This month vs last month comparison"
+"Quarterly usage trends"
+
+# Advanced filtering
+"High-usage customers with more than 1000 requests"
+"GET requests for REST APIs"
+"Microsoft.Compute resource provider usage"
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Install dependencies: `pip install -r requirements.txt`
+4. Make your changes and add tests
+5. Run tests: `python test_validation_flow.py`
+6. Commit changes: `git commit -m 'Add amazing feature'`
+7. Push branch: `git push origin feature/amazing-feature`
+8. Submit a Pull Request
+
+### Code Standards
+- Follow PEP 8 style guidelines
+- Add comprehensive docstrings
+- Include unit tests for new features
+- Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
+
+## 🎉 Getting Started
+
+Ready to start using the Azure SQL MCP Server? Follow these simple steps:
+
+1. **Clone the repository**
+2. **Install dependencies**: `pip install -r requirements.txt`  
+3. **Configure Azure authentication**: `az login`
+4. **Set environment variables** for your SQL server
+5. **Start the server**: `func start`
+6. **Connect from VS Code** using the MCP configuration
+7. **Ask your first question**: "Show me the top 10 Azure SDK products by usage"
+
+Experience faster, more reliable data analysis with our validation-first query flow! 🚀
