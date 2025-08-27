@@ -9,7 +9,7 @@
         "description": {
             "defaultExecutablePath": "python",
             "workingDirectory": "",
-            "arguments": ["sqlQuery_rest_api.py"]
+            "arguments": ["mssql_query_server.py"]
         },
         "enableForwardingHttpRequest": true,
         "enableHttpProxyingRequest": true

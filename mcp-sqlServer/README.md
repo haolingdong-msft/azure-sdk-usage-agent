@@ -2,42 +2,114 @@
 
 This repo contains a refactored MCP server that provides intelligent SQL querying capabilities for Azure SQL Server data. The server accepts natural language questions and converts them into appropriate SQL queries, making database interactions more accessible to users.
 
+## 🚀 新功能亮点：验证优先查询流程
+
+### ⚡ 核心改进
+- **🔍 预验证机制**: 先验证SQL生成，再连接数据库
+- **🚀 快速失败**: 无效查询立即返回，无需等待数据库连接
+- **💡 智能建议**: 提供具体的查询改进建议和示例
+- **📊 详细分析**: 显示表选择、列选择、过滤条件等详细信息
+
+### 🔄 流程对比
+
+**传统流程:**
+```
+用户问题 → 解析SQL → 连接数据库 → 执行查询 → 返回结果
+          ↘ 如果失败 → 浪费连接时间
+```
+
+**验证优先流程:**
+```
+用户问题 → 🔍验证&生成SQL → ✅通过 → 🔗连接数据库 → 执行查询 → 返回结果
+                          ↘ ❌失败 → 立即返回错误和建议
+```
+
+## 📚 完整文档
+
+- 📖 **[验证优先流程详细说明](README_VALIDATION_FLOW.md)** - 深入了解新架构
+- 🚀 **[快速开始指南](QUICK_START.md)** - 立即开始使用
+- 🧪 **[功能演示](demo_validation_flow.py)** - 运行完整功能演示
+
 ## Features
 
 ### 🤖 Natural Language Querying
 - Ask questions in plain English: "Show me the top 10 customers by request count"
 - Automatic table and column detection based on question context
 - Smart filtering and sorting based on query intent
+- **NEW**: 预验证机制确保查询正确性
 
 ### 📊 Multiple Query Methods
-- **Natural Language**: `sqlQuery()` - For everyday users
-- **Table Discovery**: `listTables()` - Explore available data structures  
-- **Custom SQL**: `executeCustomSQL()` - For advanced users with safety checks
+- **Natural Language**: `mssqlQuery()` - For everyday users (with validation)
+- **Query Validation**: `validateQueryMSSQL()` - Validate before execution
+- **Table Discovery**: `listTablesMSSQL()` - Explore available data structures  
+- **Custom SQL**: `executeCustomSQLMSSQL()` - For advanced users with safety checks
+- **Auth Validation**: `validateAzureAuthMSSQL()` - Check Azure authentication
 
 ### 🔒 Security & Safety
 - SQL injection protection
 - Azure AD authentication
 - Read-only access (SELECT statements only)
+- **NEW**: Pre-execution validation and error prevention
 - Comprehensive error handling
 
 ### 📈 Enhanced Responses
 - Structured JSON responses with metadata
 - Row counts and execution details
+- **NEW**: Validation information and pre-check details
 - Helpful error messages and suggestions
 
-## Quick Start Examples
+## 🎯 Quick Start Examples
 
+### 验证优先查询（推荐）
 ```python
-# Natural language queries
-await sqlQuery("Show me the top 10 customers by request count")
-await sqlQuery("What products were used in 2024-01?") 
-await sqlQuery("Which customers have more than 1000 requests?")
+# 1. 先验证查询（快速，无需连接数据库）
+validation = await validateQueryMSSQL("Show me Go-SDK request counts this month")
+if validation['valid']:
+    print(f"Generated SQL: {validation['generated_sql']}")
+    
+    # 2. 验证通过后执行查询
+    result = await mssqlQuery("Show me Go-SDK request counts this month")
+    print(f"Data: {result['data']}")
+```
 
-# Discover available data
-await listTables()
+### 自然语言查询示例
+```python
+# Go SDK 专用查询
+await mssqlQuery("Show me Go-SDK request counts this month")
+await mssqlQuery("Top Go packages by usage")
 
-# Advanced custom SQL (with safety checks)
-await executeCustomSQL("SELECT TOP 5 CustomerName, RequestCount FROM AMEConciseFiteredNewProductCCIDCustomer ORDER BY RequestCount DESC")
+# 产品对比分析
+await mssqlQuery("Top 10 Azure SDKs by request count")
+await mssqlQuery("Python-SDK vs Java-SDK usage comparison")
+
+# 时间序列分析
+await mssqlQuery("Request trends for 2024")
+await mssqlQuery("This month vs last month Azure SDK usage")
+
+# 多维度过滤
+await mssqlQuery("Windows users of Python-SDK")
+await mssqlQuery("GET requests for JavaScript SDK")
+```
+
+### 其他功能
+```python
+# 发现可用数据
+await listTablesMSSQL()
+
+# 验证Azure认证
+await validateAzureAuthMSSQL()
+
+# 高级自定义SQL（带安全检查）
+await executeCustomSQLMSSQL("SELECT TOP 5 Product, RequestCount FROM AMEConciseSubReqCCIDCountByMonthProduct ORDER BY RequestCount DESC")
+```
+
+### 🧪 测试新功能
+```bash
+# 运行验证流程测试
+python test_validation_flow.py
+
+# 运行完整功能演示
+python demo_validation_flow.py
 ```
 
 ## Running MCP server as custom handler on Azure Functions
