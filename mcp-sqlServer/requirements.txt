@@ -1,4 +1,3 @@
 httpx
 mcp[cli]>=1.5.0
-# pyodbc  # Commented out - not needed for REST API approach
 azure-identity
