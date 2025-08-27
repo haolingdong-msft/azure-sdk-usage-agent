@@ -5,6 +5,7 @@ import re
 from typing import Any, Dict, List, Optional
 from .models import QueryInfo
 from .schema_loader import SchemaLoader
+from .product_aliases import ProductAliasMapper
 
 
 class QueryParser:
@@ -12,6 +13,7 @@ class QueryParser:
     
     def __init__(self, schema_loader: SchemaLoader):
         self.schema_loader = schema_loader
+        self.product_mapper = ProductAliasMapper()
         self._enum_cache = {}
     
     def _get_enum_values(self, enum_name: str) -> List[str]:
@@ -39,6 +41,7 @@ class QueryParser:
             score = 0
             table_name = table_info.name.lower()
             description = table_info.description.lower()
+            columns = table_info.columns  # Define columns early
             
             # Score based on table name components
             if 'product' in query_lower and 'product' in table_name:
@@ -49,6 +52,14 @@ class QueryParser:
                 score += 2
             if 'go' in query_lower and 'gosdk' in table_name:
                 score += 3
+            # Enhanced product matching using alias mapper
+            if 'Product' in columns:
+                # Get available products for this table (from schema)
+                available_products = self._get_enum_values('Product') if hasattr(self, '_get_enum_values') else []
+                if available_products:
+                    matched_products = self.product_mapper.find_products_by_query(query_lower, available_products)
+                    if matched_products:
+                        score += 3  # High score for product match
             if 'request' in query_lower and ('req' in table_name or 'request' in description):
                 score += 1
             if 'count' in query_lower and 'count' in table_name:
@@ -66,8 +77,7 @@ class QueryParser:
             if 'provider' in query_lower and 'provider' in table_name:
                 score += 1
             
-            # Score based on column availability
-            columns = table_info.columns
+            # Score based on column availability (columns already defined above)
             if 'provider' in query_lower and 'Provider' in columns:
                 score += 1
             if 'resource' in query_lower and 'Resource' in columns:
@@ -191,13 +201,18 @@ class QueryParser:
         if 'this month' in query_lower and 'Month' in available_columns:
             conditions.append("Month LIKE '2025-08%'")
         
-        # Product filtering with enum support
+        # Product filtering with alias support
         if 'Product' in available_columns:
             product_enum = self._get_enum_values('Product')
-            for product in product_enum:
-                if product.lower() in query_lower:
-                    conditions.append(f"Product = '{product}'")
-                    break
+            matched_products = self.product_mapper.find_products_by_query(query_lower, product_enum)
+            
+            if matched_products:
+                if len(matched_products) == 1:
+                    conditions.append(f"Product = '{matched_products[0]}'")
+                else:
+                    # Multiple products matched, use OR condition
+                    product_conditions = [f"Product = '{p}'" for p in matched_products]
+                    conditions.append(f"({' OR '.join(product_conditions)})")
         
         # Track filtering with enum support
         if 'TrackInfo' in available_columns:
