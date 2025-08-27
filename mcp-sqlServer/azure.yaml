@@ -3,6 +3,14 @@
 name: python-mcp-sdk-functions-azd
 metadata:
   template: python-mcp-sdk-functions-azd@1.0.0
+
+infra:
+  provider: bicep
+  path: infra
+  options:
+    parameters:
+      location: East US 2 
+      resourceGroup: sdk-mgmt-bi-data 
 services:
   api:
     project: .
