@@ -192,16 +192,17 @@ class MCPTools:
 
     async def list_tables(self) -> Dict[str, Any]:
         """
-        List all available tables and their columns that can be queried via REST API for MS SQL Server.
+        List only enabled tables and their columns that can be queried via REST API for MS SQL Server.
         
         Returns:
-            A JSON object containing all available tables, their column information, and metadata.
+            A JSON object containing only enabled tables, their column information, and metadata.
         """
         try:
-            schema = self.schema_loader.load_table_schema()
+            # Get only enabled tables
+            enabled_tables_dict = self.schema_loader.get_enabled_tables()
             tables_info = []
             
-            for table_key, table_info in schema['tables'].items():
+            for table_key, table_info in enabled_tables_dict.items():
                 column_details = []
                 column_metadata = table_info.column_metadata
                 
@@ -225,15 +226,10 @@ class MCPTools:
                     "column_count": len(table_info.columns)
                 })
             
-            # Filter to show only enabled tables by default
-            enabled_tables = [t for t in tables_info if t['enabled']]
-            
             return {
                 "success": True,
-                "enabled_tables": enabled_tables,
-                "all_tables": tables_info,
+                "tables": tables_info,
                 "total_tables": len(tables_info),
-                "enabled_count": len(enabled_tables),
                 "available_products": self.schema_loader.get_enum_values('Product'),
                 "available_track_info": self.schema_loader.get_enum_values('TrackInfo'),
                 "available_http_methods": self.schema_loader.get_enum_values('HttpMethod'),
