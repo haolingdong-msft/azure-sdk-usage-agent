@@ -19,77 +19,36 @@ def create_mcp_server():
     
     # Register MCP tools
     @mcp.tool()
-    async def mssqlQuery(request: str):
+    async def parseUserQuery(user_question: str):
         """
-        Execute a SQL query based on a natural language question using REST API for MS SQL Server.
+        Parse a natural language question and extract table names, column names, and conditions for MS SQL Server.
 
         Args:
-            request: A natural language question about the data (e.g., "Show me the top 10 customers by request count", 
-                    "What products were used in 2024-01?", "Which customers have more than 1000 requests?")
+            user_question: A natural language question about the data (e.g., "Show me the top 10 customers by request count", 
+                         "What products were used in 2024-01?", "Which customers have more than 1000 requests?")
 
         Returns:
-            A JSON object containing the query results, generated SQL, or error information.
+            A JSON object containing the parsed query components: table name, columns, conditions, ordering, and limit.
         """
-        return await mcp_tools.execute_sql_query(request)
-
-    @mcp.tool() 
-    async def listTablesMSSQL():
-        """
-        List all available tables and their columns that can be queried via REST API for MS SQL Server.
-        
-        Returns:
-            A JSON object containing all available tables, their column information, and metadata.
-        """
-        return await mcp_tools.list_tables()
+        return await mcp_tools.parse_user_query(user_question)
 
     @mcp.tool()
-    async def validateAzureAuthMSSQL():
+    async def executeSQLQuery(table_name: str, columns: list, where_clause: str = "", order_clause: str = "", limit_clause: str = ""):
         """
-        Validate Azure AD authentication for MS SQL Server using REST approach.
-        
-        Returns:
-            A JSON object containing authentication test results.
-        """
-        return await mcp_tools.validate_azure_auth()
+        Execute a SQL query using the parsed components from parseUserQuery for MS SQL Server.
+        Includes Azure AD authentication validation.
 
-    @mcp.tool()
-    async def executeCustomSQLMSSQL(sql_query: str):
-        """
-        Execute a custom SQL query directly via REST API for MS SQL Server (for advanced users).
-        
         Args:
-            sql_query: A valid SQL SELECT statement to execute.
-            
-        Returns:
-            A JSON object containing the query results.
-        """
-        return await mcp_tools.execute_custom_sql(sql_query)
+            table_name: The name of the table to query
+            columns: List of column names to select
+            where_clause: SQL WHERE conditions (optional)
+            order_clause: SQL ORDER BY clause (optional)  
+            limit_clause: SQL LIMIT/TOP clause (optional)
 
-    @mcp.tool()
-    async def getEnumValuesMSSQL(field_name: str):
-        """
-        Get available enum values for a specific field to help with query construction for MS SQL Server.
-        
-        Args:
-            field_name: The name of the field to get enum values for (e.g., 'Product', 'TrackInfo', 'Provider')
-            
         Returns:
-            A JSON object containing the available enum values for the specified field.
+            A JSON object containing the query results, or error information if authentication fails.
         """
-        return await mcp_tools.get_enum_values(field_name)
-
-    @mcp.tool()
-    async def validateQueryMSSQL(user_question: str):
-        """
-        Validate a user question and show what SQL would be generated without executing it for MS SQL Server.
-        
-        Args:
-            user_question: The natural language question to validate
-            
-        Returns:
-            A JSON object containing the validation results and planned SQL query.
-        """
-        return await mcp_tools.validate_query(user_question)
+        return await mcp_tools.execute_sql_with_auth(table_name, columns, where_clause, order_clause, limit_clause)
     
     return mcp
 

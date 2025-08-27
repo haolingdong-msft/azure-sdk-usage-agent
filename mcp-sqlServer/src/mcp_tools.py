@@ -16,60 +16,135 @@ class MCPTools:
         self.schema_loader = schema_loader
         self.query_parser = QueryParser(schema_loader)
     
-    async def execute_sql_query(self, request: str) -> Dict[str, Any]:
+    async def parse_user_query(self, user_question: str) -> Dict[str, Any]:
         """
-        Execute a SQL query based on a natural language question using REST API for MS SQL Server.
+        Parse a natural language question and extract table names, column names, and conditions.
 
         Args:
-            request: A natural language question about the data (e.g., "Show me the top 10 customers by request count", 
-                    "What products were used in 2024-01?", "Which customers have more than 1000 requests?")
+            user_question: A natural language question about the data
 
         Returns:
-            A JSON object containing the query results, generated SQL, or error information.
+            A JSON object containing the parsed query components: table name, columns, conditions, ordering, and limit.
         """
-        
         try:
-            print(f"Received question: {request}")
+            print(f"Parsing user question: {user_question}")
             
-            # Step 1: Validate and generate SQL query first (without connecting to database)
-            print("🔍 Step 1: Validating query and generating SQL...")
-            validation_result = await self.validate_query(request)
+            # Parse the user question using existing query parser
+            query_info = self.query_parser.parse_user_query(user_question)
             
-            if not validation_result.get('valid', False):
-                print("❌ Query validation failed")
+            if 'error' in query_info:
                 return {
-                    "error": "Query validation failed",
-                    "validation_error": validation_result.get('error', 'Unknown validation error'),
-                    "suggestions": validation_result.get('suggestions', []),
-                    "connection_method": "REST API"
+                    "success": False,
+                    "error": query_info['error'],
+                    "suggestions": [
+                        "Try asking about products, or request counts",
+                        "Include specific dates like '2024-01' or time periods",
+                        "Mention specific products like 'Python-SDK' or 'Java Fluent Premium'",
+                        "Ask for top/bottom N results",
+                        "Filter by providers like 'Microsoft.Compute' or OS like 'Windows'"
+                    ]
                 }
             
-            sql_query = validation_result['generated_sql']
-            query_info = validation_result
+            return {
+                "success": True,
+                "table_name": query_info['table_name'],
+                "columns": query_info['columns'],
+                "where_clause": query_info['where_clause'] if query_info['where_clause'] != "1=1" else "",
+                "order_clause": query_info['order_clause'] if query_info['order_clause'] else "",
+                "limit_clause": query_info['limit_clause'] if query_info['limit_clause'] else "",
+                "original_question": user_question
+            }
             
-            print(f"✅ SQL validation successful: {sql_query}")
+        except Exception as e:
+            print(f"Error parsing query: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Error parsing your question: {str(e)}",
+                "suggestion": "Try asking questions like: 'Show me top 10 customers', 'What products were used this month?', 'Which customers have high request counts?'"
+            }
+
+    async def execute_sql_with_auth(self, table_name: str, columns: list, where_clause: str = "", order_clause: str = "", limit_clause: str = "") -> Dict[str, Any]:
+        """
+        Execute a SQL query using parsed components with Azure AD authentication validation.
+
+        Args:
+            table_name: The name of the table to query
+            columns: List of column names to select
+            where_clause: SQL WHERE conditions (optional)
+            order_clause: SQL ORDER BY clause (optional)
+            limit_clause: SQL LIMIT/TOP clause (optional)
+
+        Returns:
+            A JSON object containing the query results, or error information if authentication fails.
+        """
+        try:
+            # Step 1: Validate Azure AD authentication first
+            print("🔐 Step 1: Validating Azure AD authentication...")
+            auth_result = await self.validate_azure_auth()
             
-            # Step 2: Now that SQL is validated, attempt database connection and execution
-            print("🔗 Step 2: Connecting to database and executing query...")
+            if not auth_result.get('success', False):
+                print("❌ Azure AD authentication failed")
+                return {
+                    "success": False,
+                    "error": "Azure AD authentication failed",
+                    "auth_error": auth_result.get('error', 'Unknown authentication error'),
+                    "troubleshooting": auth_result.get('troubleshooting', [])
+                }
             
-            # Execute the query via REST API
+            print("✅ Azure AD authentication successful")
+            
+            # Step 2: Build SQL query from components
+            print("🔧 Step 2: Building SQL query from components...")
+            
+            # Validate inputs
+            if not table_name or not columns:
+                return {
+                    "success": False,
+                    "error": "Missing required parameters: table_name and columns are required"
+                }
+            
+            # Build columns string
+            if isinstance(columns, list):
+                columns_str = ', '.join(columns) if columns else '*'
+            else:
+                columns_str = str(columns)
+            
+            # Build SQL query
+            sql_parts = []
+            if limit_clause:
+                sql_parts.append(f"SELECT {limit_clause} {columns_str}")
+            else:
+                sql_parts.append(f"SELECT {columns_str}")
+            
+            sql_parts.append(f"FROM {table_name}")
+            
+            if where_clause and where_clause.strip():
+                sql_parts.append(f"WHERE {where_clause}")
+            
+            if order_clause and order_clause.strip():
+                sql_parts.append(order_clause)
+            
+            sql_query = ' '.join(sql_parts)
+            print(f"Generated SQL: {sql_query}")
+            
+            # Step 3: Execute the query
+            print("🚀 Step 3: Executing SQL query...")
             try:
                 query_result = await self.sql_client.execute_query_via_rest(sql_query)
             except Exception as api_error:
                 return {
+                    "success": False,
                     "error": f"Failed to execute query via REST API: {str(api_error)}",
                     "query": sql_query,
                     "connection_method": "REST API",
                     "troubleshooting": [
-                        "Check Azure AD authentication with validateAzureAuthMSSQL",
-                        "Verify SQL server and database names are correct",
-                        "Ensure your account has access to the SQL database",
                         "Check network connectivity to Azure SQL Database",
-                        "Verify subscription ID and resource group settings"
+                        "Verify subscription ID and resource group settings",
+                        "Ensure your account has proper database permissions"
                     ]
                 }
             
-            # Format query results
+            # Step 4: Format query results
             result_data = []
             
             for row in query_result.get("rows", []):
@@ -92,26 +167,27 @@ class MCPTools:
                 "query": sql_query,
                 "data": result_data,
                 "row_count": len(result_data),
-                "table_used": query_info.get('table_used', 'unknown'),
+                "table_used": table_name,
                 "connection_method": "REST API",
                 "data_source": metadata.get("source", "mssql_server"),
-                "query_type": metadata.get("query_type", "general"),
                 "server": SQL_SERVER,
                 "database": SQL_DATABASE,
-                "validation_info": {
-                    "pre_validated": True,
-                    "columns_selected": query_info.get('columns_selected', []),
-                    "filters_applied": query_info.get('filters_applied', ''),
-                    "ordering": query_info.get('ordering', ''),
-                    "limit": query_info.get('limit', '')
+                "authentication": "Azure AD validated",
+                "query_components": {
+                    "table": table_name,
+                    "columns": columns,
+                    "where": where_clause if where_clause else "None",
+                    "order": order_clause if order_clause else "None",
+                    "limit": limit_clause if limit_clause else "None"
                 }
             }
             
         except Exception as e:
-            print(f"Error processing query: {str(e)}")
+            print(f"Error executing SQL with auth: {str(e)}")
             return {
-                "error": f"Error processing your question: {str(e)}",
-                "suggestion": "Try asking questions like: 'Show me top 10 customers', 'What products were used this month?', 'Which customers have high request counts?'"
+                "success": False,
+                "error": f"Error executing query: {str(e)}",
+                "connection_method": "REST API"
             }
 
     async def list_tables(self) -> Dict[str, Any]:

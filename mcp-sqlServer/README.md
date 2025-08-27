@@ -4,10 +4,10 @@ A sophisticated Model Context Protocol (MCP) server that provides intelligent SQ
 
 ## 🔄 Work Flow 
 
-**Validation-First Approach:**
+**Two-Step Query Processing:**
 ```
-User Question → 🔍 Validate & Generate SQL → ✅ Pass → 🔗 Connect to Database → Execute Query → Return Results
-                                        ↘ ❌ Fail → Immediately Return Error & Suggestions
+User Question → 🔍 parseUserQuery → Extract Table/Columns/Conditions → � executeSQLQuery → Validate Auth → Execute → Return Results
+                ↘ ❌ Parse Error → Return Error & Suggestions                    ↘ ❌ Auth Fail → Return Auth Error
 ```
 
 ## ✨ Core Features
@@ -15,20 +15,39 @@ User Question → 🔍 Validate & Generate SQL → ✅ Pass → 🔗 Connect to 
 ### 🤖 Natural Language Querying
 - **Plain English Questions**: "Show me the top 10 customers by request count"
 - **Automatic Detection**: Smart table and column identification
-- **Query Validation**: Pre-validation ensures correctness before execution
+- **Two-Step Processing**: Parse first, then execute with authentication
 - **Intelligent Filtering**: Context-aware filtering and sorting
 
-### 🛠️ Multiple Query Methods
-- **`mssqlQuery()`** - Natural language queries with validation
-- **`listTablesMSSQL()`** - Explore available data structures
-- **`validateQueryMSSQL()`** - Validate queries before execution
-- **`executeCustomSQLMSSQL()`** - Advanced custom SQL with safety checks
-- **`validateAzureAuthMSSQL()`** - Check Azure authentication status
+## 🏗️ Architecture
+
+### Two-Step Query Design
+Our MCP server uses a clean two-step approach:
+
+1. **Parse Step** (`parseUserQuery`):
+   - Analyzes natural language input
+   - Identifies relevant tables and columns
+   - Generates WHERE, ORDER BY, and LIMIT clauses
+   - Returns structured query components
+   - No database connection required
+
+2. **Execute Step** (`executeSQLQuery`):
+   - Validates Azure AD authentication first
+   - Constructs SQL from parsed components
+   - Executes query via REST API
+   - Returns formatted results
+   - Handles authentication errors gracefully
+
+This separation provides better error handling, security, and flexibility for different use cases.
+
+### 🛠️ MCP Tools
+- **`parseUserQuery()`** - Parse natural language into table names, columns, and conditions
+- **`executeSQLQuery()`** - Execute SQL using parsed components with Azure AD authentication
 
 ### 🔐 Security & Performance
 - **ODBC-Free**: REST API architecture with Azure AD authentication
+- **Built-in Auth Validation**: Authentication checked before every query execution
 - **SQL Injection Protection**: Only SELECT operations allowed
-- **Validation-First**: Fast failure for invalid queries
+- **Two-Step Processing**: Parse first, then execute with validation
 - **Connection Optimization**: Smart connection strategies and caching
 
 ## 🚀 Quick Start
@@ -59,36 +78,42 @@ func start
 python mssql_query_server.py
 ```
 
-## 📝 Simple Examples
+## 📝 Usage Examples
 
-### Natural Language Queries
+### Two-Step Query Process
 ```python
-# Basic usage analysis
-await mssqlQuery("Show me Python-SDK usage this month")
-await mssqlQuery("Top 10 products by request count")
+# Step 1: Parse user question
+parse_result = await parseUserQuery("Show me Python-SDK usage this month")
+# Returns: {
+#   "success": True,
+#   "table_name": "AMEConciseSubReqCCIDCountByMonthProduct", 
+#   "columns": ["Product", "RequestCount", "YearMonth"],
+#   "where_clause": "Product LIKE '%Python-SDK%' AND YearMonth LIKE '2024-%'",
+#   "order_clause": "ORDER BY RequestCount DESC"
+# }
 
-# Comparative analysis  
-await mssqlQuery("Python-SDK vs Java-SDK usage comparison")
-await mssqlQuery("Windows users of Python-SDK")
-
-# Time-based queries
-await mssqlQuery("Request trends for 2024")
-await mssqlQuery("This month vs last month Azure SDK usage")
+# Step 2: Execute with parsed components
+result = await executeSQLQuery(
+    table_name=parse_result["table_name"],
+    columns=parse_result["columns"], 
+    where_clause=parse_result["where_clause"],
+    order_clause=parse_result["order_clause"]
+)
 ```
 
-### Discovery and Validation
+### Common Query Patterns
 ```python
-# Explore available data
-await listTablesMSSQL()
+# Basic usage analysis
+await parseUserQuery("Show me Python-SDK usage this month")
+await parseUserQuery("Top 10 products by request count")
 
-# Validate authentication
-await validateAzureAuthMSSQL()
+# Comparative analysis  
+await parseUserQuery("Python-SDK vs Java-SDK usage comparison")
+await parseUserQuery("Windows users of Python-SDK")
 
-# Validate query before execution
-await validateQueryMSSQL("Show me top 10 products")
-
-# Advanced custom SQL
-await executeCustomSQLMSSQL("SELECT TOP 5 Product, RequestCount FROM AMEConciseSubReqCCIDCountByMonthProduct ORDER BY RequestCount DESC")
+# Time-based queries
+await parseUserQuery("Request trends for 2024")
+await parseUserQuery("This month vs last month Azure SDK usage")
 ```
 
 ## 🎯 Getting Started
@@ -99,9 +124,10 @@ Ready to start? Follow these steps:
 2. **Authenticate with Azure**: `az login`
 3. **Set environment variables** for your SQL server
 4. **Start the server**: `func start`
-5. **Ask your first question**: "Show me the top 10 Azure SDK products by usage"
+5. **Parse your first question**: `await parseUserQuery("Show me the top 10 Azure SDK products by usage")`
+6. **Execute the query**: Use the parsed results with `executeSQLQuery()`
 
-Experience faster, more reliable data analysis with our validation-first query flow! 🚀
+Experience faster, more reliable data analysis with our two-step query processing! 🚀
 
 ## 🤝 Contributing
 
