@@ -500,3 +500,131 @@ class MCPTools:
                 "error": f"Error validating query: {str(e)}",
                 "connection_method": "pyodbc"
             }
+
+    async def ai_query_helper(self, user_question: str) -> Dict[str, Any]:
+        """
+        Helper function for AI agents to generate correct column names, table names, and conditions
+        based on user questions and available database schema.
+
+        Args:
+            user_question: A natural language question about the data
+
+        Returns:
+            A JSON object containing:
+            - available_tables: List of all available tables with descriptions
+            - suggested_table: Most relevant table for the question  
+            - available_columns: All columns for the suggested table
+            - column_metadata: Detailed information about each column
+            - enum_values: Valid values for enum columns
+            - example_conditions: Example WHERE clause conditions
+            - example_columns: Suggested columns based on question intent
+        """
+        try:
+            print(f"AI Query Helper analyzing: {user_question}")
+            
+            # Get all available tables
+            enabled_tables = self.schema_loader.get_enabled_tables()
+            
+            # Find the most relevant table using existing logic
+            suggested_table_name = self.query_parser.find_table_by_name(user_question)
+            
+            if not suggested_table_name and enabled_tables:
+                # Fallback to first available table
+                suggested_table_name = list(enabled_tables.values())[0].name
+            
+            # Prepare response structure
+            result = {
+                "success": True,
+                "user_question": user_question,
+                "available_tables": [],
+                "suggested_table": None,
+                "available_columns": [],
+                "column_metadata": {},
+                "enum_values": {},
+                "example_conditions": [],
+                "example_columns": []
+            }
+            
+            # Add all available tables info
+            for table_key, table_info in enabled_tables.items():
+                result["available_tables"].append({
+                    "name": table_info.name,
+                    "description": table_info.description,
+                    "key": table_key
+                })
+            
+            # Add detailed info for suggested table
+            if suggested_table_name:
+                table_info = self.schema_loader.get_table_info(suggested_table_name)
+                if table_info:
+                    result["suggested_table"] = {
+                        "name": table_info.name,
+                        "description": table_info.description
+                    }
+                    
+                    result["available_columns"] = table_info.columns
+                    result["column_metadata"] = table_info.column_metadata
+                    
+                    # Get enum values for columns that have them
+                    for column in table_info.columns:
+                        if column in table_info.column_metadata:
+                            meta = table_info.column_metadata[column]
+                            if meta.get('type') == 'enum':
+                                enum_name = meta.get('enum_name', column)
+                                enum_values = self.schema_loader.get_enum_values(enum_name)
+                                if enum_values:
+                                    result["enum_values"][column] = enum_values
+                    
+                    # Generate example conditions and suggested columns based on question
+                    query_lower = user_question.lower()
+                    
+                    # Suggest columns based on question intent
+                    if any(word in query_lower for word in ['count', 'number', 'requests']):
+                        if 'RequestCount' in table_info.columns:
+                            result["example_columns"].append('RequestCount')
+                    
+                    if any(word in query_lower for word in ['product', 'tool', 'sdk']):
+                        if 'Product' in table_info.columns:
+                            result["example_columns"].append('Product')
+                    
+                    if any(word in query_lower for word in ['customer', 'user']):
+                        if 'Customer' in table_info.columns:
+                            result["example_columns"].append('Customer')
+                    
+                    if any(word in query_lower for word in ['month', 'time', 'date', 'when']):
+                        if 'Month' in table_info.columns:
+                            result["example_columns"].append('Month')
+                    
+                    # If no specific columns identified, suggest key columns
+                    if not result["example_columns"]:
+                        # Add common important columns
+                        for col in ['Customer', 'Product', 'RequestCount', 'Month']:
+                            if col in table_info.columns:
+                                result["example_columns"].append(col)
+                    
+                    # Generate example conditions
+                    if 'this month' in query_lower and 'Month' in table_info.columns:
+                        result["example_conditions"].append("Month LIKE '2025-08%'")
+                    
+                    if any(word in query_lower for word in ['top', 'highest', 'most']) and 'RequestCount' in table_info.columns:
+                        result["example_conditions"].append("RequestCount > 100")
+                    
+                    if any(word in query_lower for word in ['recent', 'latest']) and 'Month' in table_info.columns:
+                        result["example_conditions"].append("Month >= '2025-01'")
+                    
+                    # Add enum-based example conditions
+                    for column, enum_values in result["enum_values"].items():
+                        if enum_values and len(enum_values) > 0:
+                            result["example_conditions"].append(f"{column} = '{enum_values[0]}'")
+                            if len(enum_values) > 1:
+                                result["example_conditions"].append(f"{column} IN ('{enum_values[0]}', '{enum_values[1]}')")
+            
+            return result
+            
+        except Exception as e:
+            print(f"Error in AI query helper: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Error in AI helper: {str(e)}",
+                "user_question": user_question
+            }
