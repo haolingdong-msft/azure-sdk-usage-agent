@@ -3,6 +3,9 @@ MS SQL Server Client using pyodbc with Managed Service Identity (MSI)
 """
 import pyodbc
 import os
+import asyncio
+import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any, Dict, List, Optional
 from azure.identity import DefaultAzureCredential
 from .config import (
@@ -28,6 +31,35 @@ class MSSQLMSIClient:
     def __init__(self):
         self.credential = DefaultAzureCredential()
         self.connection_string = self._build_msi_connection_string()
+        self._executor = ThreadPoolExecutor(max_workers=2)
+    
+    def _connect_sync(self, timeout: int = 30) -> pyodbc.Connection:
+        """
+        Synchronous connection method to be run in thread pool
+        
+        Args:
+            timeout: Connection timeout in seconds
+            
+        Returns:
+            pyodbc.Connection: Database connection
+        """
+        print(f"🌐 Connecting to SQL Server: {SQL_SERVER}")
+        print(f"🌐 Database: {SQL_DATABASE}")
+        print("🔐 Authentication: Managed Service Identity (MSI)")
+        print(f"⏱️  Connection timeout: {timeout} seconds")
+        
+        start_time = time.time()
+        
+        try:
+            # Create connection using MSI
+            connection = pyodbc.connect(self.connection_string)
+            elapsed_time = time.time() - start_time
+            print(f"✅ Successfully connected to SQL Server using MSI (took {elapsed_time:.2f}s)")
+            return connection
+        except Exception as e:
+            elapsed_time = time.time() - start_time
+            print(f"❌ Connection failed after {elapsed_time:.2f}s: {str(e)}")
+            raise
     
     
     def _build_msi_connection_string(self) -> str:
@@ -49,7 +81,8 @@ class MSSQLMSIClient:
             f"Database={SQL_DATABASE};"
             f"Encrypt=yes;"
             f"TrustServerCertificate=no;"
-            f"Connection Timeout=30;"
+            f"Connection Timeout=3;"
+            f"Login Timeout=3;"
             f"Authentication=ActiveDirectoryMSI"
         )
         
@@ -63,24 +96,54 @@ class MSSQLMSIClient:
             
         return connection_string
     
-    async def _get_connection(self) -> pyodbc.Connection:
+    async def _get_connection(self, timeout: int = 30) -> pyodbc.Connection:
         """
         Get or create a database connection with MSI authentication
         
+        Args:
+            timeout: Connection timeout in seconds
+            
         Returns:
             pyodbc.Connection: Database connection
         """
         try:
-            print(f"🌐 Connecting to SQL Server: {SQL_SERVER}")
-            print(f"🌐 Database: {SQL_DATABASE}")
-            print("🔐 Authentication: Managed Service Identity (MSI)")
+            print("🔄 Starting connection process...")
             
-            # Create connection using MSI
-            connection = pyodbc.connect(self.connection_string)
-            print("✅ Successfully connected to SQL Server using MSI")
+            # Create a progress task to show connection is in progress
+            progress_task = asyncio.create_task(self._show_connection_progress())
             
-            return connection
-            
+            try:
+                # Run the blocking connection operation in a thread pool with timeout
+                loop = asyncio.get_event_loop()
+                connection_future = loop.run_in_executor(
+                    self._executor, 
+                    lambda: self._connect_sync(timeout)
+                )
+                
+                # Wait for connection with timeout
+                connection = await asyncio.wait_for(connection_future, timeout=timeout)
+                
+                # Cancel progress indicator
+                progress_task.cancel()
+                try:
+                    await progress_task
+                except asyncio.CancelledError:
+                    pass
+                
+                return connection
+                
+            except asyncio.TimeoutError:
+                # Cancel progress indicator
+                progress_task.cancel()
+                try:
+                    await progress_task
+                except asyncio.CancelledError:
+                    pass
+                
+                error_msg = f"Connection timed out after {timeout} seconds"
+                print(f"⏰ {error_msg}")
+                raise Exception(error_msg)
+                
         except pyodbc.Error as e:
             error_msg = f"MSI database connection failed: {str(e)}"
             print(f"💥 {error_msg}")
@@ -89,19 +152,35 @@ class MSSQLMSIClient:
             print("   - Ensure the managed identity is assigned to this resource")
             print("   - Verify the managed identity has appropriate SQL database permissions")
             print("   - Check if AZURE_CLIENT_ID is correctly set for user-assigned identity")
+            print("   - Verify network connectivity to the SQL server")
+            print("   - Check if the SQL server allows connections from this IP/region")
             raise Exception(error_msg)
         except Exception as e:
             error_msg = f"Connection error: {str(e)}"
             print(f"💥 {error_msg}")
             raise Exception(error_msg)
     
+    async def _show_connection_progress(self):
+        """Show connection progress indicators"""
+        try:
+            dots = 0
+            while True:
+                dots = (dots + 1) % 4
+                progress_indicator = "🔄 Connecting" + "." * dots + " " * (3 - dots)
+                print(f"\r{progress_indicator}", end="", flush=True)
+                await asyncio.sleep(1)
+        except asyncio.CancelledError:
+            print("\r" + " " * 20 + "\r", end="", flush=True)  # Clear the progress line
+            raise
     
-    async def execute_query(self, sql_query: str) -> Dict[str, Any]:
+    
+    async def execute_query(self, sql_query: str, timeout: int = 30) -> Dict[str, Any]:
         """
         Execute SQL query using pyodbc with MSI authentication
         
         Args:
             sql_query: SQL query to execute
+            timeout: Connection timeout in seconds
             
         Returns:
             Dict[str, Any]: Query results with columns and rows
@@ -110,14 +189,58 @@ class MSSQLMSIClient:
         
         connection = None
         try:
-            # Get database connection
-            connection = await self._get_connection()
+            # Get database connection with timeout
+            connection = await self._get_connection(timeout)
             
+            # Execute query in thread pool to prevent blocking
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(
+                self._executor, 
+                self._execute_query_sync, 
+                connection, 
+                sql_query
+            )
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"Query execution error: {str(e)}"
+            print(f"💥 {error_msg}")
+            return {
+                "columns": [],
+                "rows": [],
+                "row_count": 0,
+                "status": "error", 
+                "error": error_msg
+            }
+        finally:
+            # Clean up connection
+            if connection:
+                try:
+                    connection.close()
+                    print("🔌 Database connection closed")
+                except:
+                    pass
+    
+    def _execute_query_sync(self, connection: pyodbc.Connection, sql_query: str) -> Dict[str, Any]:
+        """
+        Synchronous query execution to be run in thread pool
+        
+        Args:
+            connection: Database connection
+            sql_query: SQL query to execute
+            
+        Returns:
+            Dict[str, Any]: Query results
+        """
+        try:
             # Create cursor and execute query
             cursor = connection.cursor()
             print("📡 Executing SQL query...")
             
+            start_time = time.time()
             cursor.execute(sql_query)
+            execution_time = time.time() - start_time
             
             # Get column information
             columns = [column[0] for column in cursor.description] if cursor.description else []
@@ -139,15 +262,16 @@ class MSSQLMSIClient:
                     else:
                         row_dict[column_name] = value
                 result_rows.append(row_dict)
-            
+
             result = {
                 "columns": columns,
                 "rows": result_rows,
                 "row_count": len(result_rows),
-                "status": "success"
+                "status": "success",
+                "execution_time": execution_time
             }
             
-            print(f"✅ Query executed successfully. Returned {len(result_rows)} rows")
+            print(f"✅ Query executed successfully. Returned {len(result_rows)} rows in {execution_time:.2f}s")
             return result
             
         except pyodbc.Error as e:
@@ -160,29 +284,14 @@ class MSSQLMSIClient:
                 "status": "error",
                 "error": error_msg
             }
-        except Exception as e:
-            error_msg = f"Query execution error: {str(e)}"
-            print(f"💥 {error_msg}")
-            return {
-                "columns": [],
-                "rows": [],
-                "row_count": 0,
-                "status": "error", 
-                "error": error_msg
-            }
-        finally:
-            # Clean up connection
-            if connection:
-                try:
-                    connection.close()
-                    print("🔌 Database connection closed")
-                except:
-                    pass
     
-    def test_connection(self) -> Dict[str, Any]:
+    def test_connection(self, timeout: int = 30) -> Dict[str, Any]:
         """
         Test the MSI database connection
         
+        Args:
+            timeout: Connection timeout in seconds
+            
         Returns:
             Dict[str, Any]: Connection test result
         """
@@ -191,22 +300,28 @@ class MSSQLMSIClient:
         
         async def _test():
             try:
-                connection = await self._get_connection()
+                print(f"🧪 Testing connection with {timeout}s timeout...")
+                start_time = time.time()
+                connection = await self._get_connection(timeout)
+                connection_time = time.time() - start_time
                 connection.close()
                 return {
                     "status": "success",
-                    "message": "MSI connection test successful",
+                    "message": f"MSI connection test successful (took {connection_time:.2f}s)",
                     "server": SQL_SERVER,
                     "database": SQL_DATABASE,
-                    "authentication": "ActiveDirectoryMSI"
+                    "authentication": "ActiveDirectoryMSI",
+                    "connection_time": connection_time
                 }
             except Exception as e:
+                connection_time = time.time() - start_time
                 return {
                     "status": "error", 
-                    "message": f"MSI connection test failed: {str(e)}",
+                    "message": f"MSI connection test failed after {connection_time:.2f}s: {str(e)}",
                     "server": SQL_SERVER,
                     "database": SQL_DATABASE,
-                    "authentication": "ActiveDirectoryMSI"
+                    "authentication": "ActiveDirectoryMSI",
+                    "connection_time": connection_time
                 }
         
         # Handle cases where event loop is already running

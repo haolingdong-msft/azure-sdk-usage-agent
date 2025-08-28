@@ -8,6 +8,7 @@ import asyncio
 import sys
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 # Add the parent directory to the path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -50,8 +51,7 @@ class TestSQLConnection:
             logger.log_test_error("test_client_initialization", e)
             raise
     
-    @pytest.mark.asyncio
-    async def test_connection_test_method(self):
+    def test_connection_test_method(self):
         """Test the connection test method"""
         logger = get_test_logger()
         logger.log_test_start("test_connection_test_method")
@@ -82,7 +82,7 @@ class TestSQLConnection:
     
     @pytest.mark.asyncio
     async def test_simple_query_execution(self):
-        """Test executing a simple query"""
+        """Test executing a simple query with timeout and progress"""
         logger = get_test_logger()
         logger.log_test_start("test_simple_query_execution")
         
@@ -93,7 +93,8 @@ class TestSQLConnection:
             logger.log_query_execution(query)
             start_time = time.time()
             
-            result = await client.execute_query(query)
+            # Use shorter timeout for faster test feedback
+            result = await client.execute_query(query, timeout=15)
             execution_time = time.time() - start_time
             
             # Check result structure
@@ -121,7 +122,7 @@ class TestSQLConnection:
     
     @pytest.mark.asyncio
     async def test_database_connection(self):
-        """Test database connection establishment"""
+        """Test database connection establishment with progress"""
         logger = get_test_logger()
         logger.log_test_start("test_database_connection")
         
@@ -129,7 +130,8 @@ class TestSQLConnection:
         
         try:
             logger.log_connection_attempt(SQL_SERVER, SQL_DATABASE)
-            connection = await client._get_connection()
+            # Use shorter timeout for faster feedback
+            connection = await client._get_connection(timeout=15)
             assert connection is not None
             connection.close()
             logger.log_connection_success(SQL_SERVER, SQL_DATABASE)
@@ -142,7 +144,7 @@ class TestSQLConnection:
     
     @pytest.mark.asyncio
     async def test_usage_metrics_query(self):
-        """Test query on usage_metrics table"""
+        """Test query on usage_metrics table with progress"""
         logger = get_test_logger()
         logger.log_test_start("test_usage_metrics_query")
         
@@ -153,7 +155,8 @@ class TestSQLConnection:
             logger.log_query_execution(query)
             start_time = time.time()
             
-            result = await client.execute_query(query)
+            # Use shorter timeout for faster feedback
+            result = await client.execute_query(query, timeout=15)
             execution_time = time.time() - start_time
             
             if result.get('status') == 'success':
@@ -172,3 +175,33 @@ class TestSQLConnection:
             error_msg = str(e)
             logger.log_test_skip("test_usage_metrics_query", f"Query execution failed: {error_msg}")
             pytest.skip(f"Query execution failed (may be expected): {error_msg}")
+    
+    def test_connection_with_timeout(self):
+        """Test connection with explicit timeout"""
+        logger = get_test_logger()
+        logger.log_test_start("test_connection_with_timeout")
+        
+        try:
+            client = MSSQLMSIClient()
+            
+            # Test with shorter timeout for faster feedback
+            logger.log_connection_attempt(SQL_SERVER, SQL_DATABASE)
+            result = client.test_connection(timeout=10)
+            
+            assert isinstance(result, dict)
+            assert 'status' in result
+            assert result['status'] in ['success', 'error']
+            assert 'connection_time' in result
+            
+            if result['status'] == 'success':
+                logger.log_connection_success(SQL_SERVER, SQL_DATABASE)
+                logger.log_test_success("test_connection_with_timeout", 
+                                      f"Connection test passed in {result['connection_time']:.2f}s")
+            else:
+                error_msg = result.get('message', 'Unknown error')
+                logger.log_connection_failure(SQL_SERVER, SQL_DATABASE, error_msg)
+                logger.log_test_success("test_connection_with_timeout", 
+                                      f"Connection test handled error gracefully in {result['connection_time']:.2f}s: {error_msg}")
+        except Exception as e:
+            logger.log_test_error("test_connection_with_timeout", e)
+            raise

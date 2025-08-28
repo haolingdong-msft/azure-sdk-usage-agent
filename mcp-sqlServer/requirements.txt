@@ -2,3 +2,5 @@ httpx
 mcp[cli]>=1.5.0
 azure-identity
 pyodbc
+pytest>=8.0.0
+pytest-asyncio>=0.21.0
