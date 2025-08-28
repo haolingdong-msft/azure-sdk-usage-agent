@@ -2,7 +2,7 @@
 MCP Tools implementation for SQL Server operations
 """
 from typing import Any, Dict, List
-from .sql_client import MSSQLRestClient
+from .sql_client import MSSQLMSIClient
 from .schema_loader import SchemaLoader
 from .query_parser import QueryParser
 from .config import SQL_SERVER, SQL_DATABASE, AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
@@ -12,7 +12,7 @@ class MCPTools:
     """MCP Tools for SQL Server operations"""
     
     def __init__(self, schema_loader: SchemaLoader):
-        self.sql_client = MSSQLRestClient()
+        self.sql_client = MSSQLMSIClient()
         self.schema_loader = schema_loader
         self.query_parser = QueryParser(schema_loader)
     
@@ -130,17 +130,17 @@ class MCPTools:
             # Step 3: Execute the query
             print("🚀 Step 3: Executing SQL query...")
             try:
-                query_result = await self.sql_client.execute_query_via_rest(sql_query)
+                query_result = await self.sql_client.execute_query(sql_query)
             except Exception as api_error:
                 return {
                     "success": False,
-                    "error": f"Failed to execute query via REST API: {str(api_error)}",
+                    "error": f"Failed to execute query via pyodbc: {str(api_error)}",
                     "query": sql_query,
-                    "connection_method": "REST API",
+                    "connection_method": "pyodbc",
                     "troubleshooting": [
                         "Check network connectivity to Azure SQL Database",
-                        "Verify subscription ID and resource group settings",
-                        "Ensure your account has proper database permissions"
+                        "Ensure ODBC Driver 17 for SQL Server is installed",
+                        "Verify your account has proper database permissions"
                     ]
                 }
             
@@ -168,7 +168,7 @@ class MCPTools:
                 "data": result_data,
                 "row_count": len(result_data),
                 "table_used": table_name,
-                "connection_method": "REST API",
+                "connection_method": "pyodbc",
                 "data_source": metadata.get("source", "mssql_server"),
                 "server": SQL_SERVER,
                 "database": SQL_DATABASE,
@@ -187,12 +187,12 @@ class MCPTools:
             return {
                 "success": False,
                 "error": f"Error executing query: {str(e)}",
-                "connection_method": "REST API"
+                "connection_method": "pyodbc"
             }
 
     async def list_tables(self) -> Dict[str, Any]:
         """
-        List only enabled tables and their columns that can be queried via REST API for MS SQL Server.
+        List only enabled tables and their columns that can be queried via pyodbc for MS SQL Server.
         
         Returns:
             A JSON object containing only enabled tables, their column information, and metadata.
@@ -235,7 +235,7 @@ class MCPTools:
                 "available_http_methods": self.schema_loader.get_enum_values('HttpMethod'),
                 "available_os": self.schema_loader.get_enum_values('OS'),
                 "note": "Provider, Resource, and ApiVersion fields no longer have enum restrictions and accept any valid database values",
-                "connection_method": "REST API",
+                "connection_method": "pyodbc",
                 "data_source": "MS SQL Server Schema Cache"
             }
         except Exception as e:
@@ -243,7 +243,7 @@ class MCPTools:
 
     async def validate_azure_auth(self) -> Dict[str, Any]:
         """
-        Validate Azure AD authentication for MS SQL Server using REST approach.
+        Validate Azure AD authentication for MS SQL Server using pyodbc connection.
         
         Returns:
             A JSON object containing authentication test results.
@@ -252,24 +252,18 @@ class MCPTools:
             # Test SQL database token
             sql_token = await self.sql_client.get_access_token(self.sql_client.sql_scope)
             
-            # Test management API token
-            mgmt_token = await self.sql_client.get_access_token(self.sql_client.management_scope)
-            
             return {
                 "success": True,
-                "message": "Azure AD authentication successful for MS SQL Server REST API",
+                "message": "Azure AD authentication successful for MS SQL Server pyodbc connection",
                 "server": SQL_SERVER,
                 "database": SQL_DATABASE,
                 "subscription_id": AZURE_SUBSCRIPTION_ID,
                 "resource_group": AZURE_RESOURCE_GROUP,
                 "sql_token_prefix": sql_token[:30] + "...",
                 "sql_token_length": len(sql_token),
-                "mgmt_token_prefix": mgmt_token[:30] + "...",
-                "mgmt_token_length": len(mgmt_token),
                 "authentication_method": "DefaultAzureCredential",
                 "sql_scope": self.sql_client.sql_scope,
-                "management_scope": self.sql_client.management_scope,
-                "connection_method": "REST API"
+                "connection_method": "pyodbc with Azure AD"
             }
             
         except Exception as e:
@@ -281,14 +275,14 @@ class MCPTools:
                     "Check if your account has access to the MS SQL Server database",
                     "Verify the SQL server and database names are correct",
                     "Make sure Azure AD authentication is enabled on the SQL server",
-                    "Check subscription ID and resource group settings"
+                    "Ensure ODBC Driver 17 for SQL Server is installed"
                 ],
-                "connection_method": "REST API"
+                "connection_method": "pyodbc with Azure AD"
             }
 
     async def execute_custom_sql(self, sql_query: str) -> Dict[str, Any]:
         """
-        Execute a custom SQL query directly via REST API for MS SQL Server (for advanced users).
+        Execute a custom SQL query directly via pyodbc for MS SQL Server (for advanced users).
         
         Args:
             sql_query: A valid SQL SELECT statement to execute.
@@ -309,21 +303,22 @@ class MCPTools:
             if any(keyword in sql_lower for keyword in dangerous_keywords):
                 return {"error": "Query contains prohibited operations"}
             
-            print(f"Executing custom SQL via REST: {sql_query}")
+            print(f"Executing custom SQL via pyodbc: {sql_query}")
             
-            # Execute via REST API
+            # Execute via pyodbc with MSI
             try:
-                query_result = await self.sql_client.execute_query_via_rest(sql_query)
+                query_result = await self.sql_client.execute_query(sql_query)
             except Exception as api_error:
                 return {
-                    "error": f"Failed to execute custom SQL via REST API: {str(api_error)}",
+                    "error": f"Failed to execute custom SQL via pyodbc: {str(api_error)}",
                     "query": sql_query,
-                    "connection_method": "REST API",
+                    "connection_method": "pyodbc",
                     "troubleshooting": [
                         "Check Azure AD authentication with validateAzureAuthMSSQL",
                         "Verify SQL server and database names are correct",
                         "Ensure your account has access to the SQL database",
-                        "Check network connectivity to Azure SQL Database"
+                        "Check network connectivity to Azure SQL Database",
+                        "Ensure ODBC Driver 17 for SQL Server is installed"
                     ]
                 }
             
@@ -349,15 +344,15 @@ class MCPTools:
                 "query": sql_query,
                 "data": result_data,
                 "row_count": len(result_data),
-                "connection_method": "REST API",
+                "connection_method": "pyodbc",
                 "data_source": metadata.get("source", "mssql_server"),
                 "query_type": metadata.get("query_type", "custom")
             }
             
         except Exception as e:
             return {
-                "error": f"Error executing custom SQL via REST: {str(e)}",
-                "connection_method": "REST API"
+                "error": f"Error executing custom SQL via pyodbc: {str(e)}",
+                "connection_method": "pyodbc"
             }
 
     async def get_enum_values(self, field_name: str) -> Dict[str, Any]:
@@ -400,7 +395,7 @@ class MCPTools:
                         "field_name": field_name,
                         "enum_values": enum_values,
                         "count": len(enum_values),
-                        "connection_method": "REST API"
+                        "connection_method": "pyodbc"
                     }
             
             # Check if it's a field without enum restrictions
@@ -411,7 +406,7 @@ class MCPTools:
                     "message": f"No enum restriction for {field_name}",
                     "description": open_fields[field_lower],
                     "note": "This field accepts any valid value from the database",
-                    "connection_method": "REST API"
+                    "connection_method": "pyodbc"
                 }
             
             # If exact match not found, search in definitions
@@ -425,7 +420,7 @@ class MCPTools:
                         "enum_values": def_info['enum'],
                         "count": len(def_info['enum']),
                         "description": def_info.get('description', ''),
-                        "connection_method": "REST API"
+                        "connection_method": "pyodbc"
                     }
             
             # Combine available fields
@@ -435,7 +430,7 @@ class MCPTools:
                 "error": f"No enum information found for field '{field_name}'",
                 "available_fields": all_available_fields,
                 "note": "Fields like 'provider', 'resource', and 'apiversion' no longer have enum restrictions",
-                "connection_method": "REST API"
+                "connection_method": "pyodbc"
             }
             
         except Exception as e:
@@ -466,7 +461,7 @@ class MCPTools:
                         "Ask for top/bottom N results",
                         "Filter by providers like 'Microsoft.Compute' or OS like 'Windows'"
                     ],
-                    "connection_method": "REST API"
+                    "connection_method": "pyodbc"
                 }
             
             # Build the SQL query (same logic as execute_sql_query but don't execute)
@@ -496,12 +491,12 @@ class MCPTools:
                 "filters_applied": query_info['where_clause'] if query_info['where_clause'] != "1=1" else "None",
                 "ordering": query_info['order_clause'] if query_info['order_clause'] else "None",
                 "limit": query_info['limit_clause'] if query_info['limit_clause'] else "None",
-                "connection_method": "REST API"
+                "connection_method": "pyodbc"
             }
             
         except Exception as e:
             return {
                 "valid": False,
                 "error": f"Error validating query: {str(e)}",
-                "connection_method": "REST API"
+                "connection_method": "pyodbc"
             }

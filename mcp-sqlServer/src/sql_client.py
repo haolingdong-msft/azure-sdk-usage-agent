@@ -1,231 +1,226 @@
 """
-MS SQL Server REST API Client
+MS SQL Server Client using pyodbc with Managed Service Identity (MSI)
 """
-import httpx
-from typing import Any, Dict, Optional
+import pyodbc
+import os
+from typing import Any, Dict, List, Optional
 from azure.identity import DefaultAzureCredential
 from .config import (
-    SQL_SERVER, SQL_DATABASE, AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP,
-    SQL_SCOPE, MANAGEMENT_SCOPE, MANAGEMENT_URL
+    SQL_SERVER, SQL_DATABASE
 )
 
 
-class MSSQLRestClient:
+class MSSQLMSIClient:
     """
-    MS SQL Server REST API Client
+    MS SQL Server Client using pyodbc with Managed Service Identity (MSI)
     
-    This client provides REST API based connectivity to Azure SQL Database.
-    It implements a fallback strategy with two different API approaches:
+    This client provides passwordless connectivity to Azure SQL Database using pyodbc
+    with Managed Service Identity authentication. This approach is more secure and
+    eliminates the need to manage access tokens manually.
     
-    1. Direct SQL Database API: Connects directly to the SQL Database instance
-       - Uses database-specific authentication scope
-       - Potentially lower latency and better performance
-       - Conceptual implementation as Azure SQL doesn't provide public REST query API
-    
-    2. Azure Management API: Connects through Azure Resource Management layer
-       - Uses management-specific authentication scope
-       - Requires subscription and resource group information
-       - Better suited for administrative and monitoring scenarios
-    
-    The client automatically tries both methods in sequence to maximize
-    connection success rate across different Azure configurations and permissions.
+    Features:
+    - Passwordless authentication using MSI
+    - Automatic credential handling via DefaultAzureCredential
+    - Connection pooling support
+    - Proper error handling and resource cleanup
     """
     
     def __init__(self):
         self.credential = DefaultAzureCredential()
-        self.management_url = MANAGEMENT_URL
-        self.sql_scope = SQL_SCOPE
-        self.management_scope = MANAGEMENT_SCOPE
+        self.connection_string = self._build_msi_connection_string()
     
-    async def get_access_token(self, scope: str = None) -> str:
+    
+    def _build_msi_connection_string(self) -> str:
         """
-        Obtain Azure AD access token for the specified scope
+        Build ODBC connection string with MSI authentication
+        
+        This uses ActiveDirectoryMSI authentication which automatically handles
+        both system-assigned and user-assigned managed identities.
+        
+        Returns:
+            str: ODBC connection string for MSI authentication
+        """
+        # Check if AZURE_CLIENT_ID is set for user-assigned managed identity
+        client_id = os.getenv('AZURE_CLIENT_ID')
+        
+        base_connection_string = (
+            f"Driver={{ODBC Driver 18 for SQL Server}};"
+            f"Server=tcp:{SQL_SERVER},1433;"
+            f"Database={SQL_DATABASE};"
+            f"Encrypt=yes;"
+            f"TrustServerCertificate=no;"
+            f"Connection Timeout=30;"
+            f"Authentication=ActiveDirectoryMSI"
+        )
+        
+        # Add client ID for user-assigned managed identity if specified
+        if client_id:
+            connection_string = f"{base_connection_string};UID={client_id}"
+            print(f"🔑 Using user-assigned managed identity: {client_id}")
+        else:
+            connection_string = base_connection_string
+            print("🔑 Using system-assigned managed identity")
+            
+        return connection_string
+    
+    async def _get_connection(self) -> pyodbc.Connection:
+        """
+        Get or create a database connection with MSI authentication
+        
+        Returns:
+            pyodbc.Connection: Database connection
+        """
+        try:
+            print(f"🌐 Connecting to SQL Server: {SQL_SERVER}")
+            print(f"🌐 Database: {SQL_DATABASE}")
+            print("🔐 Authentication: Managed Service Identity (MSI)")
+            
+            # Create connection using MSI
+            connection = pyodbc.connect(self.connection_string)
+            print("✅ Successfully connected to SQL Server using MSI")
+            
+            return connection
+            
+        except pyodbc.Error as e:
+            error_msg = f"MSI database connection failed: {str(e)}"
+            print(f"💥 {error_msg}")
+            # Provide helpful troubleshooting information
+            print("🔍 Troubleshooting tips:")
+            print("   - Ensure the managed identity is assigned to this resource")
+            print("   - Verify the managed identity has appropriate SQL database permissions")
+            print("   - Check if AZURE_CLIENT_ID is correctly set for user-assigned identity")
+            raise Exception(error_msg)
+        except Exception as e:
+            error_msg = f"Connection error: {str(e)}"
+            print(f"💥 {error_msg}")
+            raise Exception(error_msg)
+    
+    
+    async def execute_query(self, sql_query: str) -> Dict[str, Any]:
+        """
+        Execute SQL query using pyodbc with MSI authentication
         
         Args:
-            scope: The authentication scope (defaults to SQL Database scope)
+            sql_query: SQL query to execute
             
         Returns:
-            str: Access token for API authentication
+            Dict[str, Any]: Query results with columns and rows
         """
-        try:
-            if scope is None:
-                scope = self.sql_scope
-            
-            print(f"🔑 Requesting Azure AD token for scope: {scope}")
-            token = self.credential.get_token(scope)
-            print(f"✅ Successfully obtained access token (expires: {token.expires_on})")
-            return token.token
-        except Exception as e:
-            print(f"🔒 Failed to obtain access token for scope '{scope}': {str(e)}")
-            raise Exception(f"Failed to get access token: {str(e)}")
-    
-    async def execute_query_via_rest(self, sql_query: str) -> Dict[str, Any]:
-        """
-        Execute SQL query through REST API with intelligent fallback strategy
-        First attempts direct SQL Database API, then falls back to Management API only for specific failures
-        """
-        print(f"🔄 Starting REST API query execution for: {sql_query[:50]}...")
+        print(f"📊 Executing SQL query: {sql_query[:100]}{'...' if len(sql_query) > 100 else ''}")
         
+        connection = None
         try:
-            # First attempt: Direct SQL Database API
-            print("🎯 Attempting direct SQL Database API connection...")
+            # Get database connection
+            connection = await self._get_connection()
+            
+            # Create cursor and execute query
+            cursor = connection.cursor()
+            print("📡 Executing SQL query...")
+            
+            cursor.execute(sql_query)
+            
+            # Get column information
+            columns = [column[0] for column in cursor.description] if cursor.description else []
+            
+            # Fetch all rows
+            rows = cursor.fetchall()
+            
+            # Convert rows to list of dictionaries
+            result_rows = []
+            for row in rows:
+                row_dict = {}
+                for i, value in enumerate(row):
+                    column_name = columns[i] if i < len(columns) else f"column_{i}"
+                    # Handle different data types
+                    if hasattr(value, 'isoformat'):  # datetime objects
+                        row_dict[column_name] = value.isoformat()
+                    elif isinstance(value, bytes):  # binary data
+                        row_dict[column_name] = value.decode('utf-8', errors='ignore')
+                    else:
+                        row_dict[column_name] = value
+                result_rows.append(row_dict)
+            
+            result = {
+                "columns": columns,
+                "rows": result_rows,
+                "row_count": len(result_rows),
+                "status": "success"
+            }
+            
+            print(f"✅ Query executed successfully. Returned {len(result_rows)} rows")
+            return result
+            
+        except pyodbc.Error as e:
+            error_msg = f"SQL execution failed: {str(e)}"
+            print(f"💥 {error_msg}")
+            return {
+                "columns": [],
+                "rows": [],
+                "row_count": 0,
+                "status": "error",
+                "error": error_msg
+            }
+        except Exception as e:
+            error_msg = f"Query execution error: {str(e)}"
+            print(f"💥 {error_msg}")
+            return {
+                "columns": [],
+                "rows": [],
+                "row_count": 0,
+                "status": "error", 
+                "error": error_msg
+            }
+        finally:
+            # Clean up connection
+            if connection:
+                try:
+                    connection.close()
+                    print("🔌 Database connection closed")
+                except:
+                    pass
+    
+    def test_connection(self) -> Dict[str, Any]:
+        """
+        Test the MSI database connection
+        
+        Returns:
+            Dict[str, Any]: Connection test result
+        """
+        import asyncio
+        import sys
+        
+        async def _test():
             try:
-                result = await self._try_sql_database_api(sql_query)
-                if result:
-                    print("✅ Successfully executed query via direct SQL Database API")
-                    return result
-                else:
-                    print("⚠️ Direct SQL Database API returned no result, trying fallback...")
-            except ConnectionError as e:
-                print(f"🌐 Direct API connection error: {str(e)}")
-                # Connection errors might be due to endpoint not existing, try fallback
-                print("🔄 Connection failed, attempting Azure Management API fallback...")
-            except httpx.HTTPStatusError as e:
-                if e.response.status_code in [401, 403]:
-                    print(f"🔒 Authentication/Authorization failed for Direct API: {str(e)}")
-                    # Authentication errors are serious, don't try fallback
-                    raise Exception(f"Authentication failed: {str(e)}")
-                else:
-                    print(f"💥 Direct API HTTP error: {str(e)}")
-                    print("🔄 Direct API failed, attempting Azure Management API fallback...")
+                connection = await self._get_connection()
+                connection.close()
+                return {
+                    "status": "success",
+                    "message": "MSI connection test successful",
+                    "server": SQL_SERVER,
+                    "database": SQL_DATABASE,
+                    "authentication": "ActiveDirectoryMSI"
+                }
             except Exception as e:
-                print(f"💥 Direct API unexpected error: {str(e)}")
-                # For other errors, try fallback
-                print("🔄 Direct API failed, attempting Azure Management API fallback...")
-            
-            # Second attempt: Azure Management API (only if first attempt had recoverable failure)
-            try:
-                result = await self._try_management_api(sql_query)
-                if result:
-                    print("✅ Successfully executed query via Azure Management API")
-                    return result
-                else:
-                    print("❌ Azure Management API also returned no result")
-            except Exception as e:
-                print(f"💥 Management API also failed: {str(e)}")
-                raise Exception(f"Management API failed after Direct API failure: {str(e)}")
-            
-            # If all API attempts fail, raise exception
-            print("❌ All REST API endpoints failed to connect")
-            raise Exception("All REST API endpoints failed to connect")
-            
-        except Exception as e:
-            # Re-raise if it's already a formatted exception
-            if str(e).startswith("Authentication failed") or str(e).startswith("Management API failed"):
-                raise e
-            print(f"💥 REST API execution failed with error: {str(e)}")
-            raise Exception(f"REST API execution failed: {str(e)}")
-    
-    async def _try_sql_database_api(self, sql_query: str) -> Optional[Dict[str, Any]]:
-        """
-        Attempt to use direct SQL Database API
+                return {
+                    "status": "error", 
+                    "message": f"MSI connection test failed: {str(e)}",
+                    "server": SQL_SERVER,
+                    "database": SQL_DATABASE,
+                    "authentication": "ActiveDirectoryMSI"
+                }
         
-        This method tries to connect directly to the SQL Database instance
-        using a conceptual REST API endpoint. Note: Azure SQL Database
-        doesn't currently provide public REST query APIs.
-        """
-        print("🔐 Obtaining access token for SQL Database scope...")
+        # Handle cases where event loop is already running
         try:
-            token = await self.get_access_token(self.sql_scope)
-            print("✅ Successfully obtained SQL Database access token")
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
             
-            headers = {
-                "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-            
-            # Using conceptual Azure SQL Database Query API endpoint
-            url = f"https://{SQL_SERVER}/api/sql/v1/query"
-            print(f"🌐 Attempting connection to: {url}")
-            
-            payload = {
-                "database": SQL_DATABASE,
-                "query": sql_query,
-                "timeout": 30
-            }
-            
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                print("📡 Sending HTTP POST request to SQL Database API...")
-                response = await client.post(url, headers=headers, json=payload)
-                
-                if response.status_code == 200:
-                    print("✅ SQL Database API: Query executed successfully")
-                    return response.json()
-                elif response.status_code == 401:
-                    print("🔒 SQL Database API: Authentication failed (HTTP 401)")
-                    return None
-                elif response.status_code == 403:
-                    print("🚫 SQL Database API: Access denied (HTTP 403)")
-                    return None
-                else:
-                    print(f"⚠️ SQL Database API: Unexpected HTTP status {response.status_code}")
-                    return None
-                    
-        except httpx.ConnectError as e:
-            print(f"🌐 SQL Database API: Connection failed - {str(e)}")
-            return None
-        except Exception as e:
-            print(f"💥 SQL Database API: Unexpected error - {str(e)}")
-            return None
-    
-    async def _try_management_api(self, sql_query: str) -> Optional[Dict[str, Any]]:
-        """
-        Attempt to use Azure Management API
-        
-        This method tries to execute queries through Azure Resource Management
-        layer, which requires subscription and resource group information.
-        This approach is more suitable for administrative scenarios.
-        """
-        print("🔐 Obtaining access token for Azure Management scope...")
-        try:
-            token = await self.get_access_token(self.management_scope)
-            print("✅ Successfully obtained Azure Management access token")
-            
-            headers = {
-                "Authorization": f"Bearer {token}",
-                "Content-Type": "application/json"
-            }
-            
-            # Azure Management API for SQL databases
-            server_name = SQL_SERVER.split('.')[0]  # Extract server name from FQDN
-            url = f"{self.management_url}/subscriptions/{AZURE_SUBSCRIPTION_ID}/resourceGroups/{AZURE_RESOURCE_GROUP}/providers/Microsoft.Sql/servers/{server_name}/databases/{SQL_DATABASE}/query"
-            print(f"🌐 Attempting connection to Management API: {url}")
-            print(f"📊 Target: Server={server_name}, Database={SQL_DATABASE}, ResourceGroup={AZURE_RESOURCE_GROUP}")
-            
-            payload = {
-                "query": sql_query
-            }
-            
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                print("📡 Sending HTTP POST request to Azure Management API...")
-                response = await client.post(url, headers=headers, json=payload, params={"api-version": "2021-11-01"})
-                
-                if response.status_code == 200:
-                    print("✅ Azure Management API: Query executed successfully")
-                    return response.json()
-                elif response.status_code == 401:
-                    print("🔒 Azure Management API: Authentication failed (HTTP 401)")
-                    return None
-                elif response.status_code == 403:
-                    print("🚫 Azure Management API: Access denied (HTTP 403)")
-                    return None
-                elif response.status_code == 404:
-                    print("🔍 Azure Management API: Resource not found (HTTP 404)")
-                    print(f"   Check if server '{server_name}' exists in resource group '{AZURE_RESOURCE_GROUP}'")
-                    return None
-                else:
-                    print(f"⚠️ Azure Management API: Unexpected HTTP status {response.status_code}")
-                    try:
-                        error_details = response.json()
-                        print(f"   Error details: {error_details}")
-                    except:
-                        print(f"   Response text: {response.text[:200]}...")
-                    return None
-                    
-        except httpx.ConnectError as e:
-            print(f"🌐 Azure Management API: Connection failed - {str(e)}")
-            return None
-        except Exception as e:
-            print(f"💥 Azure Management API: Unexpected error - {str(e)}")
-            return None
+        if loop is not None:
+            # If we're in an event loop, create a task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(asyncio.run, _test())
+                return future.result()
+        else:
+            # If no event loop is running, use asyncio.run
+            return asyncio.run(_test())
