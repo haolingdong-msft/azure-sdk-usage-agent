@@ -38,6 +38,5 @@ build/
 *.pyc
 
 ### Local settings ###
-**/local.settings.json
 
 *.log
