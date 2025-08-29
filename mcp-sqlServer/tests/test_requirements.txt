@@ -1,0 +1,8 @@
+# Additional testing dependencies for the improved test suite
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.10.0
+
+# These should already be in your main requirements.txt:
+# pyodbc
+# azure-identity
