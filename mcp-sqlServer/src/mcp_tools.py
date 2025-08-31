@@ -1,6 +1,7 @@
 """
 MCP Tools implementation for SQL Server operations
 """
+import asyncio
 from typing import Any, Dict, List
 from .sql_client import MSSQLMSIClient
 from .schema_loader import SchemaLoader
@@ -11,10 +12,32 @@ from .config import SQL_SERVER, SQL_DATABASE, AZURE_SUBSCRIPTION_ID, AZURE_RESOU
 class MCPTools:
     """MCP Tools for SQL Server operations"""
     
+    # Class-level client instance to avoid multiple connections
+    _sql_client_instance = None
+    
     def __init__(self, schema_loader: SchemaLoader):
-        self.sql_client = MSSQLMSIClient()
+        # Use singleton pattern for SQL client to avoid multiple instances
+        if MCPTools._sql_client_instance is None:
+            print("🔄 Creating new SQL client instance...")
+            MCPTools._sql_client_instance = MSSQLMSIClient()
+        else:
+            print("♻️ Reusing existing SQL client instance...")
+            
+        self.sql_client = MCPTools._sql_client_instance
         self.schema_loader = schema_loader
         self.query_parser = QueryParser(schema_loader)
+    
+    @classmethod
+    def cleanup_sql_client(cls):
+        """Clean up the shared SQL client instance"""
+        if cls._sql_client_instance:
+            print("🧹 Cleaning up shared SQL client instance...")
+            try:
+                cls._sql_client_instance.close()
+                cls._sql_client_instance = None
+                print("✅ SQL client instance cleaned up")
+            except Exception as e:
+                print(f"⚠️ Error cleaning up SQL client: {e}")
     
     async def parse_user_query(self, user_question: str) -> Dict[str, Any]:
         """
@@ -65,7 +88,7 @@ class MCPTools:
 
     async def execute_sql_with_auth(self, table_name: str, columns: list, where_clause: str = "", order_clause: str = "", limit_clause: str = "") -> Dict[str, Any]:
         """
-        Execute a SQL query using parsed components with Azure AD authentication validation.
+        Execute a SQL query using parsed components.
 
         Args:
             table_name: The name of the table to query
@@ -75,26 +98,11 @@ class MCPTools:
             limit_clause: SQL LIMIT/TOP clause (optional)
 
         Returns:
-            A JSON object containing the query results, or error information if authentication fails.
+            A JSON object containing the query results.
         """
         try:
-            # Step 1: Validate Azure AD authentication first
-            print("🔐 Step 1: Validating Azure AD authentication...")
-            auth_result = await self.validate_azure_auth()
-            
-            if not auth_result.get('success', False):
-                print("❌ Azure AD authentication failed")
-                return {
-                    "success": False,
-                    "error": "Azure AD authentication failed",
-                    "auth_error": auth_result.get('error', 'Unknown authentication error'),
-                    "troubleshooting": auth_result.get('troubleshooting', [])
-                }
-            
-            print("✅ Azure AD authentication successful")
-            
-            # Step 2: Build SQL query from components
-            print("🔧 Step 2: Building SQL query from components...")
+            # Step 1: Build SQL query from components
+            print("🔧 Step 1: Building SQL query from components...")
             
             # Validate inputs
             if not table_name or not columns:
@@ -127,38 +135,78 @@ class MCPTools:
             sql_query = ' '.join(sql_parts)
             print(f"Generated SQL: {sql_query}")
             
-            # Step 3: Execute the query
-            print("🚀 Step 3: Executing SQL query...")
-            try:
-                query_result = await self.sql_client.execute_query(sql_query)
-            except Exception as api_error:
+            # Step 2: Execute the query with retry logic
+            print("🚀 Step 2: Executing SQL query with retry logic...")
+            
+            max_retries = 3
+            retry_delay = 1  # seconds
+            
+            for attempt in range(max_retries):
+                try:
+                    print(f"🔄 Attempt {attempt + 1}/{max_retries}")
+                    query_result = await self.sql_client.execute_query(sql_query)
+                    
+                    # If successful, break out of retry loop
+                    if query_result.get("status") != "error":
+                        print(f"✅ Query executed successfully on attempt {attempt + 1}")
+                        break
+                    else:
+                        # If it's an error, check if it's retryable
+                        error_msg = query_result.get("error", "").lower()
+                        if any(retryable_error in error_msg for retryable_error in [
+                            "timeout", "connection", "network", "transient", "temporary"
+                        ]):
+                            if attempt < max_retries - 1:
+                                print(f"⚠️ Retryable error on attempt {attempt + 1}: {query_result.get('error')}")
+                                print(f"⏳ Waiting {retry_delay} seconds before retry...")
+                                await asyncio.sleep(retry_delay)
+                                retry_delay *= 2  # Exponential backoff
+                                continue
+                        
+                        # If not retryable or last attempt, return the error
+                        print(f"💥 Non-retryable error or final attempt: {query_result.get('error')}")
+                        break
+                        
+                except Exception as api_error:
+                    error_str = str(api_error).lower()
+                    is_retryable = any(retryable_error in error_str for retryable_error in [
+                        "timeout", "connection", "network", "transient", "temporary", "reset"
+                    ])
+                    
+                    if is_retryable and attempt < max_retries - 1:
+                        print(f"⚠️ Retryable exception on attempt {attempt + 1}: {api_error}")
+                        print(f"⏳ Waiting {retry_delay} seconds before retry...")
+                        await asyncio.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                        continue
+                    else:
+                        print(f"💥 Non-retryable exception or final attempt: {api_error}")
+                        return {
+                            "success": False,
+                            "error": f"Failed to execute query via pyodbc after {max_retries} attempts: {str(api_error)}",
+                            "query": sql_query,
+                            "connection_method": "pyodbc",
+                            "attempts": attempt + 1,
+                            "troubleshooting": [
+                                "Check network connectivity to Azure SQL Database",
+                                "Ensure ODBC Driver 18 for SQL Server is installed",
+                                "Verify your account has proper database permissions",
+                                "Check if the database server is accessible",
+                                "Verify firewall rules allow your connection"
+                            ]
+                        }
+            
+            # Step 3: Check query execution status and format results
+            if query_result.get("status") == "error":
                 return {
                     "success": False,
-                    "error": f"Failed to execute query via pyodbc: {str(api_error)}",
+                    "error": f"SQL execution failed: {query_result.get('error', 'Unknown error')}",
                     "query": sql_query,
-                    "connection_method": "pyodbc",
-                    "troubleshooting": [
-                        "Check network connectivity to Azure SQL Database",
-                        "Ensure ODBC Driver 17 for SQL Server is installed",
-                        "Verify your account has proper database permissions"
-                    ]
+                    "connection_method": "pyodbc"
                 }
             
-            # Step 4: Format query results
-            result_data = []
-            
-            for row in query_result.get("rows", []):
-                row_dict = {}
-                for i, value in enumerate(row):
-                    column_name = query_result.get("columns", [])[i] if i < len(query_result.get("columns", [])) else f"column_{i}"
-                    # Handle different data types
-                    if value is None:
-                        row_dict[column_name] = None
-                    elif isinstance(value, (int, float, str, bool)):
-                        row_dict[column_name] = value
-                    else:
-                        row_dict[column_name] = str(value)
-                result_data.append(row_dict)
+            # New sql_client returns rows as list of dictionaries already
+            result_data = query_result.get("rows", [])
             
             metadata = query_result.get("metadata", {})
             
@@ -241,45 +289,6 @@ class MCPTools:
         except Exception as e:
             return {"error": f"Error retrieving table information: {str(e)}"}
 
-    async def validate_azure_auth(self) -> Dict[str, Any]:
-        """
-        Validate Azure AD authentication for MS SQL Server using pyodbc connection.
-        
-        Returns:
-            A JSON object containing authentication test results.
-        """
-        try:
-            # Test SQL database token
-            sql_token = await self.sql_client.get_access_token(self.sql_client.sql_scope)
-            
-            return {
-                "success": True,
-                "message": "Azure AD authentication successful for MS SQL Server pyodbc connection",
-                "server": SQL_SERVER,
-                "database": SQL_DATABASE,
-                "subscription_id": AZURE_SUBSCRIPTION_ID,
-                "resource_group": AZURE_RESOURCE_GROUP,
-                "sql_token_prefix": sql_token[:30] + "...",
-                "sql_token_length": len(sql_token),
-                "authentication_method": "DefaultAzureCredential",
-                "sql_scope": self.sql_client.sql_scope,
-                "connection_method": "pyodbc with Azure AD"
-            }
-            
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"Azure AD authentication failed: {str(e)}",
-                "troubleshooting": [
-                    "Ensure you're logged in with 'az login'",
-                    "Check if your account has access to the MS SQL Server database",
-                    "Verify the SQL server and database names are correct",
-                    "Make sure Azure AD authentication is enabled on the SQL server",
-                    "Ensure ODBC Driver 17 for SQL Server is installed"
-                ],
-                "connection_method": "pyodbc with Azure AD"
-            }
-
     async def execute_custom_sql(self, sql_query: str) -> Dict[str, Any]:
         """
         Execute a custom SQL query directly via pyodbc for MS SQL Server (for advanced users).
@@ -314,28 +323,24 @@ class MCPTools:
                     "query": sql_query,
                     "connection_method": "pyodbc",
                     "troubleshooting": [
-                        "Check Azure AD authentication with validateAzureAuthMSSQL",
+                        "Check network connectivity to Azure SQL Database",
                         "Verify SQL server and database names are correct",
                         "Ensure your account has access to the SQL database",
-                        "Check network connectivity to Azure SQL Database",
                         "Ensure ODBC Driver 17 for SQL Server is installed"
                     ]
                 }
             
-            # Format results
-            result_data = []
+            # Check query execution status
+            if query_result.get("status") == "error":
+                return {
+                    "success": False,
+                    "error": f"SQL execution failed: {query_result.get('error', 'Unknown error')}",
+                    "query": sql_query,
+                    "connection_method": "pyodbc"
+                }
             
-            for row in query_result.get("rows", []):
-                row_dict = {}
-                for i, value in enumerate(row):
-                    column_name = query_result.get("columns", [])[i] if i < len(query_result.get("columns", [])) else f"column_{i}"
-                    if value is None:
-                        row_dict[column_name] = None
-                    elif isinstance(value, (int, float, str, bool)):
-                        row_dict[column_name] = value
-                    else:
-                        row_dict[column_name] = str(value)
-                result_data.append(row_dict)
+            # New sql_client returns rows as list of dictionaries already
+            result_data = query_result.get("rows", [])
             
             metadata = query_result.get("metadata", {})
             
