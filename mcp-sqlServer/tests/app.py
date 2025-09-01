@@ -1,4 +1,4 @@
-# https://docs.azure.cn/en-us/azure-sql/database/azure-sql-python-quickstart?tabs=windows%2Csql-inter
+# Reference: https://docs.azure.cn/en-us/azure-sql/database/azure-sql-python-quickstart?tabs=windows%2Csql-inter
 import os
 import pyodbc, struct
 from azure import identity
