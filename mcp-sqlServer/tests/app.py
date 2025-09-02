@@ -1,4 +1,5 @@
 # Reference: https://docs.azure.cn/en-us/azure-sql/database/azure-sql-python-quickstart?tabs=windows%2Csql-inter
+# Start: uvicorn app:app --reload
 import os
 import pyodbc, struct
 from azure import identity

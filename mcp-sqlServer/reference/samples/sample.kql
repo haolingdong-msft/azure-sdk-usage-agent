@@ -1,0 +1,5 @@
+// 按月统计每个产品的唯一 CCID 数量
+SubReqEvents
+| where Timestamp >= datetime(2025-01-01) // 可修改起始日期
+| summarize UniqueCCIDCount=dcount(CCID) by Product, Month=format_datetime(Timestamp, 'yyyy-MM')
+| order by Month asc, Product asc
