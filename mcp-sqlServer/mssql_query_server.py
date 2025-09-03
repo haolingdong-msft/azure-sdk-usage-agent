@@ -10,6 +10,9 @@ from src.main_with_ai import main
 # For AI-powered version with helper tool, uncomment this line and comment the above:
 from src.main_with_ai import main
 
+# For kusto:
+# from src.main_kusto import main
+
 # For backwards compatibility, expose the main function
 if __name__ == "__main__":
     main()
