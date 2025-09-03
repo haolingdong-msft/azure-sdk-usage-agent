@@ -1,5 +1,91 @@
-// 按月统计每个产品的唯一 CCID 数量
-SubReqEvents
-| where Timestamp >= datetime(2025-01-01) // 可修改起始日期
-| summarize UniqueCCIDCount=dcount(CCID) by Product, Month=format_datetime(Timestamp, 'yyyy-MM')
-| order by Month asc, Product asc
+let currentDateTime = datetime({startDateTime});  
+// let currentDateTime = make_datetime(2023, 09, 06, 06, 53);  
+let startDateTime = datetime_add("day", -15, currentDateTime); 
+// let endDateTime = currentDateTime; 
+let endDateTime = datetime_add("minute", 30, startDateTime); 
+// customer information table
+let GetProduct = (UAString: string)  
+{  
+    let userAgent = tolower(trim(" ", UAString));  
+    let goSdkException = dynamic(["kubernetes-cloudprovider", "custer-api-provider-azure", "cilium", "azure-metrics-exporter", "azure_prometheus_exporter", "cluster-image-registry-operator", "aad-pod-identity", "azure-service-operator"]);
+    let netReg = extract(@"(microsoft\.windowsazure\.management|microsoft\.azure\.management)", 1, userAgent);  
+    let jsRlcReg = "azsdk-js-arm-[a-z0-9]+-rest";  
+    case(
+        isempty(UAString), "",
+        userAgent has "terraform", "Terraform",  
+        userAgent has "ansible", "Ansible",  
+        (userAgent has "azure-sdk-for-java" or userAgent has "azsdk-java") and userAgent has "auto-generated", "Java Fluent Lite",  
+        userAgent has "azure-sdk-for-java" or userAgent has  "azsdk-java", "Java Fluent Premium",  
+        netReg != "" and userAgent has "fluent", ".Net Fluent",  
+        netReg != "" or userAgent has "azsdk-net", ".Net Code-gen",  
+        userAgent has "azure-sdk-for-python" or userAgent has "azsdk-python", "Python-SDK",  
+        userAgent has "azure-sdk-for-node", "JavaScript (Node.JS)",  
+        userAgent matches regex jsRlcReg, "JavaScript RLC",  
+        (userAgent has "ms-rest-js" and userAgent startswith "@azure/arm") or userAgent has "azsdk-js-arm", "JavaScript",  
+        userAgent has "azure-sdk-for-ruby", "Ruby-SDK",  
+        (userAgent has "azure-sdk-for-go" or userAgent has "azsdk-go") and array_index_of(goSdkException, userAgent) == -1, "Go-SDK",  
+        userAgent has "azure-sdk-for-php", "PHP-SDK",  
+        ""  
+    )
+};
+let GetTrackInfo = (UAString: string)   
+{  
+    let userAgent = tolower(trim(" ", UAString));  
+    let entityName = "Track1";  
+    case(  
+        userAgent has "azsdk-net", "Track2",  
+        userAgent has"azsdk-python", "Track2",  
+        userAgent has "azsdk-java", "Track2",  
+        userAgent has "azsdk-go", "Track2",  
+        userAgent has "azsdk-js", "Track2",  
+        entityName  
+    );
+};
+let GetOSInfo = (UAString: string)   
+{  
+    let userAgent = tolower(trim(" ",UAString));  
+    let entityName = "Unknown";  
+    case(  
+        userAgent has "windows", "Windows",  
+        userAgent has "linux", "Linux",  
+        userAgent has "macos", "MacOS",
+        userAgent has "mac os", "MacOS",
+        entityName   
+    ); 
+};
+let GetProvider = (uriString: string)   
+{   let entityName = "";  
+    let lowerURI = tolower(uriString);  
+    let providerMatch = extract("/providers/([^?/]*)", 1, lowerURI);  
+    let entityName1 = iff(providerMatch != "", providerMatch, entityName);  
+    let containsResourceManager = iif(lowerURI contains "/resource-manager-rest-api/" or lowerURI contains "/providers?" or lowerURI contains "/resourcegroups/", "ResourceManager", entityName1);  
+    tolower(containsResourceManager);
+};
+let GetResource = (operationName: string)  
+{  
+    let lowerOperationName = tolower(operationName);  
+    let resourceMatch = extract("/providers/microsoft.([a-z]+)/([a-z]+)/", 2, lowerOperationName);  
+    let entityName = iff(resourceMatch != "", resourceMatch, "");  
+    let elements = split(lowerOperationName, "/");  
+    let entityName2 = iif(entityName == "", elements[-1], entityName);
+    tolower(entityName2) 
+}; 
+// query HttpIncomingRequests and join with accia customer info table
+Unionizer("Requests", "HttpIncomingRequests")
+| where TIMESTAMP >= startDateTime and TIMESTAMP < endDateTime
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where isnotempty( subscriptionId)
+| where abs(hash(subscriptionId) % {partitionCount}) == {partitionIndex}
+| extend Product = GetProduct(userAgent)
+| extend Track = GetTrackInfo(userAgent)
+| extend OS = GetOSInfo(userAgent)
+| extend Resource = GetResource(operationName)
+| where isnotnull(Product) and isnotempty(Product)
+| where isnotempty( apiVersion)
+| where isnotempty( Track)
+| where isnotempty( targetResourceProvider)
+| where isnotempty( Resource)
+| where isnotempty( httpMethod)
+| summarize counts = count() by subscriptionId, Product, apiVersion, Track, OS, targetResourceProvider, Resource, httpMethod, RoleLocation
+| project subscriptionId, Product, counts, apiVersion, Track, OS, targetResourceProvider, Resource, httpMethod, RoleLocation
+| extend startDateTime

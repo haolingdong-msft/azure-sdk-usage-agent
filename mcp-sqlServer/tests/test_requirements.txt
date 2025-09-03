@@ -7,3 +7,4 @@ fastapi>=0.100.0
 pydantic>=1.10.10
 uvicorn>=0.23.0
 azure-kusto-data
+pandas

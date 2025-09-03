@@ -633,3 +633,165 @@ class MCPTools:
                 "error": f"Error in AI helper: {str(e)}",
                 "user_question": user_question
             }
+
+    async def modify_kusto_query(self, original_kql: str, user_question: str) -> Dict[str, Any]:
+        """
+        Modify an existing Kusto Query based on user requirements.
+        
+        Args:
+            original_kql: The original Kusto Query (.kql content)
+            user_question: User's question/requirement for modification
+            
+        Returns:
+            A JSON object containing the modified Kusto Query
+        """
+        try:
+            print(f"Modifying Kusto query based on: {user_question}")
+            print(f"Original KQL length: {len(original_kql)} characters")
+            
+            # Basic analysis of the user question to determine modification type
+            user_question_lower = user_question.lower()
+            
+            # Start with the original query
+            modified_kql = original_kql
+            modifications_applied = []
+            
+            # Handle time range modifications
+            if any(word in user_question_lower for word in ['last', 'past', 'recent', 'days', 'hours', 'weeks', 'months', '过去', '最近']):
+                # Extract time period from question
+                if any(phrase in user_question_lower for phrase in ['last 7 days', 'past week', '过去7天', '过去一周']):
+                    modified_kql = self._modify_time_range(modified_kql, -7, "day")
+                    modifications_applied.append("Time range changed to last 7 days")
+                elif any(phrase in user_question_lower for phrase in ['last 30 days', 'past month', '过去30天', '过去一个月']):
+                    modified_kql = self._modify_time_range(modified_kql, -30, "day")
+                    modifications_applied.append("Time range changed to last 30 days")
+                elif any(phrase in user_question_lower for phrase in ['last 24 hours', 'past day', '过去24小时', '过去一天']):
+                    modified_kql = self._modify_time_range(modified_kql, -24, "hour")
+                    modifications_applied.append("Time range changed to last 24 hours")
+                elif any(phrase in user_question_lower for phrase in ['last 3 months', '过去3个月']):
+                    modified_kql = self._modify_time_range(modified_kql, -90, "day")
+                    modifications_applied.append("Time range changed to last 3 months")
+                elif '7天' in user_question_lower or '7 天' in user_question_lower:
+                    modified_kql = self._modify_time_range(modified_kql, -7, "day")
+                    modifications_applied.append("Time range changed to last 7 days")
+            
+            # Handle filtering modifications
+            if any(word in user_question_lower for word in ['only', 'filter', 'where', 'exclude', '只', '仅', '过滤', '筛选']):
+                if any(word in user_question_lower for word in ['python', 'python-sdk', 'python sdk']):
+                    modified_kql = self._add_product_filter(modified_kql, "Python-SDK")
+                    modifications_applied.append("Added Python-SDK filter")
+                elif any(word in user_question_lower for word in ['java', 'java-sdk', 'java sdk']):
+                    modified_kql = self._add_product_filter(modified_kql, "Java Fluent Premium")
+                    modifications_applied.append("Added Java filter")
+                elif any(word in user_question_lower for word in ['.net', 'dotnet', 'csharp', 'c#']):
+                    modified_kql = self._add_product_filter(modified_kql, ".Net Code-gen")
+                    modifications_applied.append("Added .NET filter")
+                elif any(word in user_question_lower for word in ['javascript', 'js', 'node.js', 'nodejs']):
+                    modified_kql = self._add_product_filter(modified_kql, "JavaScript")
+                    modifications_applied.append("Added JavaScript filter")
+                elif any(word in user_question_lower for word in ['windows', 'win']):
+                    modified_kql = self._add_os_filter(modified_kql, "Windows")
+                    modifications_applied.append("Added Windows OS filter")
+                elif any(word in user_question_lower for word in ['linux', 'unix']):
+                    modified_kql = self._add_os_filter(modified_kql, "Linux")
+                    modifications_applied.append("Added Linux OS filter")
+            
+            # Handle aggregation modifications
+            if any(word in user_question_lower for word in ['top', 'bottom', 'highest', 'lowest', 'limit', '前', '后', '最高', '最低', '限制']):
+                import re
+                # Look for numbers in the question
+                number_matches = re.findall(r'\b(\d+)\b', user_question)
+                if number_matches:
+                    limit_num = int(number_matches[0])
+                    if any(word in user_question_lower for word in ['top', 'highest', '前', '最高']):
+                        modified_kql = self._add_top_limit(modified_kql, limit_num, descending=True)
+                        modifications_applied.append(f"Added top {limit_num} limit")
+                    elif any(word in user_question_lower for word in ['bottom', 'lowest', '后', '最低']):
+                        modified_kql = self._add_top_limit(modified_kql, limit_num, descending=False)
+                        modifications_applied.append(f"Added bottom {limit_num} limit")
+                else:
+                    # Default to top 10 if no number specified
+                    if any(word in user_question_lower for word in ['top', 'highest', '前', '最高', '结果']):
+                        modified_kql = self._add_top_limit(modified_kql, 10, descending=True)
+                        modifications_applied.append("Added top 10 limit")
+            
+            # Handle grouping modifications
+            if any(word in user_question_lower for word in ['group by', 'aggregate by', 'summarize by', '按', '分组', '汇总']):
+                if any(word in user_question_lower for word in ['provider', '提供商']):
+                    modified_kql = self._modify_grouping(modified_kql, add_column="targetResourceProvider")
+                    modifications_applied.append("Added provider grouping")
+                elif any(word in user_question_lower for word in ['os', 'operating system', '操作系统']):
+                    modified_kql = self._modify_grouping(modified_kql, add_column="OS")
+                    modifications_applied.append("Added OS grouping")
+                elif any(word in user_question_lower for word in ['product', '产品']):
+                    modified_kql = self._modify_grouping(modified_kql, add_column="Product")
+                    modifications_applied.append("Added product grouping")
+            
+            return {
+                "success": True,
+                "modified_kql": modified_kql.strip(),
+                "original_question": user_question,
+                "modifications_applied": modifications_applied if modifications_applied else ["Query structure preserved"]
+            }
+            
+        except Exception as e:
+            print(f"Error modifying Kusto query: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Error modifying Kusto query: {str(e)}",
+                "original_kql": original_kql,
+                "user_question": user_question
+            }
+    
+    def _modify_time_range(self, kql: str, offset: int, unit: str) -> str:
+        """Modify the time range in the KQL query"""
+        lines = kql.split('\n')
+        for i, line in enumerate(lines):
+            if 'datetime_add("day", -15, currentDateTime)' in line:
+                lines[i] = f'let startDateTime = datetime_add("{unit}", {offset}, currentDateTime);'
+            elif 'datetime_add("minute", 30, startDateTime)' in line:
+                lines[i] = 'let endDateTime = currentDateTime;'
+        return '\n'.join(lines)
+    
+    def _add_product_filter(self, kql: str, product: str) -> str:
+        """Add a product filter to the KQL query"""
+        lines = kql.split('\n')
+        for i, line in enumerate(lines):
+            if '| where isnotnull(Product) and isnotempty(Product)' in line:
+                lines[i] = f'{line}\n| where Product == "{product}"'
+                break
+        return '\n'.join(lines)
+    
+    def _add_os_filter(self, kql: str, os_type: str) -> str:
+        """Add an OS filter to the KQL query"""
+        lines = kql.split('\n')
+        for i, line in enumerate(lines):
+            if '| where isnotnull(Product) and isnotempty(Product)' in line:
+                lines[i] = f'{line}\n| where OS == "{os_type}"'
+                break
+        return '\n'.join(lines)
+    
+    def _add_top_limit(self, kql: str, limit: int, descending: bool = True) -> str:
+        """Add a top/bottom limit to the KQL query"""
+        lines = kql.split('\n')
+        # Find the project line and add top before it
+        for i in range(len(lines)):
+            if lines[i].strip().startswith('| project'):
+                order_direction = "desc" if descending else "asc"
+                lines.insert(i, f'| top {limit} by counts {order_direction}')
+                break
+        return '\n'.join(lines)
+    
+    def _modify_grouping(self, kql: str, add_column: str) -> str:
+        """Modify the grouping columns in summarize clause"""
+        lines = kql.split('\n')
+        for i, line in enumerate(lines):
+            if line.strip().startswith('| summarize counts = count() by'):
+                if add_column not in line:
+                    # Add the new column to the grouping
+                    parts = line.split(' by ')
+                    if len(parts) == 2:
+                        existing_cols = parts[1]
+                        lines[i] = f'{parts[0]} by {add_column}, {existing_cols}'
+                break
+        return '\n'.join(lines)

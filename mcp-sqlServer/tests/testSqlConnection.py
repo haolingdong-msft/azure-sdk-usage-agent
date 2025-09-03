@@ -2,7 +2,6 @@ import pyodbc
 import struct
 from azure import identity
 
-
 server = "azuresdkbi-server.database.windows.net"
 database = "azuresdkbi"
 driver = "{ODBC Driver 18 for SQL Server}"
