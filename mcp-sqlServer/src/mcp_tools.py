@@ -651,29 +651,6 @@ class MCPTools:
             print(f"User question: {user_question}")
             print(f"Original KQL length: {len(original_kql)} characters")
             
-            # Get schema context to help AI understand available columns and values
-            schema_context = {
-                "available_tables": ["HttpIncomingRequests"],
-                "common_columns": [
-                    "subscriptionId", "Product", "apiVersion", "Track", "OS", 
-                    "targetResourceProvider", "Resource", "httpMethod", "RoleLocation",
-                    "userAgent", "operationName", "TIMESTAMP"
-                ],
-                "available_products": self.schema_loader.get_enum_values('Product') or [],
-                "available_os": self.schema_loader.get_enum_values('OS') or ['Windows', 'Linux', 'MacOS'],
-                "available_http_methods": self.schema_loader.get_enum_values('HttpMethod') or ['GET', 'POST', 'PUT', 'DELETE'],
-                "time_functions": [
-                    "datetime()", "ago()", "datetime_add()", "startofday()", "endofday()",
-                    "between()", "now()"
-                ],
-                "common_filters": [
-                    "Product filtering: | where Product == 'ProductName'",
-                    "OS filtering: | where OS == 'Windows'",
-                    "Time range: | where TIMESTAMP between(startDateTime .. endDateTime)",
-                    "Provider filtering: | where targetResourceProvider == 'microsoft.compute'"
-                ]
-            }
-            
             # Create detailed prompt for AI
             ai_prompt = f"""Please modify the following Kusto (KQL) query based on the user's request.
 
@@ -684,16 +661,9 @@ Original KQL Query:
 {original_kql}
 ```
 
-Available Schema Context:
-- Main table: HttpIncomingRequests
-- Key columns: {', '.join(schema_context['common_columns'])}
-- Available Products: {', '.join(schema_context['available_products'][:10])}{'...' if len(schema_context['available_products']) > 10 else ''}
-- Available OS: {', '.join(schema_context['available_os'])}
-- Available HTTP Methods: {', '.join(schema_context['available_http_methods'])}
-
 Common KQL Patterns:
 - Time filtering: | where TIMESTAMP >= ago(7d)
-- Product filtering: | where Product == "Python-SDK"
+- Product filtering: | where Product == "ProductName"
 - Aggregation: | summarize count() by Product
 - Top results: | top 10 by count_column desc
 - Date range: | where TIMESTAMP between(datetime(2025-08-01) .. datetime(2025-09-01))
@@ -711,7 +681,6 @@ Ensure the modified query is syntactically correct and follows KQL best practice
                 "original_kql": original_kql,
                 "user_question": user_question,
                 "ai_prompt": ai_prompt,
-                "schema_context": schema_context,
                 "modification_guidelines": {
                     "preserve_structure": "Keep the original query structure when possible",
                     "syntax_rules": "Ensure proper KQL syntax and function usage",

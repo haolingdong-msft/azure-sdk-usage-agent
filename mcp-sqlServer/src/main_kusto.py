@@ -1,161 +1,89 @@
 """
 Main entry point for the MCP Kusto Query Server
+简化版本：只负责传递数据给AI，让AI处理查询生成逻辑
 """
 import sys
 from mcp.server.fastmcp import FastMCP
-from .config import MCP_PORT, SCHEMA_FILE_PATH
-from .schema_loader import SchemaLoader
-from .mcp_tools import MCPTools
-
+from .config import MCP_PORT_KUSTO
+from .simple_kusto_mcp import SimpleKustoMCP
 
 def create_kusto_mcp_server():
     """Create and configure the MCP server for Kusto query operations"""
-    # Initialize FastMCP server with different port for Kusto
-    kusto_port = MCP_PORT + 1  # Use a different port
-    mcp = FastMCP("kustoQueryModifier", stateless_http=True, port=kusto_port)
+    mcp = FastMCP("kustoQueryModifier", stateless_http=True, port=MCP_PORT_KUSTO)
     
     # Initialize components
-    schema_loader = SchemaLoader(SCHEMA_FILE_PATH)
-    mcp_tools = MCPTools(schema_loader)
+    mcp_tools = SimpleKustoMCP()
     
     # Register Kusto-specific MCP tools
     @mcp.tool()
-    async def modifyKustoQuery(original_kql: str, user_question: str):
+    async def generateKQLFromTemplate(user_question: str):
         """
-        根据用户提供的已有 Kusto Query 和用户问题，生成一个修改后的 Kusto Query，满足用户问题的要求。
+        基于sample.kql模板和用户问题生成KQL查询
+        
+        这个工具会：
+        1. 读取reference/samples/sample.kql作为模板
+        2. 将用户问题和模板一起返回给AI
+        3. 让AI基于模板和问题生成新的KQL查询
         
         Args:
-            original_kql: 原始的 Kusto Query (.kql 文件内容)
-            user_question: 用户的问题或修改要求 (例如: "只显示Python SDK的数据", "过去7天的数据", "按产品分组显示前10个结果")
+            user_question: 用户的查询需求（例如："显示Go SDK上个月资源提供程序的百分比分析"）
             
         Returns:
-            修改后的 Kusto Query，保持原始查询结构尽量完整，只修改必要部分
+            包含模板和用户问题的结构化数据，供AI处理生成新的KQL查询
         """
-        return await mcp_tools.modify_kusto_query(original_kql, user_question)
+        return await mcp_tools.generate_kql_from_template(user_question)
+
+    @mcp.tool()
+    async def modifyKustoQuery(original_kql: str, user_question: str):
+        """
+        兼容性工具：将请求转发到generateKQLFromTemplate
+        
+        Args:
+            original_kql: 原始KQL查询（可能不会被使用）
+            user_question: 用户的修改需求
+            
+        Returns:
+            基于模板和用户问题的结构化数据
+        """
+        return await mcp_tools.generate_kql_from_template(user_question)
 
     @mcp.tool()
     async def validateKustoSyntax(kql_query: str):
         """
-        验证 Kusto Query 语法的基本正确性
+        验证KQL查询的基本语法
         
         Args:
-            kql_query: 要验证的 Kusto Query
+            kql_query: 要验证的KQL查询
             
         Returns:
-            验证结果，包含语法错误信息（如果有）
+            基本语法验证结果
         """
-        try:
-            # Basic syntax validation
-            lines = kql_query.split('\n')
-            errors = []
-            warnings = []
-            
-            # Check for common syntax issues
-            for i, line in enumerate(lines, 1):
-                line_stripped = line.strip()
-                if not line_stripped or line_stripped.startswith('//'):
-                    continue
-                    
-                # Check for proper pipe operator usage
-                if line_stripped.startswith('|') and i == 1:
-                    errors.append(f"Line {i}: Query cannot start with pipe operator")
-                
-                # Check for let statement syntax
-                if line_stripped.startswith('let ') and not ('=' in line and line.endswith(';')):
-                    if not line.endswith('{') and not line.endswith('('):
-                        warnings.append(f"Line {i}: Let statement should end with semicolon")
-                
-                # Check for function definition syntax
-                if '= (' in line and not line.strip().endswith('{'):
-                    warnings.append(f"Line {i}: Function definition should end with opening brace")
-            
-            return {
-                "success": True,
-                "is_valid": len(errors) == 0,
-                "errors": errors,
-                "warnings": warnings,
-                "line_count": len([l for l in lines if l.strip() and not l.strip().startswith('//')])
-            }
-            
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"Validation error: {str(e)}",
-                "is_valid": False
-            }
+        return await mcp_tools.validate_kusto_syntax(kql_query)
 
     @mcp.tool()
     async def explainKustoQuery(kql_query: str):
         """
-        解释 Kusto Query 的主要组成部分和功能
+        解释KQL查询的主要组成部分
         
         Args:
-            kql_query: 要解释的 Kusto Query
+            kql_query: 要解释的KQL查询
             
         Returns:
-            查询解释，包含主要步骤和功能说明
+            查询结构和操作的解释
         """
-        try:
-            lines = kql_query.split('\n')
-            explanation = {
-                "query_type": "Kusto Query Language (KQL)",
-                "main_steps": [],
-                "variables_defined": [],
-                "functions_defined": [],
-                "data_operations": [],
-                "output_columns": []
-            }
-            
-            current_function = None
-            
-            for line in lines:
-                line_stripped = line.strip()
-                if not line_stripped or line_stripped.startswith('//'):
-                    continue
-                
-                # Identify let statements (variables)
-                if line_stripped.startswith('let ') and '=' in line:
-                    var_name = line_stripped.split(' ')[1].split('=')[0].strip()
-                    if '(' in line:  # Function definition
-                        explanation["functions_defined"].append({
-                            "name": var_name,
-                            "description": "User-defined function"
-                        })
-                        current_function = var_name
-                    else:  # Variable definition
-                        explanation["variables_defined"].append({
-                            "name": var_name,
-                            "description": "Variable definition"
-                        })
-                
-                # Identify main query operations
-                elif line_stripped.startswith('|'):
-                    operation = line_stripped.split('|')[1].strip().split(' ')[0]
-                    explanation["data_operations"].append({
-                        "operation": operation,
-                        "description": line_stripped
-                    })
-                
-                # Identify data source
-                elif 'Unionizer(' in line_stripped or any(table in line_stripped for table in ['Events', 'Requests', 'HttpIncomingRequests']):
-                    explanation["main_steps"].append("Data source identification")
-                
-                # Identify project operations (output columns)
-                elif '| project' in line_stripped:
-                    cols = line_stripped.replace('| project', '').strip()
-                    explanation["output_columns"] = [col.strip() for col in cols.split(',')]
-            
-            return {
-                "success": True,
-                "explanation": explanation,
-                "summary": f"Query defines {len(explanation['variables_defined'])} variables, {len(explanation['functions_defined'])} functions, and performs {len(explanation['data_operations'])} data operations"
-            }
-            
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"Explanation error: {str(e)}"
-            }
+        return await mcp_tools.explain_kusto_query(kql_query)
+    
+    return mcp
+
+    # @mcp.tool()
+    # async def getKqlExamples():
+    #     """
+    #     Get example KQL queries for common scenarios
+        
+    #     Returns:
+    #         Collection of example KQL queries with descriptions and usage tips
+    #     """
+    #     return mcp_tools.get_kql_examples()
     
     return mcp
 

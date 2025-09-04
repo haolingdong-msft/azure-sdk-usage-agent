@@ -5,6 +5,7 @@ import os
 
 # Server configuration
 MCP_PORT = int(os.environ.get("FUNCTIONS_CUSTOMHANDLER_PORT", 8080))
+MCP_PORT_KUSTO = int(os.environ.get("FUNCTIONS_CUSTOMHANDLER_PORT", 8082))
 
 # SQL Server connection settings
 SQL_SERVER = os.getenv('SQL_SERVER', 'azuresdkbi-server.database.windows.net')
