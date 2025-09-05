@@ -9,7 +9,7 @@
         "description": {
             "defaultExecutablePath": "python",
             "workingDirectory": "",
-            "arguments": ["mssql_query_server.py"]
+            "arguments": ["AzureSDKQueryHandler.py"]
         },
         "enableForwardingHttpRequest": true,
         "enableHttpProxyingRequest": true
