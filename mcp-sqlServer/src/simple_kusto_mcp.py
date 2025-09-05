@@ -1,13 +1,13 @@
 """
-简化的Kusto MCP工具
-只负责读取sample.kql模板和传递用户问题，让AI来处理查询生成
+Simplified Kusto MCP tool
+Only responsible for reading sample.kql template and passing user questions, letting AI handle query generation
 """
 import os
 from typing import Any, Dict
 
 
 class SimpleKustoMCP:
-    """简化的Kusto MCP工具类"""
+    """Simplified Kusto MCP tool class"""
     
     def __init__(self):
         self.sample_kql_path = os.path.join(
@@ -17,19 +17,19 @@ class SimpleKustoMCP:
     
     async def generate_kql_from_template(self, user_question: str) -> Dict[str, Any]:
         """
-        基于sample.kql模板和用户问题，返回结构化数据给AI处理
+        Based on sample.kql template and user question, return structured data for AI processing
         
         Args:
-            user_question: 用户的查询需求
+            user_question: User's query requirement
             
         Returns:
-            包含模板和用户问题的结构化数据，供AI处理
+            Structured data containing template and user question for AI processing
         """
         try:
-            # 读取sample.kql模板
+            # Read sample.kql template
             sample_kql = self._read_sample_kql()
             
-            # 返回结构化数据给AI
+            # Return structured data for AI
             return {
                 "success": True,
                 "user_question": user_question,
@@ -72,7 +72,7 @@ class SimpleKustoMCP:
             }
     
     def _read_sample_kql(self) -> str:
-        """读取sample.kql文件内容"""
+        """Read content of sample.kql file"""
         try:
             with open(self.sample_kql_path, 'r', encoding='utf-8') as f:
                 return f.read()
@@ -83,28 +83,28 @@ class SimpleKustoMCP:
     
     async def validate_kusto_syntax(self, kql_query: str) -> Dict[str, Any]:
         """
-        简单的KQL语法验证
+        Simple KQL syntax validation
         
         Args:
-            kql_query: 要验证的KQL查询
+            kql_query: KQL query to validate
             
         Returns:
-            验证结果
+            Validation result
         """
         try:
-            # 基本语法检查
+            # Basic syntax check
             errors = []
             lines = kql_query.split('\n')
             
-            # 检查基本结构
+            # Check basic structure
             if not any('Unionizer' in line for line in lines):
                 errors.append("Missing Unionizer data source")
             
-            # 检查必要的过滤条件
+            # Check necessary filter conditions
             if not any('where TIMESTAMP' in line for line in lines):
                 errors.append("Missing timestamp filter")
             
-            # 检查语法错误
+            # Check syntax errors
             for i, line in enumerate(lines, 1):
                 line = line.strip()
                 if line and not line.startswith('//') and not line.startswith('let'):
@@ -127,13 +127,13 @@ class SimpleKustoMCP:
     
     async def explain_kusto_query(self, kql_query: str) -> Dict[str, Any]:
         """
-        解释KQL查询的基本组成部分
+        Explain basic components of KQL query
         
         Args:
-            kql_query: 要解释的KQL查询
+            kql_query: KQL query to explain
             
         Returns:
-            查询解释
+            Query explanation
         """
         try:
             lines = [line.strip() for line in kql_query.split('\n') if line.strip()]
@@ -151,7 +151,7 @@ class SimpleKustoMCP:
                 "functions_used": []
             }
             
-            # 分析查询操作
+            # Analyze query operations
             for line in lines:
                 if line.startswith('let '):
                     analysis["operations"].append(f"Function definition: {line[:50]}...")

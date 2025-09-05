@@ -1,6 +1,6 @@
 """
-简化的 Kusto Query 修改 MCP 工具
-正确的MCP设计：返回结构化数据给AI助手处理，而不是直接调用AI API
+Simplified Kusto Query modification MCP tool
+Correct MCP design: Return structured data to AI assistant for processing, instead of directly calling AI API
 """
 import re
 import json
@@ -42,25 +42,25 @@ class MCPToolsKusto:
     
     async def generate_kusto_query(self, user_question: str) -> Dict[str, Any]:
         """
-        根据用户问题直接生成新的KQL查询
+        Generate new KQL query directly based on user question
         
         Args:
-            user_question: 用户的查询需求
+            user_question: User's query requirement
             
         Returns:
-            包含生成的KQL查询的结构化数据
+            Structured data containing generated KQL query
         """
         try:
-            print(f"生成KQL查询，用户需求: {user_question}")
+            print(f"Generating KQL query, user requirement: {user_question}")
             
-            # 根据用户问题生成KQL查询
+            # Generate KQL query based on user question
             generated_kql = self._generate_kql_for_question(user_question)
             
             result = {
                 "success": True,
                 "user_question": user_question,
                 "generated_kql": generated_kql,
-                "explanation": f"根据用户需求生成的KQL查询: {user_question}",
+                "explanation": f"KQL query generated based on user requirement: {user_question}",
                 "query_type": "Kusto Query Language (KQL)",
                 "estimated_execution_time": "Fast"
             }
@@ -70,33 +70,33 @@ class MCPToolsKusto:
         except Exception as e:
             return {
                 "success": False,
-                "error": f"生成KQL查询时出错: {str(e)}",
+                "error": f"Error generating KQL query: {str(e)}",
                 "user_question": user_question,
-                "suggestion": "请重新描述查询需求"
+                "suggestion": "Please re-describe the query requirement"
             }
 
     async def modify_kusto_query(self, original_kql: str, user_question: str) -> Dict[str, Any]:
         """
-        根据用户问题重新生成KQL查询（不再是修改现有查询）
+        Regenerate KQL query based on user question (no longer modifying existing query)
         
         Args:
-            original_kql: 原始 KQL 查询（可能不需要，但保留兼容性）
-            user_question: 用户的查询需求
+            original_kql: Original KQL query (might not be needed, but kept for compatibility)
+            user_question: User's query requirement
             
         Returns:
-            包含重新生成的KQL查询的结构化数据
+            Structured data containing regenerated KQL query
         """
         try:
-            print(f"重新生成KQL查询，用户需求: {user_question}")
+            print(f"Regenerating KQL query, user requirement: {user_question}")
             
-            # 直接根据用户问题生成新的KQL查询，不依赖原始查询
+            # Generate new KQL query directly based on user question, without depending on original query
             generated_kql = self._generate_kql_for_question(user_question)
             
             result = {
                 "success": True,
                 "user_question": user_question,
                 "generated_kql": generated_kql,
-                "explanation": f"根据用户需求重新生成的KQL查询: {user_question}",
+                "explanation": f"KQL query regenerated based on user requirement: {user_question}",
                 "query_type": "Kusto Query Language (KQL)",
                 "approach": "complete_regeneration"
             }
@@ -106,9 +106,9 @@ class MCPToolsKusto:
         except Exception as e:
             return {
                 "success": False,
-                "error": f"重新生成KQL查询时出错: {str(e)}",
+                "error": f"Error regenerating KQL query: {str(e)}",
                 "user_question": user_question,
-                "suggestion": "请重新描述查询需求"
+                "suggestion": "Please re-describe the query requirement"
             }
     
     def _generate_kql_for_question(self, user_question: str) -> str:
@@ -116,7 +116,7 @@ class MCPToolsKusto:
         Generate a complete KQL query with user-defined functions for user questions
         
         Args:
-            user_question: 用户的查询需求
+            user_question: User's query requirement
             
         Returns:
             Complete KQL query string with GetProduct, GetProvider, GetResource functions
@@ -246,17 +246,17 @@ Unionizer("Requests", "HttpIncomingRequests")
         current_time = "2025-09-04"
         
         # Parse time expressions
-        if 'this month' in question_lower or '本月' in question_lower:
+        if 'this month' in question_lower or 'this month' in question_lower:
             return "2025-09-01", current_time
-        elif 'last month' in question_lower or '上个月' in question_lower:
+        elif 'last month' in question_lower or 'last month' in question_lower:
             return "2025-08-01", "2025-08-31"
-        elif 'today' in question_lower or '今天' in question_lower:
+        elif 'today' in question_lower or 'today' in question_lower:
             return current_time, current_time
-        elif 'yesterday' in question_lower or '昨天' in question_lower:
+        elif 'yesterday' in question_lower or 'yesterday' in question_lower:
             return "2025-09-03", "2025-09-03"
-        elif 'this year' in question_lower or '今年' in question_lower or '2025' in question_lower:
+        elif 'this year' in question_lower or 'this year' in question_lower or '2025' in question_lower:
             return "2025-01-01", current_time
-        elif 'last year' in question_lower or '去年' in question_lower or '2024' in question_lower:
+        elif 'last year' in question_lower or 'last year' in question_lower or '2024' in question_lower:
             return "2024-01-01", "2024-12-31"
         else:
             # Default: current month
@@ -312,58 +312,58 @@ Unionizer("Requests", "HttpIncomingRequests")
 
     def _generate_summarize_project(self, question: str, detected_product: str) -> str:
         """
-        根据用户问题生成summarize和project部分
+        Generate summarize and project sections based on user question
         
         Args:
-            question: 用户问题（小写）
-            detected_product: 检测到的产品名
+            question: User question (lowercase)
+            detected_product: Detected product name
             
         Returns:
-            summarize和project的KQL语句
+            KQL statements for summarize and project
         """
-        # 如果是请求计数相关的查询
-        if any(word in question for word in ['count', 'number', 'how many', '数量', '多少']):
+        # If it's a request count related query
+        if any(word in question for word in ['count', 'number', 'how many', 'amount', 'quantity']):
             if detected_product:
-                # 特定产品的总请求数
+                # Total requests for specific product
                 return """| summarize TotalRequests = sum(counts)
 | project TotalRequests"""
             else:
-                # 按产品分组的请求数
+                # Request count grouped by product
                 return """| summarize TotalRequests = sum(counts) by Product
 | project Product, TotalRequests
 | order by TotalRequests desc"""
         
-        # 如果是订阅相关的查询
-        elif any(word in question for word in ['subscription', 'customer', '订阅', '客户']):
+        # If it's a subscription related query
+        elif any(word in question for word in ['subscription', 'customer', 'subscriber', 'tenant']):
             return """| summarize TotalRequests = sum(counts) by subscriptionId, Product
 | project subscriptionId, Product, TotalRequests
 | order by TotalRequests desc"""
         
-        # 如果是API版本相关的查询
+        # If it's API version related query
         elif any(word in question for word in ['api', 'version', 'endpoint', 'resource']):
             return """| summarize TotalRequests = sum(counts) by Product, apiVersion, targetResourceProvider
 | project Product, apiVersion, targetResourceProvider, TotalRequests
 | order by TotalRequests desc"""
         
-        # 如果是操作系统相关的查询
+        # If it's operating system related query
         elif any(word in question for word in ['os', 'platform', 'windows', 'linux', 'mac']):
             return """| summarize TotalRequests = sum(counts) by Product, OS
 | project Product, OS, TotalRequests
 | order by TotalRequests desc"""
         
-        # 如果是Track相关的查询
+        # If it's Track related query
         elif any(word in question for word in ['track', 'version']):
             return """| summarize TotalRequests = sum(counts) by Product, Track
 | project Product, Track, TotalRequests
 | order by TotalRequests desc"""
         
-        # 如果是详细分析查询
-        elif any(word in question for word in ['detail', 'breakdown', 'analysis', '详细', '分析']):
+        # If it's detailed analysis query
+        elif any(word in question for word in ['detail', 'breakdown', 'analysis', 'detailed', 'analyze']):
             return """| summarize TotalRequests = sum(counts) by subscriptionId, Product, apiVersion, Track, OS, targetResourceProvider, Resource, httpMethod
 | project subscriptionId, Product, TotalRequests, apiVersion, Track, OS, targetResourceProvider, Resource, httpMethod
 | order by TotalRequests desc"""
         
-        # 默认情况：简单的总计
+        # Default case: simple total
         else:
             if detected_product:
                 return """| summarize TotalRequests = sum(counts)
@@ -375,27 +375,27 @@ Unionizer("Requests", "HttpIncomingRequests")
 
     def _get_time_condition(self, question: str) -> str:
         """
-        根据问题获取时间条件，但保持sample.kql的时间变量结构
+        Get time condition based on question, while maintaining sample.kql time variable structure
         
         Args:
-            question: 用户问题（小写）
+            question: User question (lowercase)
             
         Returns:
-            时间相关的说明（主要用于注释）
+            Time-related description (mainly used for comments)
         """
-        if 'this month' in question or '本月' in question:
+        if 'this month' in question or 'current month' in question:
             return "current month"
-        elif 'last month' in question or '上个月' in question:
+        elif 'last month' in question or 'previous month' in question:
             return "last month"
-        elif 'today' in question or '今天' in question:
+        elif 'today' in question or 'current day' in question:
             return "today"
-        elif 'week' in question or '周' in question:
+        elif 'week' in question or 'weekly' in question:
             return "this week"
         else:
             return "default range (last 30 days)"
 
     def _detect_time_range(self, question: str) -> Optional[Dict[str, str]]:
-        """检测时间范围"""
+        """Detect time range"""
         if 'last 3 months' in question:
             return {"start": "2025-06-01", "end": "2025-09-01"}
         elif 'last 6 months' in question:
@@ -407,26 +407,26 @@ Unionizer("Requests", "HttpIncomingRequests")
         return None
 
     def _detect_query_type(self, question: str) -> str:
-        """检测查询类型"""
-        if any(word in question for word in ['count', 'number', 'how many', '数量', '多少']):
+        """Detect query type"""
+        if any(word in question for word in ['count', 'number', 'how many', 'quantity', 'amount']):
             return 'count'
-        elif any(word in question for word in ['trend', 'over time', '趋势', '变化']):
+        elif any(word in question for word in ['trend', 'over time', 'trending', 'change']):
             return 'trend'
-        elif any(word in question for word in ['top', 'most', '最多', '排名']):
+        elif any(word in question for word in ['top', 'most', 'highest', 'ranking']):
             return 'ranking'
-        elif any(word in question for word in ['percent', 'percentage', '百分比', '占比']):
+        elif any(word in question for word in ['percent', 'percentage', 'proportion', 'ratio']):
             return 'percentage'
         return 'summary'
 
     def _get_product_where_filter(self, user_question: str) -> str:
         """
-        基于用户问题生成产品过滤的 where 子句
+        Generate product filtering where clause based on user question
         
         Args:
-            user_question: 用户问题
+            user_question: User question
             
         Returns:
-            产品过滤的 where 子句
+            Product filtering where clause
         """
         question_lower = user_question.lower()
         
@@ -441,23 +441,23 @@ Unionizer("Requests", "HttpIncomingRequests")
         elif 'dotnet' in question_lower or '.net' in question_lower or 'c#' in question_lower:
             return '| where Product has ".Net"'
         else:
-            return ''  # 不过滤，显示所有产品
+            return ''  # No filtering, show all products
 
     def _generate_aggregation_and_output(self, user_question: str, query_type: str) -> str:
         """
-        基于查询类型生成聚合和输出部分
+        Generate aggregation and output section based on query type
         
         Args:
-            user_question: 用户问题
-            query_type: 查询类型
+            user_question: User question
+            query_type: Query type
             
         Returns:
-            聚合和输出的KQL语句
+            KQL statements for aggregation and output
         """
         question_lower = user_question.lower()
         
-        # 百分比相关查询
-        if query_type == 'percentage' or any(word in question_lower for word in ['percent', 'percentage', '百分比', '占比']):
+        # Percentage related query
+        if query_type == 'percentage' or any(word in question_lower for word in ['percent', 'percentage', 'proportion', 'ratio']):
             if 'provider' in question_lower or 'resource provider' in question_lower:
                 return """| summarize RequestCount = count() by Provider
 | extend TotalRequests = toscalar(summarize sum(RequestCount))
@@ -477,42 +477,42 @@ Unionizer("Requests", "HttpIncomingRequests")
 | project Product, RequestCount, Percentage
 | order by Percentage desc"""
         
-        # 订阅相关查询
-        elif any(word in question_lower for word in ['subscription', 'customer', '订阅', '客户']):
+        # Subscription related query
+        elif any(word in question_lower for word in ['subscription', 'customer', 'subscriber', 'tenant']):
             return """| summarize RequestCount = count() by subscriptionId, Product, Provider
 | project subscriptionId, Product, Provider, RequestCount
 | order by RequestCount desc"""
         
-        # API版本相关查询
+        # API version related query
         elif any(word in question_lower for word in ['api', 'version', 'endpoint']):
             return """| summarize RequestCount = count() by Product, apiVersion, Provider
 | project Product, apiVersion, Provider, RequestCount
 | order by RequestCount desc"""
         
-        # 操作系统相关查询
+        # Operating system related query
         elif any(word in question_lower for word in ['os', 'platform', 'windows', 'linux', 'mac']):
             return """| summarize RequestCount = count() by Product, OS, Provider
 | project Product, OS, Provider, RequestCount
 | order by RequestCount desc"""
         
-        # Track相关查询
+        # Track related query
         elif any(word in question_lower for word in ['track']):
             return """| summarize RequestCount = count() by Product, Track, Provider
 | project Product, Track, Provider, RequestCount
 | order by RequestCount desc"""
         
-        # 详细分析查询
-        elif any(word in question_lower for word in ['detail', 'breakdown', 'analysis', '详细', '分析']):
+        # Detailed analysis query
+        elif any(word in question_lower for word in ['detail', 'breakdown', 'analysis', 'detailed', 'analyze']):
             return """| summarize RequestCount = count() by subscriptionId, Product, apiVersion, Track, OS, Provider, Resource, httpMethod
 | project subscriptionId, Product, RequestCount, apiVersion, Track, OS, Provider, Resource, httpMethod
 | order by RequestCount desc"""
         
-        # 排名相关查询
-        elif query_type == 'ranking' or any(word in question_lower for word in ['top', 'most', '最多', '排名']):
-            limit_num = 10  # 默认前10
-            if 'top 5' in question_lower or '前5' in question_lower:
+        # Ranking related query
+        elif query_type == 'ranking' or any(word in question_lower for word in ['top', 'most', 'highest', 'ranking']):
+            limit_num = 10  # Default top 10
+            if 'top 5' in question_lower or 'first 5' in question_lower:
                 limit_num = 5
-            elif 'top 20' in question_lower or '前20' in question_lower:
+            elif 'top 20' in question_lower or 'first 20' in question_lower:
                 limit_num = 20
             
             if 'provider' in question_lower:
@@ -526,7 +526,7 @@ Unionizer("Requests", "HttpIncomingRequests")
 | order by RequestCount desc
 | take {limit_num}"""
         
-        # 默认情况：基本计数
+        # Default case: basic counting
         else:
             if 'provider' in question_lower or 'resource provider' in question_lower:
                 return """| summarize RequestCount = count() by Provider
@@ -538,38 +538,38 @@ Unionizer("Requests", "HttpIncomingRequests")
 | order by RequestCount desc"""
 
     def _generate_ai_prompt(self, original_kql: str, user_question: str) -> str:
-        """生成 AI 提示"""
-        prompt = f"""你是一个Kusto Query Language (KQL)专家。请根据用户需求修改以下KQL查询。
+        """Generate AI prompt"""
+        prompt = f"""You are a Kusto Query Language (KQL) expert. Please modify the following KQL query according to user requirements.
 
-用户需求: {user_question}
+User requirement: {user_question}
 
-原始KQL查询:
+Original KQL query:
 ```kql
 {original_kql}
 ```
 
-请按以下格式返回JSON响应:
+Please return JSON response in the following format:
 {{
     "success": true,
-    "modified_kql": "修改后的完整KQL查询",
-    "explanation": "修改说明",
-    "changes_made": ["具体修改点1", "具体修改点2"]
+    "modified_kql": "Complete modified KQL query",
+    "explanation": "Modification explanation",
+    "changes_made": ["Specific change point 1", "Specific change point 2"]
 }}
 
-修改要求:
-1. 保持原查询的核心结构
-2. 只修改与用户需求相关的部分
-3. 确保修改后的KQL语法正确
-4. 提供清晰的修改说明
+Modification requirements:
+1. Keep the core structure of original query
+2. Only modify parts related to user requirements
+3. Ensure modified KQL syntax is correct
+4. Provide clear modification explanation
 
-常见修改类型:
-- 时间过滤: 使用 ago(7d), ago(30d), ago(1d) 等
-- 产品过滤: 添加或修改 Product == "产品名" 条件
-- 结果限制: 添加 | top N by 列名 desc
-- 聚合修改: 更改 count(), sum(), avg() 等函数
-- 分组修改: 调整 summarize ... by 子句
+Common modification types:
+- Time filtering: use ago(7d), ago(30d), ago(1d) etc.
+- Product filtering: add or modify Product == "product name" condition
+- Result limiting: add | top N by column desc
+- Aggregation modification: change count(), sum(), avg() functions
+- Grouping modification: adjust summarize ... by clause
 
-请确保返回有效的JSON格式。"""
+Please ensure valid JSON format is returned."""
         
         return prompt
     
@@ -751,55 +751,55 @@ Unionizer("Requests", "HttpIncomingRequests")
         }
     
     def get_supported_modifications(self) -> Dict[str, Any]:
-        """获取支持的修改类型说明"""
+        """Get supported modification types description"""
         return {
             "time_filters": {
-                "description": "时间过滤修改",
+                "description": "Time filtering modifications",
                 "examples": [
-                    "过去7天的数据",
-                    "最近30天",
-                    "今天的记录",
-                    "2025年的数据"
+                    "Data from past 7 days",
+                    "Last 30 days",
+                    "Today's records",
+                    "Data from 2025"
                 ]
             },
             "product_filters": {
-                "description": "产品过滤",
+                "description": "Product filtering",
                 "examples": [
-                    "只显示Python SDK",
-                    "Java相关数据",
-                    "JavaScript SDK使用情况"
+                    "Show only Python SDK",
+                    "Java related data",
+                    "JavaScript SDK usage"
                 ]
             },
             "result_limits": {
-                "description": "结果数量限制",
+                "description": "Result count limitation",
                 "examples": [
-                    "前10个结果",
-                    "显示前5名",
-                    "限制100条记录"
+                    "Top 10 results",
+                    "Show top 5",
+                    "Limit to 100 records"
                 ]
             },
             "aggregations": {
-                "description": "聚合函数修改",
+                "description": "Aggregation function modifications",
                 "examples": [
-                    "改为计数统计",
-                    "求和而不是计数",
-                    "计算平均值"
+                    "Change to count statistics",
+                    "Sum instead of count",
+                    "Calculate average"
                 ]
             },
             "grouping": {
-                "description": "分组方式修改",
+                "description": "Grouping method modifications",
                 "examples": [
-                    "按产品分组",
-                    "按客户分组",
-                    "按月份汇总"
+                    "Group by product",
+                    "Group by customer",
+                    "Summarize by month"
                 ]
             }
         }
 
 
-# 使用示例
+# Usage example
 async def example_usage():
-    """使用示例"""
+    """Usage example"""
     modifier = MCPToolsKusto()
     
     sample_kql = """let currentDateTime = datetime("2025-09-01");  
@@ -811,20 +811,20 @@ Unionizer("Requests", "HttpIncomingRequests")
 | summarize counts = count() by subscriptionId, Product
 | project subscriptionId, Product, counts"""
     
-    user_question = "只显示Python SDK的数据，限制前10个结果"
+    user_question = "Show only Python SDK data, limit to top 10 results"
     
     result = await modifier.modify_kusto_query(sample_kql, user_question)
     
-    print("MCP工具返回结果:")
-    print(f"成功: {result['success']}")
+    print("MCP tool return result:")
+    print(f"Success: {result['success']}")
     if result['success']:
-        print(f"任务类型: {result['instructions']['task']}")
-        print(f"用户需求: {result['user_question']}")
-        print("AI提示片段:")
+        print(f"Task type: {result['instructions']['task']}")
+        print(f"User requirement: {result['user_question']}")
+        print("AI prompt excerpt:")
         print(result['ai_prompt'][:200] + "...")
-        print("\n这个结果应该传递给AI助手来处理AI提示并生成修改后的KQL")
+        print("\nThis result should be passed to AI assistant to process the AI prompt and generate modified KQL")
     else:
-        print(f"错误: {result['error']}")
+        print(f"Error: {result['error']}")
 
 
 if __name__ == "__main__":

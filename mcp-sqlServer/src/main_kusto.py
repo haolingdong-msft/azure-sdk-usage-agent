@@ -1,6 +1,6 @@
 """
 Main entry point for the MCP Kusto Query Server
-简化版本：只负责传递数据给AI，让AI处理查询生成逻辑
+Simplified version: Only responsible for passing data to AI, letting AI handle query generation logic
 """
 import sys
 from mcp.server.fastmcp import FastMCP
@@ -18,58 +18,58 @@ def create_kusto_mcp_server():
     @mcp.tool()
     async def generateKQLFromTemplate(user_question: str):
         """
-        基于sample.kql模板和用户问题生成KQL查询
+        Generate KQL query based on sample.kql template and user question
         
-        这个工具会：
-        1. 读取reference/samples/sample.kql作为模板
-        2. 将用户问题和模板一起返回给AI
-        3. 让AI基于模板和问题生成新的KQL查询
+        This tool will:
+        1. Read reference/samples/sample.kql as template
+        2. Return user question and template together to AI
+        3. Let AI generate new KQL query based on template and question
         
         Args:
-            user_question: 用户的查询需求（例如："显示Go SDK上个月资源提供程序的百分比分析"）
+            user_question: User's query requirement (e.g.: "Show percentage analysis of Go SDK resource providers last month")
             
         Returns:
-            包含模板和用户问题的结构化数据，供AI处理生成新的KQL查询
+            Structured data containing template and user question for AI to generate new KQL query
         """
         return await mcp_tools.generate_kql_from_template(user_question)
 
     @mcp.tool()
     async def modifyKustoQuery(original_kql: str, user_question: str):
         """
-        兼容性工具：将请求转发到generateKQLFromTemplate
+        Compatibility tool: Forward request to generateKQLFromTemplate
         
         Args:
-            original_kql: 原始KQL查询（可能不会被使用）
-            user_question: 用户的修改需求
+            original_kql: Original KQL query (might not be used)
+            user_question: User's modification requirement
             
         Returns:
-            基于模板和用户问题的结构化数据
+            Structured data based on template and user question
         """
         return await mcp_tools.generate_kql_from_template(user_question)
 
     @mcp.tool()
     async def validateKustoSyntax(kql_query: str):
         """
-        验证KQL查询的基本语法
+        Validate basic syntax of KQL query
         
         Args:
-            kql_query: 要验证的KQL查询
+            kql_query: KQL query to validate
             
         Returns:
-            基本语法验证结果
+            Basic syntax validation result
         """
         return await mcp_tools.validate_kusto_syntax(kql_query)
 
     @mcp.tool()
     async def explainKustoQuery(kql_query: str):
         """
-        解释KQL查询的主要组成部分
+        Explain main components of KQL query
         
         Args:
-            kql_query: 要解释的KQL查询
+            kql_query: KQL query to explain
             
         Returns:
-            查询结构和操作的解释
+            Explanation of query structure and operations
         """
         return await mcp_tools.explain_kusto_query(kql_query)
     
