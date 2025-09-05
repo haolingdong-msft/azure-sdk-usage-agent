@@ -4,9 +4,9 @@ MCP Tools implementation for SQL Server operations
 import asyncio
 from typing import Any, Dict, List
 from .sql_client import MSSQLMSIClient
-from .schema_loader import SchemaLoader
-from .query_parser import QueryParser
-from .config import SQL_SERVER, SQL_DATABASE, AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
+from ..data.schema_loader import SchemaLoader
+from ..parsers.query_parser import QueryParser
+from ..config.config import SQL_SERVER, SQL_DATABASE, AZURE_SUBSCRIPTION_ID, AZURE_RESOURCE_GROUP
 
 
 class MCPTools:

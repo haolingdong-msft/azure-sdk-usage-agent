@@ -8,7 +8,7 @@ import struct
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional
 from azure.identity import DefaultAzureCredential
-from .config import (
+from ..config.config import (
     SQL_SERVER, SQL_DATABASE
 )
 
@@ -143,8 +143,7 @@ class MSSQLMSIClient:
             elapsed_time = time.time() - start_time
             print(f"❌ Connection failed after {elapsed_time:.2f}s: {str(e)}")
             raise
-    
-    
+
     async def get_connection(self, timeout: int = 30) -> pyodbc.Connection:
         """
         Get a database connection with MSI authentication

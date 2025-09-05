@@ -54,7 +54,8 @@ let GetOSInfo = (UAString: string)
     ); 
 };
 let GetProvider = (uriString: string)   
-{   let entityName = "";  
+{   
+    let entityName = "";  
     let lowerURI = tolower(uriString);  
     let providerMatch = extract("/providers/([^?/]*)", 1, lowerURI);  
     let entityName1 = iff(providerMatch != "", providerMatch, entityName);  

@@ -1,3 +1,0 @@
-"""
-MCP SQL Server package
-"""

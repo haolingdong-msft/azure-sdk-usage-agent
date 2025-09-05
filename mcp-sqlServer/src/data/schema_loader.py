@@ -4,7 +4,7 @@ Schema loader for table and column information
 import os
 import json
 from typing import Any, Dict, List
-from .models import TableInfo
+from ..types.models import TableInfo
 
 
 class SchemaLoader:

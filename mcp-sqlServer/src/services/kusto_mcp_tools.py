@@ -5,13 +5,12 @@ Only responsible for reading sample.kql template and passing user questions, let
 import os
 from typing import Any, Dict
 
-
 class SimpleKustoMCP:
     """Simplified Kusto MCP tool class"""
     
     def __init__(self):
         self.sample_kql_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), 
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
             "reference", "samples", "sample.kql"
         )
     

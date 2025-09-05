@@ -3,9 +3,9 @@ Query parser for natural language to SQL conversion
 """
 import re
 from typing import Any, Dict, List, Optional
-from .models import QueryInfo
-from .schema_loader import SchemaLoader
-from .product_aliases import ProductAliasMapper
+from ..types.models import QueryInfo
+from ..data.schema_loader import SchemaLoader
+from ..data.product_aliases import ProductAliasMapper
 
 
 class QueryParser:

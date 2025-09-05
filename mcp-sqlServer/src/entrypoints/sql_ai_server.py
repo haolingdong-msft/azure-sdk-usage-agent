@@ -4,9 +4,9 @@ Only includes executeSQLQuery and AI helper tools (no parseUserQuery)
 """
 import sys
 from mcp.server.fastmcp import FastMCP
-from .config import MCP_PORT, SCHEMA_FILE_PATH
-from .schema_loader import SchemaLoader
-from .mcp_tools import MCPTools
+from ..config.config import MCP_PORT, SCHEMA_FILE_PATH
+from ..data.schema_loader import SchemaLoader
+from ..services.mcp_tools import MCPTools
 
 
 def create_mcp_server():

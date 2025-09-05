@@ -47,7 +47,7 @@
 ### 启动服务器
 ```bash
 # 启动Kusto MCP服务器
-python src/main_kusto.py
+python -m src.mains.main_kusto
 ```
 
 ### MCP工具调用
@@ -144,18 +144,22 @@ PYTHONPATH=$(pwd) python tests/demo_kusto_modify.py
 ```
 mcp-sqlServer/
 ├── src/
-│   ├── main_kusto.py          # Kusto MCP服务器主入口
-│   ├── mcp_tools.py           # MCP工具实现（包含modify_kusto_query）
-│   ├── config.py              # 配置文件
+│   ├── mains/
+│   │   ├── __init__.py
+│   │   ├── main.py              # SQL MCP服务器主入口
+│   │   ├── main_kusto.py        # Kusto MCP服务器主入口
+│   │   └── main_with_ai.py      # AI辅助SQL MCP服务器入口
+│   ├── mcp_tools.py             # MCP工具实现（包含modify_kusto_query）
+│   ├── config.py                # 配置文件
 │   └── ...
 ├── tests/
-│   ├── testKustoQueryModify.py # 完整功能测试
-│   ├── demo_kusto_modify.py    # 演示脚本
-│   └── simple_kql_test.py      # 简单测试
+│   ├── testKustoQueryModify.py  # 完整功能测试
+│   ├── demo_kusto_modify.py     # 演示脚本
+│   └── simple_kql_test.py       # 简单测试
 ├── reference/
 │   └── samples/
-│       └── sample.kql          # 示例Kusto查询
-└── readme_kusto.md            # 本文档
+│       └── sample.kql           # 示例Kusto查询
+└── readme_kusto.md             # 本文档
 ```
 
 ## 🔧 核心实现

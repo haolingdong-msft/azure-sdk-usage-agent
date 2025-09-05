@@ -6,7 +6,7 @@
 
 1. **直接使用 MCP 工具**，不要先查看 schema 文件
 2. **优先级**：MCP 工具 > 静态文件分析
-3. **当前启用的服务**：`main_kusto.py` (不依赖 AMEAnalytics_Schema.json)
+3. **当前启用的服务**：`src/mains/main_kusto.py` (不依赖 AMEAnalytics_Schema.json)
 
 ## 可用的 MCP 工具
 

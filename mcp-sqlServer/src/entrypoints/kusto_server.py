@@ -4,8 +4,8 @@ Simplified version: Only responsible for passing data to AI, letting AI handle q
 """
 import sys
 from mcp.server.fastmcp import FastMCP
-from .config import MCP_PORT_KUSTO
-from .simple_kusto_mcp import SimpleKustoMCP
+from ..config.config import MCP_PORT_KUSTO
+from ..services.kusto_mcp_tools import SimpleKustoMCP
 
 def create_kusto_mcp_server():
     """Create and configure the MCP server for Kusto query operations"""

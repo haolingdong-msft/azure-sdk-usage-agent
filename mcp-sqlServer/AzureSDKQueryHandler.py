@@ -1,14 +1,14 @@
 """
 Backwards compatibility wrapper for the refactored MCP SQL Server
-This file now imports and uses the modular components from the src/ directory
+This file now imports and uses the modular components from the src/mains/ directory
 
 ⚠️  IMPORTANT FOR AI ASSISTANTS:
 When user requests KQL queries, use MCP tools directly!
-Current active: main_kusto.py (independent, does NOT use AMEAnalytics_Schema.json)
+Current active: src/mains/main_kusto.py (independent, does NOT use AMEAnalytics_Schema.json)
 Do NOT analyze schema files first - call MCP tools immediately.
 
 To use the AI-powered version, change the import to:
-from src.main_with_ai import main
+from src.mains.main_with_ai import main
 """
 
 import os
@@ -17,19 +17,19 @@ import sys
 def start_ai_enhanced_mcp_server():
     """Start AI-enhanced MCP Server with AI-powered query generation"""
     print("Starting AI-enhanced MCP Server with AI-powered query generation...")
-    from src.main_with_ai import main
+    from src.mains.main_with_ai import main
     main()
 
 def start_kusto_analytics_mcp_server():
     """Start Kusto Analytics MCP Server for KQL query processing"""
     print("Starting Kusto Analytics MCP Server for KQL query processing...")
-    from src.main_kusto import main
+    from src.mains.main_kusto import main
     main()
 
 def start_standard_sql_mcp_server():
     """Start Standard SQL MCP Server"""
     print("Starting Standard SQL MCP Server...")
-    from src.main import main
+    from src.mains.main import main
     main()
 
 if __name__ == "__main__":
