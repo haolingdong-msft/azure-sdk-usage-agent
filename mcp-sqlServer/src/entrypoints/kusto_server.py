@@ -1,18 +1,18 @@
 """
-Main entry point for the MCP Kusto Query Server
-Simplified version: Only responsible for passing data to AI, letting AI handle query generation logic
+Main entry point for the MCP KQL Generator Server
+Template-based KQL query generation through MCP protocol
 """
 import sys
 from mcp.server.fastmcp import FastMCP
 from ..config.config import MCP_PORT_KUSTO
-from ..services.kusto_mcp_tools import SimpleKustoMCP
+from ..services.kusto_mcp_tools import KQLGeneratorMCP
 
 def create_kusto_mcp_server():
-    """Create and configure the MCP server for Kusto query operations"""
-    mcp = FastMCP("kustoQueryModifier", stateless_http=True, port=MCP_PORT_KUSTO)
+    """Create and configure the MCP server for KQL query generation"""
+    mcp = FastMCP("kqlGenerator", stateless_http=True, port=MCP_PORT_KUSTO)
     
     # Initialize components
-    mcp_tools = SimpleKustoMCP()
+    mcp_tools = KQLGeneratorMCP()
     
     # Register Kusto-specific MCP tools
     @mcp.tool()
@@ -32,71 +32,18 @@ def create_kusto_mcp_server():
             Structured data containing template and user question for AI to generate new KQL query
         """
         return await mcp_tools.generate_kql_from_template(user_question)
-
-    @mcp.tool()
-    async def modifyKustoQuery(original_kql: str, user_question: str):
-        """
-        Compatibility tool: Forward request to generateKQLFromTemplate
-        
-        Args:
-            original_kql: Original KQL query (might not be used)
-            user_question: User's modification requirement
-            
-        Returns:
-            Structured data based on template and user question
-        """
-        return await mcp_tools.generate_kql_from_template(user_question)
-
-    @mcp.tool()
-    async def validateKustoSyntax(kql_query: str):
-        """
-        Validate basic syntax of KQL query
-        
-        Args:
-            kql_query: KQL query to validate
-            
-        Returns:
-            Basic syntax validation result
-        """
-        return await mcp_tools.validate_kusto_syntax(kql_query)
-
-    @mcp.tool()
-    async def explainKustoQuery(kql_query: str):
-        """
-        Explain main components of KQL query
-        
-        Args:
-            kql_query: KQL query to explain
-            
-        Returns:
-            Explanation of query structure and operations
-        """
-        return await mcp_tools.explain_kusto_query(kql_query)
     
     return mcp
-
-    # @mcp.tool()
-    # async def getKqlExamples():
-    #     """
-    #     Get example KQL queries for common scenarios
-        
-    #     Returns:
-    #         Collection of example KQL queries with descriptions and usage tips
-    #     """
-    #     return mcp_tools.get_kql_examples()
-    
-    return mcp
-
 
 def main():
-    """Main entry point for Kusto MCP server"""
+    """Main entry point for KQL Generator MCP server"""
     try:
         # Initialize and run the server
-        print("Starting MCP Kusto Query Modifier Server...")
+        print("Starting MCP KQL Generator Server...")
         mcp = create_kusto_mcp_server()
         mcp.run(transport="streamable-http")
     except Exception as e:
-        print(f"Error while running Kusto MCP server: {e}", file=sys.stderr)
+        print(f"Error while running KQL Generator MCP server: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":

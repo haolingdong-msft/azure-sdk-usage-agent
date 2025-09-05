@@ -1,12 +1,13 @@
 """
-Simplified Kusto MCP tool
-Only responsible for reading sample.kql template and passing user questions, letting AI handle query generation
+KQL Generator MCP tool
+Generates KQL queries based on sample templates and user questions through MCP protocol
 """
 import os
+from datetime import datetime
 from typing import Any, Dict
 
-class SimpleKustoMCP:
-    """Simplified Kusto MCP tool class"""
+class KQLGeneratorMCP:
+    """KQL Generator MCP tool for template-based query generation"""
     
     def __init__(self):
         self.sample_kql_path = os.path.join(
@@ -42,7 +43,7 @@ class SimpleKustoMCP:
                         "Modify filters, aggregations, and output based on user question",
                         "Ensure proper time range filtering"
                     ],
-                    "current_date": "2025-09-04"
+                    "current_date": datetime.now().strftime("%Y-%m-%d")
                 },
                 "query_context": {
                     "data_source": "Kusto cluster",
@@ -79,100 +80,3 @@ class SimpleKustoMCP:
             raise Exception(f"Sample KQL file not found: {self.sample_kql_path}")
         except Exception as e:
             raise Exception(f"Error reading sample KQL file: {str(e)}")
-    
-    async def validate_kusto_syntax(self, kql_query: str) -> Dict[str, Any]:
-        """
-        Simple KQL syntax validation
-        
-        Args:
-            kql_query: KQL query to validate
-            
-        Returns:
-            Validation result
-        """
-        try:
-            # Basic syntax check
-            errors = []
-            lines = kql_query.split('\n')
-            
-            # Check basic structure
-            if not any('Unionizer' in line for line in lines):
-                errors.append("Missing Unionizer data source")
-            
-            # Check necessary filter conditions
-            if not any('where TIMESTAMP' in line for line in lines):
-                errors.append("Missing timestamp filter")
-            
-            # Check syntax errors
-            for i, line in enumerate(lines, 1):
-                line = line.strip()
-                if line and not line.startswith('//') and not line.startswith('let'):
-                    if line.endswith(','):
-                        errors.append(f"Line {i}: Unexpected comma at end of line")
-            
-            return {
-                "success": len(errors) == 0,
-                "errors": errors,
-                "query_length": len(kql_query),
-                "line_count": len(lines),
-                "validation_note": "Basic syntax validation only"
-            }
-            
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"Validation error: {str(e)}"
-            }
-    
-    async def explain_kusto_query(self, kql_query: str) -> Dict[str, Any]:
-        """
-        Explain basic components of KQL query
-        
-        Args:
-            kql_query: KQL query to explain
-            
-        Returns:
-            Query explanation
-        """
-        try:
-            lines = [line.strip() for line in kql_query.split('\n') if line.strip()]
-            
-            analysis = {
-                "query_structure": {
-                    "total_lines": len(lines),
-                    "has_let_statements": any(line.startswith('let ') for line in lines),
-                    "has_functions": any('= (' in line for line in lines),
-                    "data_source": "Unionizer" if any('Unionizer' in line for line in lines) else "Unknown",
-                    "has_time_filter": any('TIMESTAMP' in line for line in lines),
-                    "has_aggregation": any('summarize' in line.lower() for line in lines)
-                },
-                "operations": [],
-                "functions_used": []
-            }
-            
-            # Analyze query operations
-            for line in lines:
-                if line.startswith('let '):
-                    analysis["operations"].append(f"Function definition: {line[:50]}...")
-                elif line.startswith('| where'):
-                    analysis["operations"].append(f"Filter: {line}")
-                elif line.startswith('| extend'):
-                    analysis["operations"].append(f"Extend: {line}")
-                elif line.startswith('| summarize'):
-                    analysis["operations"].append(f"Aggregation: {line}")
-                elif line.startswith('| project'):
-                    analysis["operations"].append(f"Projection: {line}")
-                elif line.startswith('| order'):
-                    analysis["operations"].append(f"Ordering: {line}")
-            
-            return {
-                "success": True,
-                "analysis": analysis,
-                "explanation": "Query structure and operations identified"
-            }
-            
-        except Exception as e:
-            return {
-                "success": False,
-                "error": f"Error explaining query: {str(e)}"
-            }
