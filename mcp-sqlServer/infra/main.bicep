@@ -32,14 +32,14 @@ param storageAccountName string
 var tags = { 'azd-env-name': environmentName }
 var functionAppName = apiServiceName
 
-// Create an App Service Plan for traditional consumption
+// Create an App Service Plan for Basic tier
 module appServicePlan 'br/public:avm/res/web/serverfarm:0.1.1' = {
   name: 'appserviceplan'
   params: {
     name: appServicePlanName
     sku: {
-      name: 'Y1'
-      tier: 'Dynamic'
+      name: 'B1'
+      tier: 'Basic'
     }
     reserved: true
     location: location
@@ -69,7 +69,7 @@ module storage 'br/public:avm/res/storage/storage-account:0.8.3' = {
   params: {
     name: storageAccountName
     allowBlobPublicAccess: false
-    allowSharedKeyAccess: true // Required for Function App content storage
+    allowSharedKeyAccess: false // Try with managed identity first
     dnsEndpointType: 'Standard'
     publicNetworkAccess: 'Enabled'
     networkAcls: {
@@ -82,18 +82,6 @@ module storage 'br/public:avm/res/storage/storage-account:0.8.3' = {
     minimumTlsVersion: 'TLS1_2'  // Enforcing TLS 1.2 for better security
     location: location
     tags: tags
-  }
-}
-
-// Configure RBAC permissions for the Function App to access storage
-module rbac './app/rbac.bicep' = {
-  name: 'rbac'
-  params: {
-    storageAccountName: storage.outputs.name
-    managedIdentityPrincipalId: api.outputs.SERVICE_API_IDENTITY_PRINCIPAL_ID
-    enableBlob: true
-    enableQueue: true
-    enableTable: true
   }
 }
 

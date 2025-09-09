@@ -9,8 +9,8 @@ infra:
   path: infra
   options:
     parameters:
-      location: East US 2 
-      resourceGroup: sdk-mgmt-bi-data 
+      location: East US 
+      resourceGroup: Azure SDK Developer Playground 
 services:
   api:
     project: .

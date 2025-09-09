@@ -36,15 +36,13 @@ module api 'br/public:avm/res/web/site:0.15.1' = {
       linuxFxVersion: '${toUpper(runtimeName)}|${runtimeVersion}'
     }
     appSettingsKeyValuePairs: union(appSettings, {
-      // Use managed identity for main storage operations
+      // Use managed identity for all storage operations in App Service Plan
       AzureWebJobsStorage__accountName: stg.name
       AzureWebJobsStorage__credential: 'managedidentity'
       AzureWebJobsStorage__blobServiceUri: stg.properties.primaryEndpoints.blob
       AzureWebJobsStorage__queueServiceUri: stg.properties.primaryEndpoints.queue
       AzureWebJobsStorage__tableServiceUri: stg.properties.primaryEndpoints.table
-      // Content storage requires traditional connection string for Consumption plans
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: 'DefaultEndpointsProtocol=https;AccountName=${stg.name};AccountKey=${stg.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
-      WEBSITE_CONTENTSHARE: toLower(name)
+      // App Service Plan doesn't require WEBSITE_CONTENTAZUREFILECONNECTIONSTRING
       // Function runtime settings
       FUNCTIONS_EXTENSION_VERSION: '~4'
       FUNCTIONS_WORKER_RUNTIME: runtimeName
