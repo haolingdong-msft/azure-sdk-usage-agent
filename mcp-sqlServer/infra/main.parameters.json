@@ -8,11 +8,14 @@
     "location": {
       "value": "${AZURE_LOCATION}"
     },
-    "principalId": {
-      "value": "${AZURE_PRINCIPAL_ID}"
+    "apiServiceName": {
+      "value": "${AZURE_API_SERVICE_NAME}"
     },
-    "vnetEnabled": {
-      "value": "${VNET_ENABLED}"
+    "appServicePlanName": {
+      "value": "${AZURE_APP_SERVICE_PLAN_NAME}"
+    },
+    "storageAccountName": {
+      "value": "${AZURE_STORAGE_ACCOUNT_NAME}"
     }
   }
 }
