@@ -9,32 +9,33 @@ This folder contains Bicep templates for deploying Azure resources required for 
 The infrastructure creates the following Azure resources:
 
 - **Azure Function App** - Hosts the MCP SQL Server API
-- **App Service Plan** - Consumption plan for the Function App
-- **Storage Account** - Backend storage for the Function App
+- **App Service Plan** - Basic tier (B1) plan for the Function App
+- **Storage Account** - Backend storage for the Function App with managed identity access
 
 ## Resource Details
 
 ### 1. App Service Plan
-- **Type**: Consumption Plan (Y1/Dynamic tier)
+- **Type**: Basic Plan (B1 tier)
 - **Platform**: Linux
-- **Billing**: Pay-per-execution model
-- **Auto-scaling**: Serverless, scales automatically based on demand
+- **Billing**: Fixed monthly cost (~$13/month)
+- **Scaling**: Manual scaling, supports up to 3 instances
+- **Benefits**: More stable performance, supports managed identity for all storage operations
 
 ### 2. Azure Function App
 - **Runtime**: Python 3.12
 - **Platform**: Linux
 - **Identity**: System-assigned managed identity
-- **Memory**: 2048 MB (default)
-- **Max instances**: 100 (default)
-- **Deployment**: Uses managed identity for secure blob storage access
+- **Authentication**: Uses managed identity for secure storage access
+- **Content Storage**: No longer requires WEBSITE_CONTENTAZUREFILECONNECTIONSTRING (App Service Plan benefit)
 
 ### 3. Storage Account
 - **Security**: 
   - Blob public access disabled
-  - Shared key access disabled
+  - Shared key access disabled (secure managed identity access)
   - Minimum TLS version 1.2
 - **Network**: Public access enabled with Azure Services bypass
-- **Purpose**: Stores Function App deployment packages
+- **Access Method**: Managed identity authentication for all operations
+- **Purpose**: Stores Function App runtime data and application storage needs
 
 ## Files Structure
 
@@ -43,19 +44,17 @@ infra/
 ├── README.md                    # This documentation
 ├── main.bicep                   # Main infrastructure template
 ├── main.parameters.json         # Parameter configuration
-├── abbreviations.json           # Resource naming abbreviations (unused)
+├── abbreviations.json           # Resource naming abbreviations
 ├── bicepconfig.json            # Bicep configuration
 └── app/
-    ├── api.bicep               # Function App configuration
-    ├── rbac.bicep              # Role-based access control
-    ├── storage-PrivateEndpoint.bicep  # Private endpoint for storage
-    ├── vnet.bicep              # Virtual network configuration
-    └── apim-mcp/               # API Management related files
-        ├── mcp-api.bicep
-        ├── mcp-api.policy.xml
-        ├── mcp-entra-app.bicep
-        └── mcp-prm.policy.xml
+    └── api.bicep               # Function App configuration
 ```
+
+**Note**: The following files have been removed as they are not needed for the current simplified architecture:
+- `rbac.bicep` (RBAC permissions will be configured manually)
+- `storage-PrivateEndpoint.bicep` (No private networking required)
+- `vnet.bicep` (No virtual network required)
+- `apim/` and `apim-mcp/` directories (API Management not used)
 
 ## Deployment
 
@@ -156,11 +155,35 @@ After successful deployment, the following outputs are available:
 
 ## Security Features
 
-- **Managed Identity**: Function App uses system-assigned managed identity
-- **No Shared Keys**: Storage account disables shared key access
+- **Managed Identity**: Function App uses system-assigned managed identity for all Azure service authentication
+- **No Shared Keys**: Storage account disables shared key access, uses managed identity instead
 - **TLS 1.2**: Enforced minimum TLS version
 - **Private Access**: Blob public access disabled
 - **Network Security**: Proper network ACLs configured
+- **Manual RBAC**: Storage permissions configured manually for enhanced security control
+
+## Cost Considerations
+
+### App Service Plan B1 vs Consumption Plan
+
+**Basic Plan (B1) - Current Configuration:**
+- **Cost**: ~$13 USD/month fixed cost
+- **Benefits**: 
+  - Full managed identity support
+  - No WEBSITE_CONTENTAZUREFILECONNECTIONSTRING requirement
+  - More predictable performance
+  - Better for consistent workloads
+
+**Consumption Plan Alternative:**
+- **Cost**: Pay-per-execution (can be $0 for low usage)
+- **Limitations**: 
+  - Requires WEBSITE_CONTENTAZUREFILECONNECTIONSTRING
+  - Needs shared key access enabled on storage
+  - More complex security configuration
+
+**Storage Account:**
+- **Cost**: Minimal (~$1-5/month depending on usage)
+- **LRS (Locally Redundant Storage)**: Included in template
 
 ## Monitoring & Tagging
 
@@ -183,6 +206,11 @@ All resources are tagged with:
 3. **Permission Issues**
    - Ensure you have Contributor role on the target subscription
    - Verify Azure CLI is authenticated: `az login`
+
+4. **Managed Identity Permissions** (Post-deployment)
+   - After deployment, manually assign storage permissions to the Function App's managed identity
+   - Required roles: "Storage Blob Data Contributor", "Storage Queue Data Contributor", "Storage Table Data Contributor"
+   - Go to Storage Account > Access Control (IAM) > Add role assignment
 
 ### Validation
 
