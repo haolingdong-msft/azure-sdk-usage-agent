@@ -20,7 +20,8 @@ class SchemaLoader:
             return self._schema_cache
             
         try:
-            schema_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), self.schema_file_path)
+            # Get the project root directory (go up from src/data/ to project root)
+            schema_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), self.schema_file_path)
             with open(schema_file, 'r') as f:
                 schema_data = json.load(f)
             

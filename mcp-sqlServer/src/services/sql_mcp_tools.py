@@ -2,6 +2,7 @@
 MCP Tools implementation for SQL Server operations
 """
 import asyncio
+from datetime import datetime
 from typing import Any, Dict, List
 from .sql_client import MSSQLMSIClient
 from ..data.schema_loader import SchemaLoader
@@ -318,6 +319,97 @@ class MCPTools:
         except Exception as e:
             return {"error": f"Error retrieving enum values: {str(e)}"}
 
+    async def decide_and_generate_query(self, user_question: str) -> Dict[str, Any]:
+        """
+        根据用户问题决定使用SQL还是Kusto查询
+        
+        Args:
+            user_question: 用户的自然语言问题
+            
+        Returns:
+            结构化的决策结果
+        """
+        try:
+            print(f"🤖 分析问题并决定查询类型: {user_question}")
+            
+            # 获取SQL schema信息
+            enabled_tables = self.schema_loader.get_enabled_tables()
+            
+            # 直接进行决策
+            return self._make_decision(user_question, enabled_tables)
+            
+        except Exception as e:
+            print(f"❌ 决策过程出错: {str(e)}")
+            return {
+                "type": "error",
+                "message": f"决策处理错误: {str(e)}",
+                "user_question": user_question
+            }
+    
+    def _make_decision(self, user_question: str, enabled_tables: Dict) -> Dict[str, Any]:
+        """
+        根据用户问题和可用表格信息做出查询类型决策
+        返回包含问题和上下文的prompt给AI处理
+        
+        Args:
+            user_question: 用户问题
+            enabled_tables: 可用的数据表信息
+            
+        Returns:
+            AI决策prompt数据
+        """
+        try:
+            # 构建表格信息
+            tables_info = []
+            for table_info in enabled_tables.values():
+                tables_info.append({
+                    "name": table_info.name,
+                    "columns": table_info.columns
+                })
+            
+            return {
+                "success": True,
+                "user_question": user_question,
+                "available_tables": tables_info,
+                "instructions": {
+                    "task": "Analyze the user question and decide which query type to use",
+                    "requirements": [
+                        "Choose between 'sql' for structured database queries or 'kusto' for log analytics",
+                        "For SQL: identify table name, columns, and query conditions",
+                        "For Kusto: prepare for time-series analytics and monitoring data",
+                        "Consider the user question intent and available table schemas",
+                        "Return decision with reasoning"
+                    ],
+                    "current_date": datetime.now().strftime("%Y-%m-%d")
+                },
+                "decision_context": {
+                    "sql_scenarios": [
+                        "Business data analysis (counts, sums, aggregations)",
+                        "Customer/product/usage queries",
+                        "Structured data retrieval",
+                        "When question matches available table schemas"
+                    ],
+                    "kusto_scenarios": [
+                        "Log analysis and monitoring",
+                        "Time-series data analysis", 
+                        "Performance and error tracking",
+                        "Azure SDK usage analytics"
+                    ],
+                    "available_operations": {
+                        "sql_functions": ["COUNT", "SUM", "AVG", "GROUP BY", "WHERE", "ORDER BY"],
+                        "kusto_functions": ["summarize", "where", "extend", "project", "join"]
+                    }
+                }
+            }
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Error processing decision request: {str(e)}",
+                "user_question": user_question,
+                "suggestion": "Please check the question format and try again"
+            }
+ 
     async def ai_query_helper(self, user_question: str) -> Dict[str, Any]:
         """
         Helper function for AI agents to generate correct column names, table names, and conditions
