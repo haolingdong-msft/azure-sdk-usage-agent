@@ -321,45 +321,45 @@ class MCPTools:
 
     async def decide_and_generate_query(self, user_question: str) -> Dict[str, Any]:
         """
-        根据用户问题决定使用SQL还是Kusto查询
+        Decide whether to use SQL or Kusto query based on user question
         
         Args:
-            user_question: 用户的自然语言问题
+            user_question: User's natural language question
             
         Returns:
-            结构化的决策结果
+            Structured decision result
         """
         try:
-            print(f"🤖 分析问题并决定查询类型: {user_question}")
+            print(f"🤖 Analyzing question and deciding query type: {user_question}")
             
-            # 获取SQL schema信息
+            # Get SQL schema information
             enabled_tables = self.schema_loader.get_enabled_tables()
             
-            # 直接进行决策
+            # Make decision directly
             return self._make_decision(user_question, enabled_tables)
             
         except Exception as e:
-            print(f"❌ 决策过程出错: {str(e)}")
+            print(f"❌ Error in decision process: {str(e)}")
             return {
                 "type": "error",
-                "message": f"决策处理错误: {str(e)}",
+                "message": f"Decision processing error: {str(e)}",
                 "user_question": user_question
             }
     
     def _make_decision(self, user_question: str, enabled_tables: Dict) -> Dict[str, Any]:
         """
-        根据用户问题和可用表格信息做出查询类型决策
-        返回包含问题和上下文的prompt给AI处理
+        Make query type decision based on user question and available table information
+        Returns prompt data containing question and context for AI processing
         
         Args:
-            user_question: 用户问题
-            enabled_tables: 可用的数据表信息
+            user_question: User question
+            enabled_tables: Available data table information
             
         Returns:
-            AI决策prompt数据
+            AI decision prompt data
         """
         try:
-            # 构建表格信息
+            # Build table information
             tables_info = []
             for table_info in enabled_tables.values():
                 tables_info.append({
