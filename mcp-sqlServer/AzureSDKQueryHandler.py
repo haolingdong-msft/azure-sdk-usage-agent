@@ -32,7 +32,7 @@ import sys
 def start_unified_mcp_server():
     """Start Unified MCP Server with comprehensive query capabilities"""
     print("Starting Unified MCP Server with comprehensive query capabilities...")
-    from src.entrypoints.unified_server import main
+    from src.entrypoints.SdkDataQuery import main
     main()
 
 def start_ai_enhanced_mcp_server():
