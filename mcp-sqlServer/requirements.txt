@@ -1,0 +1,10 @@
+httpx
+mcp[cli]>=1.5.0
+azure-identity
+pyodbc
+azure-kusto-data
+
+# tests/app.py
+fastapi
+uvicorn[standard]
+pydantic
