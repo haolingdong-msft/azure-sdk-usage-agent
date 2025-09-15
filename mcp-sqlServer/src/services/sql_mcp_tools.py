@@ -537,3 +537,126 @@ class MCPTools:
                 "error": f"Error in AI helper: {str(e)}",
                 "user_question": user_question
             }
+
+    async def generate_and_execute_sql_query(self, user_question: str, schema_hint: str = "") -> Dict[str, Any]:
+        """
+        直接根据用户问题生成并执行 SQL 查询，返回结果数据。
+        
+        Generate and execute SQL query directly based on user question, return result data.
+
+        Args:
+            user_question: A natural language question about the data
+            schema_hint: Optional hint about which table or schema to focus on
+
+        Returns:
+            A JSON object containing:
+            - success: Whether the query was successful
+            - data: Query result data (if successful)
+            - generated_sql: The SQL query that was generated and executed
+            - confidence: Confidence score of the query generation (0-1)
+            - explanation: Human-readable explanation of the query logic
+            - error: Error message (if failed)
+        """
+        try:
+            print(f"🚀 Generating and executing SQL query for: {user_question}")
+            if schema_hint:
+                print(f"📋 Schema hint: {schema_hint}")
+
+            # Step 1: Generate SQL query parameters
+            print("🔧 Step 1: Generating SQL query parameters...")
+            params_result = await self.generate_sql_query_params(user_question, schema_hint)
+            
+            if not params_result.get('success'):
+                return {
+                    "success": False,
+                    "error": f"Failed to generate query parameters: {params_result.get('error', 'Unknown error')}",
+                    "user_question": user_question,
+                    "schema_hint": schema_hint
+                }
+
+            # Extract parameters
+            table_name = params_result.get('table_name', '')
+            columns = params_result.get('columns', [])
+            where_clause = params_result.get('where_clause', '')
+            order_clause = params_result.get('order_clause', '')
+            limit_clause = params_result.get('limit_clause', '')
+            confidence = params_result.get('confidence', 0.0)
+            
+            # Step 2: Build the complete SQL query string for display
+            print("🔧 Step 2: Building complete SQL query...")
+            sql_parts = []
+            if limit_clause:
+                sql_parts.append(f"SELECT {limit_clause} {', '.join(columns) if columns else '*'}")
+            else:
+                sql_parts.append(f"SELECT {', '.join(columns) if columns else '*'}")
+            
+            sql_parts.append(f"FROM {table_name}")
+            
+            if where_clause and where_clause.strip():
+                sql_parts.append(f"WHERE {where_clause}")
+            
+            if order_clause and order_clause.strip():
+                sql_parts.append(order_clause)
+            
+            generated_sql = ' '.join(sql_parts)
+            print(f"📜 Generated SQL: {generated_sql}")
+
+            # Step 3: Execute the query
+            print("🚀 Step 3: Executing SQL query...")
+            execution_result = await self.execute_sql_with_auth(
+                table_name=table_name,
+                columns=columns,
+                where_clause=where_clause,
+                order_clause=order_clause,
+                limit_clause=limit_clause
+            )
+
+            # Step 4: Prepare the final result
+            if execution_result.get('success'):
+                result = {
+                    "success": True,
+                    "data": execution_result.get('data', []),
+                    "generated_sql": generated_sql,
+                    "confidence": confidence,
+                    "explanation": params_result.get('explanation', ''),
+                    "user_question": user_question,
+                    "schema_hint": schema_hint,
+                    "row_count": len(execution_result.get('data', [])),
+                    "execution_time": execution_result.get('execution_time', 'N/A'),
+                    "query_parameters": {
+                        "table_name": table_name,
+                        "columns": columns,
+                        "where_clause": where_clause,
+                        "order_clause": order_clause,
+                        "limit_clause": limit_clause
+                    }
+                }
+                
+                print(f"✅ Query executed successfully! Returned {result['row_count']} rows")
+                return result
+            else:
+                return {
+                    "success": False,
+                    "error": execution_result.get('error', 'Query execution failed'),
+                    "generated_sql": generated_sql,
+                    "confidence": confidence,
+                    "explanation": params_result.get('explanation', ''),
+                    "user_question": user_question,
+                    "schema_hint": schema_hint,
+                    "query_parameters": {
+                        "table_name": table_name,
+                        "columns": columns,
+                        "where_clause": where_clause,
+                        "order_clause": order_clause,
+                        "limit_clause": limit_clause
+                    }
+                }
+
+        except Exception as e:
+            print(f"❌ Error in generate_and_execute_sql_query: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Error generating and executing SQL query: {str(e)}",
+                "user_question": user_question,
+                "schema_hint": schema_hint
+            }
