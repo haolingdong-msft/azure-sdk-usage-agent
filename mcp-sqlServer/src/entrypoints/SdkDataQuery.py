@@ -19,26 +19,6 @@ def sdkdataQueryMCP():
     # Initialize FastMCP server
     mcp = FastMCP("sdkdataQueryServer", stateless_http=True, port=MCP_PORT)
 
-    @mcp.resource(name="kusto_schema_resource", uri="http://localhost:7071/mcp/load_kusto_schema")
-    def load_kusto_schema():
-        """Load Kusto schema from reference/schemas/KQL_Schema.json"""
-        try:
-            schema_content = read_file_content('../../reference/schemas/KQL_Schema.json', relative_to_file=__file__)
-            kusto_schema = json.loads(schema_content)
-            return kusto_schema
-        except Exception as e:
-            return {"error": f"Failed to load Kusto schema: {str(e)}"}
-
-    @mcp.resource(name="sql_schema_resource", uri="http://localhost:7071/mcp/load_sql_schema")
-    def load_sql_schema():
-        """Load SQL schema from reference/schemas/AMEAnalytics_Schema.json"""
-        try:
-            schema_content = read_file_content('../../reference/schemas/AMEAnalytics_Schema.json', relative_to_file=__file__)
-            sql_schema = json.loads(schema_content)
-            return sql_schema
-        except Exception as e:
-            return {"error": f"Failed to load SQL schema: {str(e)}"}
-
     @mcp.tool()
     async def queryTypeDecision(user_question: str):
         """
@@ -53,12 +33,14 @@ def sdkdataQueryMCP():
         try:
             print(f"Processing unified query: {user_question}")
             
-            # Read prompt template from file
-            prompt_template = read_file_content('../../reference/prompt/QueryTypeDecision2.md', relative_to_file=__file__)
+            prompt_template = read_file_content('../../reference/prompt/QueryTypeDecision.md', relative_to_file=__file__)
             
-            # Replace placeholder with actual user question
-            prompt = prompt_template.replace("{user_question_here}", user_question)
+            prompt = prompt_template.replace("{USER_QUESTION}", user_question)
             
+            # Await the async function call
+            schema_definitions = await getSQLSchemaDefinitions(["Month", "Product", "TrackInfo", "HttpMethod", "OS", "RequestCount", "SubscriptionCount", "SubscriptionId", "Provider", "ApiVersion", "HttpMethod", "OS", "PackageName", "PackageVersion", "IsTrack2"])
+            prompt = prompt.replace("{SQL_SCHEMA_FIELD}", str(schema_definitions))
+
             return prompt
             
         except Exception as e:
@@ -67,26 +49,67 @@ def sdkdataQueryMCP():
                 "type": "error",
                 "message": f"Error processing unified query: {str(e)}"
             }
-    
+
+    async def getSQLSchemaDefinitions(field_names: list = None):
+        """
+        Extract complete field definitions from AMEAnalytics_Schema.json with all attributes.
+        Returns the exact definition structure including title, description, type, enum, pattern, etc.
+        
+        Args:
+            field_names: List of field names to retrieve from definitions (optional).
+                        If None, returns all definitions.
+                        Example: ["TrackInfo", "Product", "HttpMethod", "OS"]
+            
+        Returns:
+            Complete field definitions in their original format, e.g.:
+            {
+                "Product": {
+                    "title": "Product",
+                    "description": "Azure SDK product name", 
+                    "type": "string",
+                    "enum": [".Net Code-gen", ".Net Fluent", ...]
+                }
+            }
+        """
+        try:
+            print(f"Loading SQL schema definitions for fields: {field_names}")
+            
+            schema_content = read_file_content('../../reference/schemas/AMEAnalytics_Schema.json', relative_to_file=__file__)
+            sql_schema = json.loads(schema_content)
+            
+            definitions = sql_schema.get("definitions", {})
+            
+            if field_names is None:
+                return definitions
+            
+            filtered_definitions = {}
+            
+            for field_name in field_names:
+                if field_name in definitions:
+                    # Return the complete definition with all attributes
+                    filtered_definitions[field_name] = definitions[field_name]
+            
+            return filtered_definitions
+            
+        except Exception as e:
+            print(f"Error in getSQLSchemaDefinitions tool: {str(e)}")
+            return {
+                "_error": f"Error loading schema definitions: {str(e)}",
+                "_available_fields": []
+            }
+
     # Register executeSQLQuery tool with fallback to KQL (enhanced version)
     # This allows users to execute SQL queries, with automatic fallback to KQL generation if SQL fails
     @mcp.tool()
-    async def executeSQLQuery(table_name: str, columns: list, where_clause: str = "", order_clause: str = "", limit_clause: str = "", original_question: str = ""):
+    async def executeSQLQuery(user_question: str):
         """
-        Execute a SQL query using the parsed components from parseUserQuery for MS SQL Server.
-        Includes Azure AD authentication validation. If SQL execution fails, automatically attempts 
-        to generate a KQL query as fallback.
+        Execute a SQL query .
 
         Args:
-            table_name: The name of the table to query
-            columns: List of column names to select
-            where_clause: SQL WHERE conditions (optional)
-            order_clause: SQL ORDER BY clause (optional)  
-            limit_clause: SQL LIMIT/TOP clause (optional)
-            original_question: The original user question (optional, used for KQL fallback)
+            user_question: User's query requirement (e.g.: "how many request count for go this month")
 
         Returns:
-            A JSON object containing the query results, or KQL generation if SQL fails.
+            A JSON object containing the query results.
         """
         print(f"Executing SQL query")
         return "SQL query result placeholder"
@@ -120,10 +143,10 @@ def main():
     try:
         print("Starting Unified MCP Server with comprehensive query tools...")
         print("Available tools:")
-        print("  - unified_query: Decides between SQL/KQL and generates queries")
-        print("  - smart_query_execution: Automatically tries SQL first, falls back to KQL")
+        print("  - queryTypeDecision: Decides between SQL/KQL based on user question")
+        print("  - getSQLSchemaDefinitions: Extracts complete field definitions from AMEAnalytics schema")
         print("  - executeSQLQuery: Executes SQL queries with automatic KQL fallback")
-        print("  - generateKQLFromTemplate: Generates KQL queries from templates")
+        print("  - executeKQLQuery: Generates KQL queries from templates")
         
         # Initialize and run the server
         mcp = sdkdataQueryMCP()

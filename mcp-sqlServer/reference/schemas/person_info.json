@@ -1,0 +1,185 @@
+{
+    "people": [
+        {
+            "id": "P001",
+            "name": "Xiao Ming",
+            "age": 30,
+            "email": "xiaoming@example.com",
+            "occupation": "Software Engineer",
+            "department": "Engineering",
+            "dateOfBirth": "1994-03-15",
+            "nationality": "Chinese",
+            "address": {
+                "street": "123 Main St",
+                "city": "Beijing",
+                "state": "Beijing",
+                "country": "China",
+                "postalCode": "100000"
+            },
+            "phoneNumbers": [
+                {
+                    "type": "mobile",
+                    "number": "+86-138-1234-5678",
+                    "primary": true
+                },
+                {
+                    "type": "home",
+                    "number": "+86-010-8765-4321",
+                    "primary": false
+                }
+            ],
+            "emergencyContact": {
+                "name": "Li Wei",
+                "relationship": "Spouse",
+                "phone": "+86-139-8765-4321"
+            },
+            "skills": ["Python", "JavaScript", "Azure", "SQL"],
+            "languages": ["Chinese", "English"],
+            "isActive": true
+        },
+        {
+            "id": "P002",
+            "name": "Sarah Johnson",
+            "age": 28,
+            "email": "sarah.johnson@example.com",
+            "occupation": "Product Manager",
+            "department": "Product",
+            "dateOfBirth": "1996-07-22",
+            "nationality": "American",
+            "address": {
+                "street": "456 Oak Avenue",
+                "city": "Seattle",
+                "state": "Washington",
+                "country": "USA",
+                "postalCode": "98101"
+            },
+            "phoneNumbers": [
+                {
+                    "type": "mobile",
+                    "number": "+1-206-555-0123",
+                    "primary": true
+                },
+                {
+                    "type": "work",
+                    "number": "+1-206-555-0199",
+                    "primary": false
+                }
+            ],
+            "emergencyContact": {
+                "name": "Robert Johnson",
+                "relationship": "Father",
+                "phone": "+1-206-555-0145"
+            },
+            "skills": ["Product Strategy", "Agile", "Data Analysis", "User Research"],
+            "languages": ["English", "Spanish"],
+            "isActive": true
+        },
+        {
+            "id": "P003",
+            "name": "Hiroshi Tanaka",
+            "age": 35,
+            "email": "hiroshi.tanaka@example.com",
+            "occupation": "DevOps Engineer",
+            "department": "Infrastructure",
+            "dateOfBirth": "1989-11-08",
+            "nationality": "Japanese",
+            "address": {
+                "street": "789 Sakura Street",
+                "city": "Tokyo",
+                "state": "Tokyo",
+                "country": "Japan",
+                "postalCode": "100-0001"
+            },
+            "phoneNumbers": [
+                {
+                    "type": "mobile",
+                    "number": "+81-90-1234-5678",
+                    "primary": true
+                }
+            ],
+            "emergencyContact": {
+                "name": "Yuki Tanaka",
+                "relationship": "Spouse",
+                "phone": "+81-90-8765-4321"
+            },
+            "skills": ["Docker", "Kubernetes", "AWS", "Terraform", "Python"],
+            "languages": ["Japanese", "English"],
+            "isActive": true
+        },
+        {
+            "id": "P004",
+            "name": "Maria Garcia",
+            "age": 26,
+            "email": "maria.garcia@example.com",
+            "occupation": "UX Designer",
+            "department": "Design",
+            "dateOfBirth": "1998-02-14",
+            "nationality": "Spanish",
+            "address": {
+                "street": "321 Plaza Mayor",
+                "city": "Madrid",
+                "state": "Madrid",
+                "country": "Spain",
+                "postalCode": "28013"
+            },
+            "phoneNumbers": [
+                {
+                    "type": "mobile",
+                    "number": "+34-612-345-678",
+                    "primary": true
+                },
+                {
+                    "type": "home",
+                    "number": "+34-91-234-5678",
+                    "primary": false
+                }
+            ],
+            "emergencyContact": {
+                "name": "Carlos Garcia",
+                "relationship": "Brother",
+                "phone": "+34-645-987-321"
+            },
+            "skills": ["Figma", "Adobe Creative Suite", "User Research", "Prototyping"],
+            "languages": ["Spanish", "English", "French"],
+            "isActive": true
+        },
+        {
+            "id": "P005",
+            "name": "Ahmed Hassan",
+            "age": 32,
+            "email": "ahmed.hassan@example.com",
+            "occupation": "Data Scientist",
+            "department": "Analytics",
+            "dateOfBirth": "1992-09-03",
+            "nationality": "Egyptian",
+            "address": {
+                "street": "654 Nile View Road",
+                "city": "Cairo",
+                "state": "Cairo Governorate",
+                "country": "Egypt",
+                "postalCode": "11511"
+            },
+            "phoneNumbers": [
+                {
+                    "type": "mobile",
+                    "number": "+20-100-123-4567",
+                    "primary": true
+                }
+            ],
+            "emergencyContact": {
+                "name": "Fatima Hassan",
+                "relationship": "Sister",
+                "phone": "+20-101-987-6543"
+            },
+            "skills": ["Python", "R", "Machine Learning", "SQL", "Tableau"],
+            "languages": ["Arabic", "English"],
+            "isActive": false
+        }
+    ],
+    "metadata": {
+        "totalRecords": 5,
+        "lastUpdated": "2024-09-15T10:30:00Z",
+        "version": "1.2",
+        "schema": "person_info_v1.2"
+    }
+}

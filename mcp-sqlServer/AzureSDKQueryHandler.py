@@ -29,11 +29,18 @@ providing the most comprehensive query processing capabilities.
 import os
 import sys
 
-def start_unified_mcp_server():
-    """Start Unified MCP Server with comprehensive query capabilities"""
-    print("Starting Unified MCP Server with comprehensive query capabilities...")
+def start_SdkDataQuery_mcp_server():
+    """Start SdkDataQuery MCP Server with comprehensive query capabilities"""
+    print("Starting SdkDataQuery MCP Server with comprehensive query capabilities...")
     from src.entrypoints.SdkDataQuery import main
     main()
+
+def start_test_mcp_server():
+    """Start Test MCP Server with comprehensive query capabilities"""
+    print("Starting Test MCP Server with comprehensive query capabilities...")
+    from src.entrypoints.test import main
+    main()
+
 
 def start_ai_enhanced_mcp_server():
     """Start AI-enhanced MCP Server with AI-powered query generation"""
@@ -58,9 +65,11 @@ if __name__ == "__main__":
 
     if not mcp_server:
         # Default to unified server when MCP_SERVER is not set or empty
-        start_unified_mcp_server()
+        start_SdkDataQuery_mcp_server()
     elif mcp_server == "UNIFIED":
-        start_unified_mcp_server()
+        start_SdkDataQuery_mcp_server()
+    elif mcp_server == "TEST":
+        start_test_mcp_server()
     elif mcp_server == "AI":
         start_ai_enhanced_mcp_server()
     elif mcp_server == "KUSTO":
