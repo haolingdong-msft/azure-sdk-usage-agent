@@ -7,6 +7,6 @@
         "SQL_DATABASE": "azuresdkbi",
         "AZURE_SUBSCRIPTION_ID": "a18897a6-7e44-457d-9260-f2854c0aca42",
         "AZURE_RESOURCE_GROUP": "sdk-mgmt-bi-data",
-        "MCP_SERVER": "UNIFIED"
+        "MCP_SERVER": "AI"
     }
 }

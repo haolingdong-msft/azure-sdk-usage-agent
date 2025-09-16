@@ -35,13 +35,6 @@ def start_SdkDataQuery_mcp_server():
     from src.entrypoints.SdkDataQuery import main
     main()
 
-def start_test_mcp_server():
-    """Start Test MCP Server with comprehensive query capabilities"""
-    print("Starting Test MCP Server with comprehensive query capabilities...")
-    from src.entrypoints.test import main
-    main()
-
-
 def start_ai_enhanced_mcp_server():
     """Start AI-enhanced MCP Server with AI-powered query generation"""
     print("Starting AI-enhanced MCP Server with AI-powered query generation...")

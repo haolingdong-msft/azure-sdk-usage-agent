@@ -5,7 +5,7 @@ import sys
 from mcp.server.fastmcp import FastMCP
 from ..config.config import MCP_PORT, SCHEMA_FILE_PATH
 from ..data.schema_loader import SchemaLoader
-from ..services.sql_mcp_tools import MCPTools
+from ..services.sql_mcp_tools import SQLServerMCPTools
 
 
 def create_mcp_server():
@@ -15,7 +15,7 @@ def create_mcp_server():
     
     # Initialize components
     schema_loader = SchemaLoader(SCHEMA_FILE_PATH)
-    mcp_tools = MCPTools(schema_loader)
+    mcp_tools = SQLServerMCPTools(schema_loader)
     
     # Register MCP tools
     @mcp.tool()

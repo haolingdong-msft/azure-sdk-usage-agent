@@ -1,5 +1,16 @@
 """
-MCP Tools implementation for SQL Server operations
+SQL Server MCP Tools - A comprehensive toolkit for SQL Server database operations
+via Model Context Protocol (MCP). This module provides high-level SQL operations,
+query generation, authentication, and result processing capabilities for Azure SQL Database
+and SQL Server instances.
+
+Features:
+- SQL query generation from natural language
+- Azure AD authenticated database connections
+- Query parsing and validation
+- Enum value management
+- Error handling and retry logic
+- Result formatting and metadata extraction
 """
 import asyncio
 from datetime import datetime
@@ -9,21 +20,41 @@ from ..data.schema_loader import SchemaLoader
 from ..parsers.query_parser import QueryParser
 from ..config.config import SQL_SERVER, SQL_DATABASE
 
-class MCPTools:
-    """MCP Tools for SQL Server operations"""
+class SQLServerMCPTools:
+    """
+    SQL Server MCP Tools - High-level SQL Server operations for Model Context Protocol
+    
+    This class provides a comprehensive interface for performing SQL Server database operations
+    through the Model Context Protocol (MCP). It includes functionality for:
+    
+    - Natural language to SQL query conversion
+    - Azure AD authenticated SQL Server connections
+    - Query execution with retry logic and error handling
+    - Schema introspection and enum value retrieval
+    - Result formatting and metadata extraction
+    - Query parsing and validation
+    
+    The class uses a singleton pattern for SQL client connections to ensure efficient
+    resource management and connection pooling.
+    
+    Example usage:
+        schema_loader = SchemaLoader()
+        tools = SQLServerMCPTools(schema_loader)
+        result = await tools.execute_sql_query("SELECT * FROM Orders")
+    """
     
     # Class-level client instance to avoid multiple connections
     _sql_client_instance = None
     
     def __init__(self, schema_loader: SchemaLoader):
         # Use singleton pattern for SQL client to avoid multiple instances
-        if MCPTools._sql_client_instance is None:
+        if SQLServerMCPTools._sql_client_instance is None:
             print("🔄 Creating new SQL client instance...")
-            MCPTools._sql_client_instance = MSSQLMSIClient()
+            SQLServerMCPTools._sql_client_instance = MSSQLMSIClient()
         else:
             print("♻️ Reusing existing SQL client instance...")
             
-        self.sql_client = MCPTools._sql_client_instance
+        self.sql_client = SQLServerMCPTools._sql_client_instance
         self.schema_loader = schema_loader
         self.query_parser = QueryParser(schema_loader)
     
@@ -39,6 +70,41 @@ class MCPTools:
             except Exception as e:
                 print(f"⚠️ Error cleaning up SQL client: {e}")
     
+    async def generate_sql_from_template(self, user_question: str) -> Dict[str, Any]:
+        """
+        Based on stable schema and user question, return structured data for AI processing
+        
+        Args:
+            user_question: User's query requirement
+            
+        Returns:
+           A SQL Query base on the user question and the provided database schema.
+        """
+        try:
+            tableSchema = """
+                Database Schema:
+                    - Orders table: OrderId, CustomerId, OrderDate, Amount
+                    - Customers table: CustomerId, Name, Region
+            """
+
+            # Return structured data for AI
+            return {
+                "success": True,
+                "user_question": user_question,
+                "tableSchema": tableSchema,
+                "instructions": {
+                    "task": "Generate a SQL query based on the user question and the provided database schema",
+                    "current_date": datetime.now().strftime("%Y-%m-%d")
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Error processing request: {str(e)}",
+                "user_question": user_question,
+                "suggestion": "Please check if sample.kql file exists and is readable"
+            }
+
     async def parse_user_query(self, user_question: str) -> Dict[str, Any]:
         """
         Parse a natural language question and extract table names, column names, and conditions.
@@ -235,6 +301,126 @@ class MCPTools:
             return {
                 "success": False,
                 "error": f"Error executing query: {str(e)}",
+                "connection_method": "pyodbc"
+            }
+
+    async def execute_sql_query(self, sql_query: str) -> Dict[str, Any]:
+        """
+        Execute a SQL query directly with authentication and retry logic.
+
+        Args:
+            sql_query: The SQL query string to execute
+
+        Returns:
+            A JSON object containing the query results.
+        """
+        try:
+            # Step 1: Validate input
+            print("🔧 Step 1: Validating SQL query...")
+            
+            if not sql_query or not sql_query.strip():
+                return {
+                    "success": False,
+                    "error": "Missing required parameter: sql_query cannot be empty"
+                }
+            
+            sql_query = sql_query.strip()
+            print(f"SQL Query to execute: {sql_query}")
+            
+            # Step 2: Execute the query with retry logic
+            print("🚀 Step 2: Executing SQL query with retry logic...")
+            
+            max_retries = 3
+            retry_delay = 1  # seconds
+            
+            for attempt in range(max_retries):
+                try:
+                    print(f"🔄 Attempt {attempt + 1}/{max_retries}")
+                    query_result = await self.sql_client.execute_query(sql_query)
+                    
+                    # If successful, break out of retry loop
+                    if query_result.get("status") != "error":
+                        print(f"✅ Query executed successfully on attempt {attempt + 1}")
+                        break
+                    else:
+                        # If it's an error, check if it's retryable
+                        error_msg = query_result.get("error", "").lower()
+                        if any(retryable_error in error_msg for retryable_error in [
+                            "timeout", "connection", "network", "transient", "temporary"
+                        ]):
+                            if attempt < max_retries - 1:
+                                print(f"⚠️ Retryable error on attempt {attempt + 1}: {query_result.get('error')}")
+                                print(f"⏳ Waiting {retry_delay} seconds before retry...")
+                                await asyncio.sleep(retry_delay)
+                                retry_delay *= 2  # Exponential backoff
+                                continue
+                        
+                        # If not retryable or last attempt, return the error
+                        print(f"💥 Non-retryable error or final attempt: {query_result.get('error')}")
+                        break
+                        
+                except Exception as api_error:
+                    error_str = str(api_error).lower()
+                    is_retryable = any(retryable_error in error_str for retryable_error in [
+                        "timeout", "connection", "network", "transient", "temporary", "reset"
+                    ])
+                    
+                    if is_retryable and attempt < max_retries - 1:
+                        print(f"⚠️ Retryable exception on attempt {attempt + 1}: {api_error}")
+                        print(f"⏳ Waiting {retry_delay} seconds before retry...")
+                        await asyncio.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                        continue
+                    else:
+                        print(f"💥 Non-retryable exception or final attempt: {api_error}")
+                        return {
+                            "success": False,
+                            "error": f"Failed to execute query via pyodbc after {max_retries} attempts: {str(api_error)}",
+                            "query": sql_query,
+                            "connection_method": "pyodbc",
+                            "attempts": attempt + 1,
+                            "troubleshooting": [
+                                "Check network connectivity to Azure SQL Database",
+                                "Ensure ODBC Driver 18 for SQL Server is installed",
+                                "Verify your account has proper database permissions",
+                                "Check if the database server is accessible",
+                                "Verify firewall rules allow your connection"
+                            ]
+                        }
+            
+            # Step 3: Check query execution status and format results
+            if query_result.get("status") == "error":
+                return {
+                    "success": False,
+                    "error": f"SQL execution failed: {query_result.get('error', 'Unknown error')}",
+                    "query": sql_query,
+                    "connection_method": "pyodbc"
+                }
+            
+            # New sql_client returns rows as list of dictionaries already
+            result_data = query_result.get("rows", [])
+            
+            metadata = query_result.get("metadata", {})
+            
+            return {
+                "success": True,
+                "query": sql_query,
+                "data": result_data,
+                "row_count": len(result_data),
+                "connection_method": "pyodbc",
+                "data_source": metadata.get("source", "mssql_server"),
+                "server": SQL_SERVER,
+                "database": SQL_DATABASE,
+                "authentication": "Azure AD validated",
+                "execution_timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            print(f"Error executing SQL query: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Error executing query: {str(e)}",
+                "query": sql_query,
                 "connection_method": "pyodbc"
             }
 
@@ -536,4 +722,127 @@ class MCPTools:
                 "success": False,
                 "error": f"Error in AI helper: {str(e)}",
                 "user_question": user_question
+            }
+
+    async def generate_and_execute_sql_query(self, user_question: str, schema_hint: str = "") -> Dict[str, Any]:
+        """
+        直接根据用户问题生成并执行 SQL 查询，返回结果数据。
+        
+        Generate and execute SQL query directly based on user question, return result data.
+
+        Args:
+            user_question: A natural language question about the data
+            schema_hint: Optional hint about which table or schema to focus on
+
+        Returns:
+            A JSON object containing:
+            - success: Whether the query was successful
+            - data: Query result data (if successful)
+            - generated_sql: The SQL query that was generated and executed
+            - confidence: Confidence score of the query generation (0-1)
+            - explanation: Human-readable explanation of the query logic
+            - error: Error message (if failed)
+        """
+        try:
+            print(f"🚀 Generating and executing SQL query for: {user_question}")
+            if schema_hint:
+                print(f"📋 Schema hint: {schema_hint}")
+
+            # Step 1: Generate SQL query parameters
+            print("🔧 Step 1: Generating SQL query parameters...")
+            params_result = await self.generate_sql_query_params(user_question, schema_hint)
+            
+            if not params_result.get('success'):
+                return {
+                    "success": False,
+                    "error": f"Failed to generate query parameters: {params_result.get('error', 'Unknown error')}",
+                    "user_question": user_question,
+                    "schema_hint": schema_hint
+                }
+
+            # Extract parameters
+            table_name = params_result.get('table_name', '')
+            columns = params_result.get('columns', [])
+            where_clause = params_result.get('where_clause', '')
+            order_clause = params_result.get('order_clause', '')
+            limit_clause = params_result.get('limit_clause', '')
+            confidence = params_result.get('confidence', 0.0)
+            
+            # Step 2: Build the complete SQL query string for display
+            print("🔧 Step 2: Building complete SQL query...")
+            sql_parts = []
+            if limit_clause:
+                sql_parts.append(f"SELECT {limit_clause} {', '.join(columns) if columns else '*'}")
+            else:
+                sql_parts.append(f"SELECT {', '.join(columns) if columns else '*'}")
+            
+            sql_parts.append(f"FROM {table_name}")
+            
+            if where_clause and where_clause.strip():
+                sql_parts.append(f"WHERE {where_clause}")
+            
+            if order_clause and order_clause.strip():
+                sql_parts.append(order_clause)
+            
+            generated_sql = ' '.join(sql_parts)
+            print(f"📜 Generated SQL: {generated_sql}")
+
+            # Step 3: Execute the query
+            print("🚀 Step 3: Executing SQL query...")
+            execution_result = await self.execute_sql_with_auth(
+                table_name=table_name,
+                columns=columns,
+                where_clause=where_clause,
+                order_clause=order_clause,
+                limit_clause=limit_clause
+            )
+
+            # Step 4: Prepare the final result
+            if execution_result.get('success'):
+                result = {
+                    "success": True,
+                    "data": execution_result.get('data', []),
+                    "generated_sql": generated_sql,
+                    "confidence": confidence,
+                    "explanation": params_result.get('explanation', ''),
+                    "user_question": user_question,
+                    "schema_hint": schema_hint,
+                    "row_count": len(execution_result.get('data', [])),
+                    "execution_time": execution_result.get('execution_time', 'N/A'),
+                    "query_parameters": {
+                        "table_name": table_name,
+                        "columns": columns,
+                        "where_clause": where_clause,
+                        "order_clause": order_clause,
+                        "limit_clause": limit_clause
+                    }
+                }
+                
+                print(f"✅ Query executed successfully! Returned {result['row_count']} rows")
+                return result
+            else:
+                return {
+                    "success": False,
+                    "error": execution_result.get('error', 'Query execution failed'),
+                    "generated_sql": generated_sql,
+                    "confidence": confidence,
+                    "explanation": params_result.get('explanation', ''),
+                    "user_question": user_question,
+                    "schema_hint": schema_hint,
+                    "query_parameters": {
+                        "table_name": table_name,
+                        "columns": columns,
+                        "where_clause": where_clause,
+                        "order_clause": order_clause,
+                        "limit_clause": limit_clause
+                    }
+                }
+
+        except Exception as e:
+            print(f"❌ Error in generate_and_execute_sql_query: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Error generating and executing SQL query: {str(e)}",
+                "user_question": user_question,
+                "schema_hint": schema_hint
             }
