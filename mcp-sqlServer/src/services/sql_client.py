@@ -8,7 +8,7 @@ import struct
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional
 from azure.identity import DefaultAzureCredential
-from ..config.config import (
+from src.config import (
     SQL_SERVER, SQL_DATABASE
 )
 
