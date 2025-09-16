@@ -31,6 +31,19 @@ def sdkdataQueryMCP():
         try:
             print(f"Processing unified query: {user_question}")
             
+            """
+            try to use structured input first with JSON format
+            {
+            "success": True,
+            "user_question": user_question,
+            "sql_schema_fields": schema_definitions,
+            "instructions": {
+                "task": "Decide between SQL or Kusto based on user question and schema",
+                "decision_options": ["sql", "kusto"],
+                "priority_rule": "When both apply, prefer SQL for performance"
+            }
+
+            """
             prompt_template = read_file_content('templates/prompts/QueryTypeDecision.md', relative_to_file=__file__)
             
             prompt = prompt_template.replace("{USER_QUESTION}", user_question)
