@@ -42,7 +42,7 @@ def read_prompt_file(relative_path: str, caller_file: str = __file__) -> str:
     Read prompt file content based on relative path from caller file
     
     Args:
-        relative_path: Relative path to the prompt file (e.g., '../../reference/prompt/QueryTypeDecision.md')
+        relative_path: Relative path to the prompt file (e.g., 'templates/prompts/QueryTypeDecision.md')
         caller_file: The file from which this function is called (default: this file)
         
     Returns:

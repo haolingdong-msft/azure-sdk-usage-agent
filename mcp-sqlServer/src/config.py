@@ -18,4 +18,7 @@ MANAGEMENT_SCOPE = "https://management.azure.com/.default"
 MANAGEMENT_URL = "https://management.azure.com"
 
 # Schema file path
-SCHEMA_FILE_PATH = 'reference/schemas/AMEAnalytics_Schema.json'
+SCHEMA_FILE_PATH = 'src/schemas/SQL_Schema.json'
+
+# Environment variable for debug mode
+DEBUG_MODE = os.getenv("DEBUGMODE", "").upper()
