@@ -1,5 +1,7 @@
 # Reference: https://docs.azure.cn/en-us/azure-sql/database/azure-sql-python-quickstart?tabs=windows%2Csql-inter
-# Start: uvicorn app:app --reload
+# Start: uvicorn testAPP:app --reload
+# In browser: http://127.0.0.1:8000/logQueryResult to test connection and can see query result in terminal
+
 import os
 import pyodbc, struct
 from azure import identity
@@ -20,8 +22,19 @@ connection_string = 'Driver={ODBC Driver 18 for SQL Server};' \
 'Connection Timeout=30'
 app = FastAPI()
 
-@app.get("/")
-def root():
+@app.get("/logQueryResult")
+def logQueryResult():
+    rows = []
+    with get_conn() as conn:
+        cursor = conn.cursor()
+        cursor.execute("select top 10 * from dbo.AMEConciseSubReqCCIDCountByMonthProduct;")
+
+        for row in cursor.fetchall():
+            print(row)
+    return rows
+
+@app.get("/CreateTable")
+def root_create_table():
     print("Root of Person API")
     try:
         conn = get_conn()
@@ -42,15 +55,34 @@ def root():
         print(e)
     return "Person API"
 
-@app.get("/all-testself")
+@app.get("/DeleteTable")
+def root_delete_table():
+    print("Root of Person API")
+    try:
+        conn = get_conn()
+        cursor = conn.cursor()
+
+        # Drop the entire table (remove schema + data).
+        cursor.execute("""
+            DROP TABLE Persons;
+        """)
+
+        conn.commit()
+    except Exception as e:
+        # Table may already exist
+        print(e)
+    return "Person API"
+
+@app.get("/all")
 def get_persons():
     rows = []
     with get_conn() as conn:
         cursor = conn.cursor()
-        cursor.execute("select top 10 * from dbo.AMEConciseSubReqCCIDCountByMonthProduct;")
+        cursor.execute("SELECT * FROM Persons")
 
         for row in cursor.fetchall():
-            print(row)
+            print(row.FirstName, row.LastName)
+            rows.append(f"{row.ID}, {row.FirstName}, {row.LastName}")
     return rows
 
 @app.get("/person/{person_id}")
