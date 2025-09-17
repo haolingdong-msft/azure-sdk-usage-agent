@@ -43,15 +43,77 @@ def sdkdataQueryMCP():
                 }
             }
             """
-            prompt_template = read_file_content('templates/prompts/QueryTypeDecision.md', relative_to_file=__file__)
+            # prompt_template = read_file_content('templates/prompts/QueryTypeDecision.md', relative_to_file=__file__)
             
-            prompt = prompt_template.replace("{USER_QUESTION}", user_question)
+            # prompt = prompt_template.replace("{USER_QUESTION}", user_question)
             
-            schema_definitions = await getSQLSchemaDefinitions(["Month", "Product", "TrackInfo", "HttpMethod", "OS", "RequestCount", "SubscriptionCount", "SubscriptionId", "Provider", "ApiVersion", "HttpMethod", "OS", "PackageName", "PackageVersion", "IsTrack2"])
-            prompt = prompt.replace("{SQL_SCHEMA_FIELD}", str(schema_definitions))
+            # schema_definitions = await getSQLSchemaDefinitions(["Month", "Product", "TrackInfo", "HttpMethod", "OS", "RequestCount", "SubscriptionCount", "SubscriptionId", "Provider", "ApiVersion", "HttpMethod", "OS", "PackageName", "PackageVersion", "IsTrack2"])
+            # prompt = prompt.replace("{SQL_SCHEMA_FIELD}", str(schema_definitions))
 
-            return prompt
-            
+            # return prompt
+
+            return {
+                "prompt": "Decide whether to use SQL or Kusto for the given query",
+                "context": {
+                    "user_question": "Show request count for Go SDK this month",
+                    "sql_schema": {
+                        "tables": {
+                            "sdk_usage": {
+                                    "columns": {
+                                        "Month": {
+                                            "title": "The month of the data",
+                                            "type": "string",
+                                            "format": "date",
+                                            "pattern": "^\\d{4}-\\d{2}-01$"
+                                        },
+                                        "Product": {
+                                            "title": "Product",
+                                            "type": "string",
+                                            "enum": ["Go-SDK", ".Net Code-gen", "Python-SDK"]
+                                        },
+                                        "RequestCount": {
+                                            "title": "Request Count",
+                                            "type": "integer",
+                                            "description": "Number of API requests made"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "decision_rules": {
+                            "sql_criteria": [
+                                {
+                                    "rule": "monthly_aggregation",
+                                    "description": "Use SQL for monthly/quarterly/yearly grouping",
+                                    "weight": 2
+                                },
+                                {
+                                    "rule": "statistical_summary",
+                                    "description": "Use SQL for count/sum/average operations",
+                                    "weight": 2
+                                }
+                            ],
+                            "kusto_criteria": [
+                                {
+                                    "rule": "real_time_data",
+                                    "description": "Use Kusto for data within last 48 hours",
+                                    "weight": 3
+                                },
+                                {
+                                    "rule": "complex_filtering",
+                                    "description": "Use Kusto for multi-dimensional analysis",
+                                    "weight": 2
+                                }
+                            ]
+                        }
+                    },
+                    "output_format": {
+                        "type": "string",
+                        "enum": ["sql", "kusto"],
+                        "description": "Return only 'sql' or 'kusto' as decision"
+                    }
+                }
+        
         except Exception as e:
             print(f"Error in unified_query tool: {str(e)}")
             return {
