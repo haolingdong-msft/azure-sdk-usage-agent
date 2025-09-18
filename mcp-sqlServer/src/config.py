@@ -5,7 +5,6 @@ import os
 
 # Server configuration
 MCP_PORT = int(os.environ.get("FUNCTIONS_CUSTOMHANDLER_PORT", 8080))
-MCP_PORT_KUSTO = int(os.environ.get("FUNCTIONS_CUSTOMHANDLER_PORT", 8082))
 
 # SQL Server connection settings
 SQL_SERVER = os.getenv('SQL_SERVER', 'azuresdkbi-server.database.windows.net')
@@ -19,6 +18,3 @@ MANAGEMENT_URL = "https://management.azure.com"
 
 # Schema file path
 SCHEMA_FILE_PATH = 'src/schemas/SQL_Schema.json'
-
-# Environment variable for debug mode
-DEBUG_MODE = os.getenv("DEBUGMODE", "").upper()

@@ -4,7 +4,7 @@ Decides between SQL Server and Kusto based on the user question
 """
 import sys
 from mcp.server.fastmcp import FastMCP
-from src.config import MCP_PORT, SCHEMA_FILE_PATH
+from src.config import MCP_PORT
 from src.services.sql_mcp_tools import SQLServerMCPTools
 from src.services.kusto_mcp_tools import KQLGeneratorMCP
 from src.utils.file_utils import read_file_content
