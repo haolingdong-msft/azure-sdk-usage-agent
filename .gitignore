@@ -43,6 +43,5 @@ local.settings.json
 ### Azure and development environment directories ###
 .azure/
 .venv/
-.vscode/
 
 *.log
