@@ -401,30 +401,9 @@ def create_sdk_usage_mcp_server():
 def start_sdk_usage_query_server():
     """Main entry point for the table-specific SQL MCP server"""
     try:
-        print("Starting Table-Specific SQL MCP Server...")
-        print("\n=== USAGE STRATEGY ===")
-        print("1. Try table-specific SQL tools first (generateSQLBy...)")
-        print("2. Use generateKQLFromTemplate as fallback if SQL tables cannot satisfy requirements")
-        print("\n=== AVAILABLE TOOLS ===")
-        print("SQL Tools (try first):")
-        print("  - genSQLByMonthProductSubscriptionId")
-        print("  - genSQLByMonthProduct")
-        print("  - genSQLByMonthProductHttpMethod")
-        print("  - genSQLByMonthProductOS")
-        print("  - genSQLByMonthProductProviderTrackInfo")
-        print("  - genSQLByMonthProductProviderTrackInfoApiVersion")
-        print("  - genSQLByMonthProductProviderTrackInfoPUT")
-        print("  - genSQLByMonthProductTrackInfo")
-        print("  - genSQLByMonthProductTrackInfoMinorLanguageVersion")
-        print("  - genSQLByMonthProductTrackInfoMinorLanguageVersionPatchLanguageVersion")
-        print("  - genSQLReqCountByMonthTrackInfoPackageNamePackageVersionGoVersionForGo")
-        print("  - genSQLSubCountByMonthPackageNamePackageVersionForGo")
-        print("  - genSQLSubCountByMonthTrackInfoForGo")
-        print("  - genSQLSubCountByMonthGoVersionForGo")
-        print("\nOther Tools:")
-        print("  - executeSQLQuery: Execute generated SQL queries")
-        print("\nFallback Tool (use only if SQL tools cannot satisfy):")
-        print("  - generateKQLFromTemplate: KQL query generation for complex/unsupported queries")
+        print("Starting Azure SDK Usage Data Query Server...")
+        print("Server provides SQL tools for structured queries and KQL as fallback")
+        print(f"Server running on port {MCP_PORT}")
         
         # Initialize and run the server
         mcp = create_sdk_usage_mcp_server()
