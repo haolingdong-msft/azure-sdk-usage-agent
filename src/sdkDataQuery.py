@@ -411,7 +411,3 @@ def start_sdk_usage_query_server():
         
     except Exception as e:
         print(f"Error while running Table-Specific SQL MCP server: {e}", file=sys.stderr)
-
-
-if __name__ == "__main__":
-    start_sdk_usage_query_server()
