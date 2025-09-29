@@ -14,6 +14,7 @@ from mcp.server.fastmcp import FastMCP
 from src.config import MCP_PORT
 from src.services.sql_mcp_tools import SQLServerMCPTools
 from src.services.kusto_mcp_tools import KQLGeneratorMCP
+from src.utils.file_utils import load_and_format_prompt
 
 def tableSpecificSqlMCP():
     """Create and configure the MCP server with table-specific SQL generation tools"""
@@ -23,7 +24,7 @@ def tableSpecificSqlMCP():
     mcpKustoTools = KQLGeneratorMCP()
 
     @mcp.tool()
-    async def generateSQLByAMEConciseFiteredNewProductCCIDCustomerSubscriptionId(user_question: str):
+    async def genSQLByMonthProductSubscriptionId(user_question: str):
         """
         Generate SQL query for AMEConciseFiteredNewProductCCIDCustomerSubscriptionId table.
         
@@ -42,29 +43,10 @@ def tableSpecificSqlMCP():
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseFiteredNewProductCCIDCustomerSubscriptionId table based on the user question.
-
-TABLE: AMEConciseFiteredNewProductCCIDCustomerSubscriptionId
-DESCRIPTION: Filtered Azure SDK usage data by product, and subscription ID
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- TrackInfo (string): SDK track information. Valid values: ["Track1", "Track2"]
-- SubscriptionId (string): Azure subscription identifier in UUID format
-- RequestCount (integer): Number of API requests made (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseFiteredNewProductCCIDCustomerSubscriptionId", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCCIDCountByMonthProduct(user_question: str):
+    async def genSQLByMonthProduct(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCCIDCountByMonthProduct table.
         
@@ -82,28 +64,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCCIDCountByMonthProduct table based on the user question.
-
-TABLE: AMEConciseSubReqCCIDCountByMonthProduct
-DESCRIPTION: Subscription, request, and CCID counts by month and product
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCCIDCountByMonthProduct", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCCIDCountByMonthProductHttpMethod(user_question: str):
+    async def genSQLByMonthProductHttpMethod(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCCIDCountByMonthProductHttpMethod table.
         
@@ -122,29 +86,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCCIDCountByMonthProductHttpMethod table based on the user question.
-
-TABLE: AMEConciseSubReqCCIDCountByMonthProductHttpMethod
-DESCRIPTION: Subscription, request, and CCID counts by month, product, and HTTP method
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- HttpMethod (string): HTTP method used for the request. Valid values: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"]
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCCIDCountByMonthProductHttpMethod", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCCIDCountByMonthProductOS(user_question: str):
+    async def genSQLByMonthProductOS(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCCIDCountByMonthProductOS table.
         
@@ -163,29 +108,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCCIDCountByMonthProductOS table based on the user question.
-
-TABLE: AMEConciseSubReqCCIDCountByMonthProductOS
-DESCRIPTION: Subscription, request, and CCID counts by month, product, and operating system
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- OS (string): Operating system of the client making the request. Valid values: ["Windows", "Linux", "MacOS", "Unknown"]
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCCIDCountByMonthProductOS", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo(user_question: str):
+    async def genSQLByMonthProductProviderTrackInfo(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo table.
         
@@ -205,30 +131,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo table based on the user question.
-
-TABLE: AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo
-DESCRIPTION: Subscription, request, and CCID counts by month, product, provider, and track info
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- Provider (string): Azure resource provider name (e.g., Microsoft.Storage, Microsoft.Compute, etc.)
-- TrackInfo (string): SDK track information. Valid values: ["Track1", "Track2"]
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion(user_question: str):
+    async def genSQLByMonthProductProviderTrackInfoApiVersion(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion table.
         
@@ -249,31 +155,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion table based on the user question.
-
-TABLE: AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion
-DESCRIPTION: Subscription, request, and CCID counts by month, product, provider, track info, and API version
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- Provider (string): Azure resource provider name (e.g., Microsoft.Storage, Microsoft.Compute, etc.)
-- TrackInfo (string): SDK track information. Valid values: ["Track1", "Track2"]
-- ApiVersion (string): Version of the Azure API being used. Format: YYYY-MM-DD or YYYY-MM-DD-preview (e.g., '2023-01-01', '2023-01-01-preview')
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT(user_question: str):
+    async def genSQLByMonthProductProviderTrackInfoPUT(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT table.
         
@@ -293,32 +178,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT table based on the user question.
-
-TABLE: AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT
-DESCRIPTION: PUT operation subscription, request, and CCID counts by month, product, provider, and track info
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- Provider (string): Azure resource provider name (e.g., Microsoft.Storage, Microsoft.Compute, etc.)
-- TrackInfo (string): SDK track information. Valid values: ["Track1", "Track2"]
-- RequestCount (integer): Number of API requests made for PUT operations (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-NOTE: This table specifically contains data for PUT HTTP operations only.
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCCIDCountByMonthProductTrackInfo(user_question: str):
+    async def genSQLByMonthProductTrackInfo(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCCIDCountByMonthProductTrackInfo table.
         
@@ -337,29 +200,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCCIDCountByMonthProductTrackInfo table based on the user question.
-
-TABLE: AMEConciseSubReqCCIDCountByMonthProductTrackInfo
-DESCRIPTION: Subscription, request, and CCID counts by month, product, and track info
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- TrackInfo (string): SDK track information. Valid values: ["Track1", "Track2"]
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCCIDCountByMonthProductTrackInfo", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCountByMonthProductMinorLanguageVersion(user_question: str):
+    async def genSQLByMonthProductTrackInfoMinorLanguageVersion(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCountByMonthProductMinorLanguageVersion table.
         
@@ -379,30 +223,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCountByMonthProductMinorLanguageVersion table based on the user question.
-
-TABLE: AMEConciseSubReqCountByMonthProductMinorLanguageVersion
-DESCRIPTION: Subscription and request counts by month, product, track info, and minor language version
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- TrackInfo (string): SDK track information. Valid values: ["Track1", "Track2"]
-- MinorLanguageVersion (string): Minor version of the programming language (e.g., for Python: "3.8", "3.9", "3.10")
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCountByMonthProductMinorLanguageVersion", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEConciseSubReqCountByMonthProductPatchLanguageVersion(user_question: str):
+    async def genSQLByMonthProductTrackInfoMinorLanguageVersionPatchLanguageVersion(user_question: str):
         """
         Generate SQL query for AMEConciseSubReqCountByMonthProductPatchLanguageVersion table.
         
@@ -423,31 +247,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEConciseSubReqCountByMonthProductPatchLanguageVersion table based on the user question.
-
-TABLE: AMEConciseSubReqCountByMonthProductPatchLanguageVersion
-DESCRIPTION: Subscription and request counts by month, product, track info, patch, and minor language versions
-
-SCHEMA:
-- Month (string): The month of the data in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- RequestCount (integer): Number of API requests made (≥ 0)
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-- Product (string): Azure SDK product name. Valid values: [".Net Code-gen", ".Net Fluent", "Ansible", "AzureCLI", "AzurePowershell", "Go-SDK", "Java Fluent Lite", "Java Fluent Premium", "JavaScript", "JavaScript (Node.JS)", "JavaScript RLC", "PHP-SDK", "Python-SDK", "Ruby-SDK", "Rust", "Terraform", "VS Code Azure Extension"]
-- TrackInfo (string): SDK track information. Valid values: ["Track1", "Track2"]
-- PatchLanguageVersion (string): Patch version of the programming language (e.g., for Python: "3.8.10", "3.9.16")
-- MinorLanguageVersion (string): Minor version of the programming language (e.g., for Python: "3.8", "3.9", "3.10")
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEConciseSubReqCountByMonthProductPatchLanguageVersion", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEGoSDKReqCountCustomerDataByMonth(user_question: str):
+    async def genSQLReqCountByMonthTrackInfoPackageNamePackageVersionGoVersionForGo(user_question: str):
         """
         Generate SQL query for AMEGoSDKReqCountCustomerDataByMonth table.
         
@@ -467,30 +270,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEGoSDKReqCountCustomerDataByMonth table based on the user question.
-
-TABLE: AMEGoSDKReqCountCustomerDataByMonth
-DESCRIPTION: Go SDK customer request counts aggregated by month
-
-SCHEMA:
-- RequestsDate (string): Date when the requests were made in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- RequestCount (integer): Number of API requests made (≥ 0)
-- GoVersion (string): Version of Go programming language (e.g., "1.19", "1.20", "1.21")
-- PackageName (string): Name of the Go SDK package (e.g., "azblob", "azidentity", "azcore")
-- PackageVersion (string): Version of the Go SDK package (e.g., "1.0.0", "1.1.2")
-- IsTrack2 (boolean): Boolean indicating if this is Track 2 SDK (true/false)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEGoSDKReqCountCustomerDataByMonth", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEGoSDKSubCountCustomerDataByMonthPackageName(user_question: str):
+    async def genSQLSubCountByMonthPackageNamePackageVersionForGo(user_question: str):
         """
         Generate SQL query for AMEGoSDKSubCountCustomerDataByMonthPackageName table.
         
@@ -508,28 +291,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEGoSDKSubCountCustomerDataByMonthPackageName table based on the user question.
-
-TABLE: AMEGoSDKSubCountCustomerDataByMonthPackageName
-DESCRIPTION: Go SDK subscription counts by month and package name
-
-SCHEMA:
-- RequestsDate (string): Date when the requests were made in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- PackageName (string): Name of the Go SDK package (e.g., "azblob", "azidentity", "azcore")
-- PackageVersion (string): Version of the Go SDK package (e.g., "1.0.0", "1.1.2")
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEGoSDKSubCountCustomerDataByMonthPackageName", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEGoSDKSubCountCustomerDataByMonthTrackInfo(user_question: str):
+    async def genSQLSubCountByMonthTrackInfoForGo(user_question: str):
         """
         Generate SQL query for AMEGoSDKSubCountCustomerDataByMonthTrackInfo table.
         
@@ -546,27 +311,10 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEGoSDKSubCountCustomerDataByMonthTrackInfo table based on the user question.
-
-TABLE: AMEGoSDKSubCountCustomerDataByMonthTrackInfo
-DESCRIPTION: Go SDK subscription counts by month and track info
-
-SCHEMA:
-- RequestsDate (string): Date when the requests were made in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-- IsTrack2 (boolean): Boolean indicating if this is Track 2 SDK (true/false)
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEGoSDKSubCountCustomerDataByMonthTrackInfo", user_question, __file__)
 
     @mcp.tool()
-    async def generateSQLByAMEGoSDKSubCountCustomerDataByMonthVersion(user_question: str):
+    async def genSQLSubCountByMonthGoVersionForGo(user_question: str):
         """
         Generate SQL query for AMEGoSDKSubCountCustomerDataByMonthVersion table.
         
@@ -583,24 +331,7 @@ Generate a SQL query that answers the user's question using only the columns ava
         Returns:
             A prompt for generating SQL query for this specific table
         """
-        
-        prompt = f"""
-You are a SQL query generator for Azure SDK usage analytics. Generate a SQL query for the AMEGoSDKSubCountCustomerDataByMonthVersion table based on the user question.
-
-TABLE: AMEGoSDKSubCountCustomerDataByMonthVersion
-DESCRIPTION: Go SDK subscription counts by month and Go version
-
-SCHEMA:
-- RequestsDate (string): Date when the requests were made in YYYY-MM-01 format. Example: '2024-01-01', '2024-02-01'
-- SubscriptionCount (integer): Number of unique subscriptions (≥ 0)
-- GoVersion (string): Version of Go programming language (e.g., "1.19", "1.20", "1.21")
-
-USER QUESTION: {user_question}
-
-Generate a SQL query that answers the user's question using only the columns available in this table. Return only the SQL query without any additional text or formatting.
-"""
-        
-        return prompt
+        return load_and_format_prompt("AMEGoSDKSubCountCustomerDataByMonthVersion", user_question, __file__)
 
     @mcp.tool()
     async def executeSQLQuery(sql_query: str):
@@ -672,20 +403,20 @@ def main():
         print("2. Use generateKQLFromTemplate as fallback if SQL tables cannot satisfy requirements")
         print("\n=== AVAILABLE TOOLS ===")
         print("SQL Tools (try first):")
-        print("  - generateSQLByAMEConciseFiteredNewProductCCIDCustomerSubscriptionId")
-        print("  - generateSQLByAMEConciseSubReqCCIDCountByMonthProduct")
-        print("  - generateSQLByAMEConciseSubReqCCIDCountByMonthProductHttpMethod")
-        print("  - generateSQLByAMEConciseSubReqCCIDCountByMonthProductOS")
-        print("  - generateSQLByAMEConciseSubReqCCIDCountByMonthProductProviderTrackInfo")
-        print("  - generateSQLByAMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoApiVersion")
-        print("  - generateSQLByAMEConciseSubReqCCIDCountByMonthProductProviderTrackInfoPUT")
-        print("  - generateSQLByAMEConciseSubReqCCIDCountByMonthProductTrackInfo")
-        print("  - generateSQLByAMEConciseSubReqCountByMonthProductMinorLanguageVersion")
-        print("  - generateSQLByAMEConciseSubReqCountByMonthProductPatchLanguageVersion")
-        print("  - generateSQLByAMEGoSDKReqCountCustomerDataByMonth")
-        print("  - generateSQLByAMEGoSDKSubCountCustomerDataByMonthPackageName")
-        print("  - generateSQLByAMEGoSDKSubCountCustomerDataByMonthTrackInfo")
-        print("  - generateSQLByAMEGoSDKSubCountCustomerDataByMonthVersion")
+        print("  - genSQLByMonthProductSubscriptionId")
+        print("  - genSQLByMonthProduct")
+        print("  - genSQLByMonthProductHttpMethod")
+        print("  - genSQLByMonthProductOS")
+        print("  - genSQLByMonthProductProviderTrackInfo")
+        print("  - genSQLByMonthProductProviderTrackInfoApiVersion")
+        print("  - genSQLByMonthProductProviderTrackInfoPUT")
+        print("  - genSQLByMonthProductTrackInfo")
+        print("  - genSQLByMonthProductTrackInfoMinorLanguageVersion")
+        print("  - genSQLByMonthProductTrackInfoMinorLanguageVersionPatchLanguageVersion")
+        print("  - genSQLReqCountByMonthTrackInfoPackageNamePackageVersionGoVersionForGo")
+        print("  - genSQLSubCountByMonthPackageNamePackageVersionForGo")
+        print("  - genSQLSubCountByMonthTrackInfoForGo")
+        print("  - genSQLSubCountByMonthGoVersionForGo")
         print("\nOther Tools:")
         print("  - executeSQLQuery: Execute generated SQL queries")
         print("\nFallback Tool (use only if SQL tools cannot satisfy):")
