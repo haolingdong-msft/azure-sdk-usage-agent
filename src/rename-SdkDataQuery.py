@@ -1,6 +1,9 @@
 """
-Table-Specific SQL MCP Server that provides generateSQLBy<tablename> tools
-for each enabled table in SQL_Schema.json
+
+Azure SDK Usage Data Query Server
+
+This module provides table-specific SQL MCP tools for querying Azure SDK usage data.
+Supports both SQL queries for structured data and KQL queries as fallback.
 
 USAGE STRATEGY:
 1. First try table-specific SQL tools (generateSQLBy...) for structured queries on enabled tables
@@ -8,6 +11,7 @@ USAGE STRATEGY:
 
 SQL TOOLS: Best for monthly aggregation, product analysis, subscription data, version tracking
 KQL TOOL: Fallback for complex queries, real-time data, or when SQL tables lack required dimensions
+
 """
 import sys
 from mcp.server.fastmcp import FastMCP
@@ -16,9 +20,9 @@ from src.services.sql_mcp_tools import SQLServerMCPTools
 from src.services.kusto_mcp_tools import KQLGeneratorMCP
 from src.utils.file_utils import load_and_format_prompt
 
-def tableSpecificSqlMCP():
+def create_sdk_usage_mcp_server():
     """Create and configure the MCP server with table-specific SQL generation tools"""
-    mcp = FastMCP("tableSpecificSqlServer", stateless_http=True, port=MCP_PORT)
+    mcp = FastMCP("create_sdk_usage_mcp_server", stateless_http=True, port=MCP_PORT)
     
     mcpSqltools = SQLServerMCPTools()
     mcpKustoTools = KQLGeneratorMCP()
@@ -394,7 +398,7 @@ def tableSpecificSqlMCP():
     return mcp
 
 
-def main():
+def start_sdk_usage_query_server():
     """Main entry point for the table-specific SQL MCP server"""
     try:
         print("Starting Table-Specific SQL MCP Server...")
@@ -423,7 +427,7 @@ def main():
         print("  - generateKQLFromTemplate: KQL query generation for complex/unsupported queries")
         
         # Initialize and run the server
-        mcp = tableSpecificSqlMCP()
+        mcp = create_sdk_usage_mcp_server()
         mcp.run(transport="streamable-http")
         
     except Exception as e:
@@ -431,4 +435,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    start_sdk_usage_query_server()

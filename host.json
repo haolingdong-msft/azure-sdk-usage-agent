@@ -9,7 +9,7 @@
         "description": {
             "defaultExecutablePath": "python",
             "workingDirectory": "",
-            "arguments": ["AzureSDKQueryHandler.py"]
+            "arguments": ["sdk_query_server.py"]
         },
         "enableForwardingHttpRequest": true
     }
