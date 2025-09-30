@@ -12,7 +12,7 @@ class KQLGeneratorMCP:
     def __init__(self):
         self.kql_template_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), 
-            "templates", "queries", "azure_sdk_usage_query.kql"
+            "templates", "azure_sdk_usage_query.kql"
         )
     
     async def generate_kql_from_template(self, user_question: str) -> Dict[str, Any]:
