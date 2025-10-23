@@ -9,7 +9,7 @@ providing MCP (Model Context Protocol) based SQL/KQL query capabilities for SDK 
 def start_sdk_query_server():
     """Start Azure SDK usage data query MCP server"""
     print("Starting Azure SDK Usage Data Query Server...")
-    from src.sdkDataQuery import start_sdk_usage_query_server
+    from src.main import start_sdk_usage_query_server
     start_sdk_usage_query_server()
 
 if __name__ == "__main__":

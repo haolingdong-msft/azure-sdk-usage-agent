@@ -15,7 +15,7 @@ Features:
 import asyncio
 from datetime import datetime
 from typing import Any, Dict, List
-from .sql_client import MSSQLMSIClient
+from .database_client import MSSQLMSIClient
 from src.config import SQL_SERVER, SQL_DATABASE
 
 class SQLServerMCPTools:

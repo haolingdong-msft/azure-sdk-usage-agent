@@ -9,7 +9,7 @@
         "description": {
             "defaultExecutablePath": "python",
             "workingDirectory": "",
-            "arguments": ["sdk_query_server.py"]
+            "arguments": ["server.py"]
         },
         "enableForwardingHttpRequest": true
     }
