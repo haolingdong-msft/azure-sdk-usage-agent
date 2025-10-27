@@ -35,7 +35,6 @@ def start_sdk_usage_query_server():
     """Main entry point for the table-specific SQL MCP server"""
     try:
         print("Starting Azure SDK Usage Data Query Server...")
-        print("Server provides SQL tools for structured queries and KQL as fallback")
         print(f"Server running on port {MCP_PORT}")
         
         # Initialize and run the server

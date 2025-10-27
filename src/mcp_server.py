@@ -8,7 +8,7 @@ from src.config import MCP_PORT
 from src.tools.sql_query_tool import SQLServerMCPTools
 from src.tools.kql_generator_tool import KQLGeneratorMCP
 from src.tools.query_selection_tool import QueryToolSelector
-from src.tools.sql_generator_tool import SQLGeneratorTool
+from src.tools.sql_registry_tool import SQLGeneratorTool
 from src.utils.file_utils import read_relative_file, load_description
 
 class ServerConfigurator:
