@@ -120,3 +120,26 @@ def load_and_format_prompt(table_name: str, user_question: str, caller_file: str
     formatted_prompt = prompt_template.format(user_question=user_question)
     
     return formatted_prompt
+
+
+def load_description(function_name: str, caller_file: Optional[str] = None) -> str:
+    """
+    Load description from a markdown file in the description directory
+    
+    Args:
+        function_name: Name of the function (used to find the corresponding .md file)
+        caller_file: The file from which this function is called (auto-detected if None)
+        
+    Returns:
+        Description content as string
+        
+    Example:
+        description = load_description("analyzeUserIntent")
+    """
+    # Construct the relative path to the description file
+    description_file_path = f"description/{function_name}.md"
+    
+    # Read the description file
+    description_content = read_relative_file(description_file_path, caller_file)
+    
+    return description_content
