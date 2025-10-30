@@ -1,0 +1,22 @@
+{
+  "table": "HttpIncomingRequests",
+  "dimensions": {
+    "subscriptionId": "string (Azure subscription identifier)",
+    "Product": "string (SDK or client type, derived from userAgent; e.g., .Net Code-gen, Java Fluent Lite, Python-SDK, Go-SDK, JavaScript RLC, Rust, etc.)",
+    "Track": "string (SDK generation track, Track1 or Track2, derived from userAgent)",
+    "OS": "string (Operating system parsed from userAgent; e.g., Windows, Linux, MacOS, Unknown)",
+    "apiVersion": "string (API version from request)",
+    "targetResourceProvider": "string (Azure resource provider, e.g., microsoft.compute, microsoft.storage)",
+    "Resource": "string (resource type parsed from operationName, e.g., virtualmachines, storageaccounts)",
+    "httpMethod": "string (HTTP method of request, e.g., GET, PUT, POST)",
+    "RoleLocation": "string (Azure region or role location)",
+    "LanguageVersion": "string (Language runtime version extracted from userAgent; e.g., Python 3.9.7, Java 11.0.17, .NET 6.0, Node v16.14.2, Go 1.18)"
+  },
+  "metrics": {
+    "counts": "int (number of requests summarized by group)"
+  },
+  "timeRange": {
+    "startDateTime": "datetime (calculated start time of query window)",
+    "endDateTime": "datetime (calculated end time of query window)"
+  }
+}

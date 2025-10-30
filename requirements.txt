@@ -1,0 +1,5 @@
+httpx
+mcp>=1.5.0
+azure-identity
+pyodbc
+azure-kusto-data
