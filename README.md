@@ -11,13 +11,25 @@ This repo contains instructions and sample for running MCP server built with the
 
 Ensure you have the following:
 
+* [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd) v1.17.2 or above
 * [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript) v4.5.0 or above
 * [Visual Studio Code](https://code.visualstudio.com/)
 * [Azure Functions extension on Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
 * [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 >[!NOTE]
->*****This sample requires that you have permission to create a [Microsoft Entra app](https://docs.azure.cn/entra/fundamentals/what-is-entra) in the Azure subscription you use. 
+>You can run the installation script in the `scripts` directory to set up prerequisites quickly:
+>- **Linux/macOS**: Run `bash scripts/install.sh`
+>- **Windows**: Run `powershell -ExecutionPolicy Bypass -File scripts/install.ps1`
+>
+>The script will check all prerequisites and automatically install or update missing/outdated components. When successful, you'll see:
+>```
+>✓ All prerequisites are installed and up to date!
+>```
+>or
+>```
+>✓ All operations completed!
+>``` 
 
 ## Run locally
 
