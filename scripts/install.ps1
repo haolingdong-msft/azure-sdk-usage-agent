@@ -6,6 +6,7 @@
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Required versions
+$REQUIRED_AZ_VERSION = "2.65.0"
 $REQUIRED_AZD_VERSION = "1.17.2"
 $REQUIRED_FUNC_VERSION = "4.5.0"
 
@@ -73,6 +74,45 @@ function Compare-Version {
 function Test-Administrator {
     $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     return $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+# Check Azure CLI
+function Test-AzureCLI {
+    Write-Progress-Custom "Checking Azure CLI (az)..."
+    
+    $azCommand = Get-Command az -ErrorAction SilentlyContinue
+    if ($azCommand) {
+        try {
+            $versionOutput = az version --output json 2>&1 | Out-String
+            if ($versionOutput -match '"azure-cli": "([0-9]+\.[0-9]+\.[0-9]+)') {
+                $currentVersion = $matches[1]
+                Write-Info "Found az version: $currentVersion"
+                
+                $comparison = Compare-Version $currentVersion $REQUIRED_AZ_VERSION
+                if ($comparison -lt 0) {
+                    Write-Warning-Custom "az version $currentVersion is below required version $REQUIRED_AZ_VERSION"
+                    $script:ToUpdate["az"] = "$currentVersion -> $REQUIRED_AZ_VERSION+"
+                    $script:UpdateCount++
+                }
+                else {
+                    Write-Success "Azure CLI is up to date (>= $REQUIRED_AZ_VERSION)"
+                }
+            }
+            else {
+                Write-Warning-Custom "Could not determine az version"
+                $script:ToUpdate["az"] = "unknown -> $REQUIRED_AZ_VERSION+"
+                $script:UpdateCount++
+            }
+        }
+        catch {
+            Write-Warning-Custom "Error checking az version: $_"
+        }
+    }
+    else {
+        Write-Warning-Custom "Azure CLI (az) is not installed"
+        $script:ToInstall["az"] = $REQUIRED_AZ_VERSION
+        $script:InstallCount++
+    }
 }
 
 # Check Azure Developer CLI
@@ -223,6 +263,61 @@ function Test-UV {
         Write-Warning-Custom "uv is not installed"
         $script:ToInstall["uv"] = "latest"
         $script:InstallCount++
+    }
+}
+
+# Install Azure CLI
+function Install-AzureCLI {
+    Write-Progress-Custom "Installing Azure CLI..."
+    
+    try {
+        # Check if winget is available
+        $wingetCommand = Get-Command winget -ErrorAction SilentlyContinue
+        if ($wingetCommand) {
+            winget install Microsoft.AzureCLI --accept-source-agreements --accept-package-agreements
+            if ($LASTEXITCODE -eq 0) {
+                Write-Success "az installed successfully"
+                return
+            }
+        }
+        
+        # Fallback to MSI installer
+        Write-Info "Downloading Azure CLI installer..."
+        $msiUrl = "https://aka.ms/installazurecliwindows"
+        $msiPath = "$env:TEMP\AzureCLI.msi"
+        Invoke-WebRequest -Uri $msiUrl -OutFile $msiPath
+        
+        Write-Info "Installing Azure CLI (this may take a few minutes)..."
+        Start-Process msiexec.exe -ArgumentList "/i", $msiPath, "/quiet", "/norestart" -Wait
+        Remove-Item $msiPath -ErrorAction SilentlyContinue
+        
+        Write-Success "az installed successfully"
+        Write-Warning-Custom "Please restart your terminal to use 'az' command"
+    }
+    catch {
+        Write-Error-Custom "Failed to install az: $_"
+        Write-Info "Please install manually from: https://learn.microsoft.com/cli/azure/install-azure-cli"
+    }
+}
+
+# Update Azure CLI
+function Update-AzureCLI {
+    Write-Progress-Custom "Updating Azure CLI..."
+    
+    try {
+        $wingetCommand = Get-Command winget -ErrorAction SilentlyContinue
+        if ($wingetCommand) {
+            winget upgrade Microsoft.AzureCLI --accept-source-agreements --accept-package-agreements
+            Write-Success "az updated successfully"
+        }
+        else {
+            Write-Warning-Custom "winget not available, using az upgrade"
+            az upgrade --yes
+            Write-Success "az updated successfully"
+        }
+    }
+    catch {
+        Write-Error-Custom "Failed to update az: $_"
     }
 }
 
@@ -440,6 +535,7 @@ function Start-Installation {
         Write-Host "`n[$current/$totalActions]" -ForegroundColor Blue
         
         switch ($package) {
+            "az" { Install-AzureCLI }
             "azd" { Install-AzureDeveloperCLI }
             "func" { Install-AzureFunctionsCoreTools }
             "vscode" { Install-VSCode }
@@ -454,6 +550,7 @@ function Start-Installation {
         Write-Host "`n[$current/$totalActions]" -ForegroundColor Blue
         
         switch ($package) {
+            "az" { Update-AzureCLI }
             "azd" { Update-AzureDeveloperCLI }
             "func" { Update-AzureFunctionsCoreTools }
         }
@@ -472,6 +569,7 @@ function Main {
     }
     
     # Check all prerequisites
+    Test-AzureCLI
     Test-AzureDeveloperCLI
     Test-AzureFunctionsCoreTools
     Test-VSCode
@@ -517,6 +615,7 @@ function Main {
     
     # Final verification
     Write-Header "Final Verification"
+    Test-AzureCLI
     Test-AzureDeveloperCLI
     Test-AzureFunctionsCoreTools
     Test-VSCode

@@ -11,6 +11,7 @@ This repo contains instructions and sample for running MCP server built with the
 
 Ensure you have the following:
 
+* [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) v2.65.0 or above
 * [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd) v1.17.2 or above
 * [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-typescript) v4.5.0 or above
 * [Visual Studio Code](https://code.visualstudio.com/)
@@ -34,6 +35,9 @@ Ensure you have the following:
 ## Run locally
 
 1. In the root directory, run `uv run func start` to create the virtual environment, install dependencies, and start the server locally
+1. Open terminal and input `az login` select `Azure SDK Engineering System`
+
+    <img src="./media/az-login.png" width="200" alt="azlogin screenshot">
 1. Open _mcp.json_ (in the _.vscode_ directory)
 
     <img src="./media/mcp-json.png" width="200" alt="mcp.json screenshot">

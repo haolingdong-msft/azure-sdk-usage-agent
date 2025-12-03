@@ -8,6 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Required versions
+REQUIRED_AZ_VERSION="2.65.0"
 REQUIRED_AZD_VERSION="1.17.2"
 REQUIRED_FUNC_VERSION="4.5.0"
 
@@ -66,6 +67,31 @@ version_compare() {
         fi
     done
     return 0
+}
+
+# Check Azure CLI
+check_az() {
+    print_progress "Checking Azure CLI (az)..."
+    
+    if command -v az &> /dev/null; then
+        local current_version=$(az version --output json 2>/dev/null | grep -oP '"azure-cli": "\K[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0")
+        print_info "Found az version: $current_version"
+        
+        version_compare $current_version $REQUIRED_AZ_VERSION
+        local result=$?
+        
+        if [[ $result -eq 2 ]]; then
+            print_warning "az version $current_version is below required version $REQUIRED_AZ_VERSION"
+            TO_UPDATE["az"]="$current_version -> $REQUIRED_AZ_VERSION+"
+            ((UPDATE_COUNT++))
+        else
+            print_success "Azure CLI is up to date (>= $REQUIRED_AZ_VERSION)"
+        fi
+    else
+        print_warning "Azure CLI (az) is not installed"
+        TO_INSTALL["az"]=$REQUIRED_AZ_VERSION
+        ((INSTALL_COUNT++))
+    fi
 }
 
 # Check Azure Developer CLI
@@ -160,6 +186,48 @@ check_uv() {
         print_warning "uv is not installed"
         TO_INSTALL["uv"]="latest"
         ((INSTALL_COUNT++))
+    fi
+}
+
+# Install Azure CLI
+install_az() {
+    print_progress "Installing Azure CLI..."
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        if command -v brew &> /dev/null; then
+            brew install azure-cli && print_success "az installed successfully" || print_error "Failed to install az"
+        else
+            print_error "Homebrew is required to install Azure CLI on macOS"
+            print_info "Please install from: https://learn.microsoft.com/cli/azure/install-azure-cli"
+            return 1
+        fi
+    elif [[ -f /etc/debian_version ]]; then
+        # Debian/Ubuntu
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash && print_success "az installed successfully" || print_error "Failed to install az"
+    elif [[ -f /etc/redhat-release ]]; then
+        # RHEL/CentOS/Fedora
+        sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+        sudo sh -c 'echo -e "[azure-cli]\nname=Azure CLI\nbaseurl=https://packages.microsoft.com/yumrepos/azure-cli\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/azure-cli.repo'
+        sudo yum install -y azure-cli && print_success "az installed successfully" || print_error "Failed to install az"
+    else
+        print_error "Unsupported Linux distribution"
+        print_info "Please install from: https://learn.microsoft.com/cli/azure/install-azure-cli"
+        return 1
+    fi
+}
+
+# Update Azure CLI
+update_az() {
+    print_progress "Updating Azure CLI..."
+    
+    if [[ "$OSTYPE" == "darwin"* ]] && command -v brew &> /dev/null; then
+        brew upgrade azure-cli && print_success "az updated successfully" || print_error "Failed to update az"
+    elif [[ -f /etc/debian_version ]]; then
+        sudo apt-get update
+        sudo apt-get install --only-upgrade -y azure-cli && print_success "az updated successfully" || print_error "Failed to update az"
+    elif [[ -f /etc/redhat-release ]]; then
+        sudo yum update -y azure-cli && print_success "az updated successfully" || print_error "Failed to update az"
     fi
 }
 
@@ -300,6 +368,9 @@ perform_installation() {
         echo -e "\n${BLUE}[$current/$total_actions]${NC}"
         
         case $package in
+            az)
+                install_az
+                ;;
             azd)
                 install_azd
                 ;;
@@ -324,6 +395,9 @@ perform_installation() {
         echo -e "\n${BLUE}[$current/$total_actions]${NC}"
         
         case $package in
+            az)
+                update_az
+                ;;
             azd)
                 update_azd
                 ;;
@@ -339,6 +413,7 @@ main() {
     print_header "Prerequisites Check for Azure SDK Usage Agent"
     
     # Check all prerequisites
+    check_az
     check_azd
     check_func
     check_vscode
@@ -385,6 +460,7 @@ main() {
     
     # Final verification
     print_header "Final Verification"
+    check_az
     check_azd
     check_func
     check_vscode
