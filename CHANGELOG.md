@@ -1,13 +1,4 @@
-## [project-title] Changelog
+## Kusto Query Changelog
 
-<a name="x.y.z"></a>
-# x.y.z (yyyy-mm-dd)
-
-*Features*
-* ...
-
-*Bug Fixes*
-* ...
-
-*Breaking Changes*
-* ...
+# 2025.12.03
+-- Init Repo and Add Features for Kusto Query 
