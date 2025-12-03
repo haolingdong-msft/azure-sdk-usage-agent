@@ -1,6 +1,10 @@
 # Installation script for Azure SDK Usage Agent prerequisites
 # Supports Windows with PowerShell 5.1+
 
+# Set UTF-8 encoding for console output
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 # Required versions
 $REQUIRED_AZD_VERSION = "1.17.2"
 $REQUIRED_FUNC_VERSION = "4.5.0"
@@ -21,27 +25,27 @@ function Write-Header {
 
 function Write-Success {
     param([string]$Message)
-    Write-Host "✓ $Message" -ForegroundColor Green
+    Write-Host "[OK] $Message" -ForegroundColor Green
 }
 
 function Write-Error-Custom {
     param([string]$Message)
-    Write-Host "✗ $Message" -ForegroundColor Red
+    Write-Host "[ERROR] $Message" -ForegroundColor Red
 }
 
 function Write-Warning-Custom {
     param([string]$Message)
-    Write-Host "⚠ $Message" -ForegroundColor Yellow
+    Write-Host "[WARNING] $Message" -ForegroundColor Yellow
 }
 
 function Write-Info {
     param([string]$Message)
-    Write-Host "ℹ $Message" -ForegroundColor Cyan
+    Write-Host "[INFO] $Message" -ForegroundColor Cyan
 }
 
 function Write-Progress-Custom {
     param([string]$Message)
-    Write-Host "⏳ $Message" -ForegroundColor Blue
+    Write-Host "[...] $Message" -ForegroundColor Blue
 }
 
 # Version comparison function

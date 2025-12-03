@@ -24,11 +24,11 @@ Ensure you have the following:
 >
 >The script will check all prerequisites and automatically install or update missing/outdated components. When successful, you'll see:
 >```
->✓ All prerequisites are installed and up to date!
+>[OK] All prerequisites are installed and up to date!
 >```
 >or
 >```
->✓ All operations completed!
+>[OK] All operations completed!
 >``` 
 
 ## Run locally
