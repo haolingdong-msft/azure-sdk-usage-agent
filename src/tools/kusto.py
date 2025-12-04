@@ -3,16 +3,172 @@ Kusto query execution tool via Azure Data Factory
 """
 
 import logging
-from typing import Any, Optional, Dict
+import json
+import csv
+from pathlib import Path
+from typing import Any, Optional, Dict, List
 from azure.identity import DefaultAzureCredential
 
-from adf import ADFClient
+from ..adf import ADFClient
 from .config import (
     SUBSCRIPTION_ID,
     RESOURCE_GROUP_NAME,
     FACTORY_NAME,
     PIPELINE_NAME
 )
+
+
+def export_to_csv(data: List[Dict[str, Any]], output_file: str) -> str:
+    """Export data to CSV file.
+    
+    Args:
+        data: List of dictionaries to export
+        output_file: Path to output CSV file
+    
+    Returns:
+        str: Status message with file path
+    """
+    if not data:
+        return "No data to export."
+    
+    # Get all unique keys from all dictionaries
+    keys = []
+    for item in data:
+        for key in item.keys():
+            if key not in keys:
+                keys.append(key)
+    
+    if not keys:
+        return "No data to export."
+    
+    # Write to CSV
+    output_path = Path(output_file)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(output_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(data)
+    
+    return f"Exported {len(data)} rows to: {output_path.absolute()}"
+
+
+def format_table(data: List[Dict[str, Any]], max_rows: Optional[int] = None) -> str:
+    """Format a list of dictionaries as a readable table.
+    
+    Args:
+        data: List of dictionaries to format
+        max_rows: Maximum number of rows to display (None for all)
+    
+    Returns:
+        str: Formatted table as string
+    """
+    if not data:
+        return "No data to display."
+    
+    # Limit rows if specified
+    display_data = data[:max_rows] if max_rows else data
+    total_rows = len(data)
+    
+    # Get all unique keys from all dictionaries
+    keys = []
+    for item in display_data:
+        for key in item.keys():
+            if key not in keys:
+                keys.append(key)
+    
+    if not keys:
+        return "No data to display."
+    
+    # Calculate column widths
+    col_widths = {}
+    for key in keys:
+        col_widths[key] = len(str(key))
+    
+    for item in display_data:
+        for key in keys:
+            value = str(item.get(key, ''))
+            col_widths[key] = max(col_widths[key], len(value))
+    
+    # Build table
+    lines = []
+    
+    # Header
+    header = " | ".join(str(key).ljust(col_widths[key]) for key in keys)
+    lines.append(header)
+    
+    # Separator
+    separator = "-+-".join("-" * col_widths[key] for key in keys)
+    lines.append(separator)
+    
+    # Data rows
+    for item in display_data:
+        row = " | ".join(str(item.get(key, '')).ljust(col_widths[key]) for key in keys)
+        lines.append(row)
+    
+    result = "\n".join(lines)
+    
+    # Add summary if truncated
+    if max_rows and total_rows > max_rows:
+        result += f"\n\n... {total_rows - max_rows} more rows (showing {max_rows} of {total_rows})"
+    else:
+        result += f"\n\nTotal rows: {total_rows}"
+    
+    return result
+
+
+def format_query_results(output: Dict[str, Any], show_raw: bool = False) -> str:
+    """Format Kusto query results for display.
+    
+    Args:
+        output: Activity output containing query results
+        show_raw: Whether to show raw JSON output
+    
+    Returns:
+        str: Formatted results
+    """
+    parts = []
+    
+    # Extract result count and data
+    count = output.get('count', 0)
+    value = output.get('value', [])
+    
+    parts.append(f"Result count: {count}")
+    
+    if isinstance(value, list) and value:
+        # Format as table
+        parts.append("\nResults:\n")
+        parts.append(format_table(value, max_rows=100))
+    elif value:
+        parts.append(f"\nResults:\n{json.dumps(value, indent=2)}")
+    else:
+        parts.append("\nNo results returned.")
+    
+    # Add billing and runtime info if available
+    if 'effectiveIntegrationRuntime' in output:
+        parts.append(f"\nIntegration Runtime: {output['effectiveIntegrationRuntime']}")
+    
+    if 'billingReference' in output:
+        billing = output['billingReference']
+        if 'billableDuration' in billing:
+            for duration in billing['billableDuration']:
+                meter = duration.get('meterType', 'Unknown')
+                time = duration.get('duration', 0)
+                unit = duration.get('unit', 'Hours')
+                parts.append(f"Billing: {meter} - {time} {unit}")
+    
+    if 'durationInQueue' in output:
+        queue_time = output['durationInQueue'].get('integrationRuntimeQueue', 0)
+        parts.append(f"Queue time: {queue_time}s")
+    
+    # Optionally show raw JSON
+    if show_raw:
+        parts.append(f"\n{'=' * 80}")
+        parts.append("RAW OUTPUT")
+        parts.append(f"{'=' * 80}")
+        parts.append(json.dumps(output, indent=2))
+    
+    return "\n".join(parts)
 
 async def generate_kql_from_query(user_query: str) -> str:
     """Generate KQL (Kusto Query Language) from a natural language query.
@@ -45,7 +201,8 @@ async def generate_kql_from_query(user_query: str) -> str:
 async def execute_kusto_query(
     kusto_query: str,
     timeout: int = 3600,
-    poll_interval: int = 30
+    poll_interval: int = 30,
+    export_to_file: Optional[str] = None
 ) -> str:
     """Execute a Kusto query via Azure Data Factory pipeline.
     
@@ -56,6 +213,7 @@ async def execute_kusto_query(
         kusto_query: The Kusto query to execute
         timeout: Maximum wait time in seconds (default: 3600)
         poll_interval: Status check interval in seconds (default: 30)
+        export_to_file: Optional file path to export full results (CSV format)
     
     Returns:
         str: Formatted query results or error message
@@ -120,6 +278,8 @@ async def execute_kusto_query(
         ]
         
         # Extract output from Kusto activity
+        full_data = []  # Store all data for export
+        
         for activity in activity_runs:
             activity_type = activity.get('activityType', '')
             activity_name = activity.get('activityName', 'Unknown')
@@ -131,13 +291,22 @@ async def execute_kusto_query(
             if activity_status == 'Succeeded':
                 output = activity.get('output', {})
                 if output:
-                    import json
-                    result_parts.append("\nOutput:")
-                    result_parts.append(json.dumps(output, indent=2))
+                    # Store full data for export
+                    value = output.get('value', [])
+                    if isinstance(value, list):
+                        full_data.extend(value)
+                    
+                    result_parts.append("\n" + format_query_results(output, show_raw=False))
             elif activity_status == 'Failed':
                 error = activity.get('error', {})
                 result_parts.append(f"\n❌ Error: {error.get('message', 'Unknown error')}")
                 result_parts.append(f"Error Code: {error.get('errorCode', 'Unknown')}")
+        
+        # Export to file if requested
+        if export_to_file and full_data:
+            export_msg = export_to_csv(full_data, export_to_file)
+            result_parts.append(f"\n{'=' * 80}")
+            result_parts.append(export_msg)
         
         return "\n".join(result_parts)
         

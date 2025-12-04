@@ -1,13 +1,8 @@
 import sys
 import warnings
 import logging
-from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
-
-# Add src directory to Python path
-src_path = Path(__file__).parent / "src"
-sys.path.insert(0, str(src_path))
 
 from src.tools import execute_kusto_query, query_kusto_with_natural_language
 
@@ -23,9 +18,23 @@ warnings.filterwarnings("ignore", category=DeprecationWarning, module="uvicorn.p
 # Initialize FastMCP server
 mcp = FastMCP("kusto", stateless_http=True)
 
-# Register tools
-mcp.tool()(query_kusto_with_natural_language)
-mcp.tool()(execute_kusto_query)
+# Register tools using decorator syntax
+@mcp.tool()
+async def query_kusto_with_natural_language_tool(user_query: str, database: str = None, timeout: int = 3600, poll_interval: int = 30) -> str:
+    """Execute a Kusto query using natural language."""
+    return await query_kusto_with_natural_language(user_query, database, timeout, poll_interval)
+
+@mcp.tool()
+async def execute_kusto_query_tool(kusto_query: str, timeout: int = 3600, poll_interval: int = 30, export_to_file: str = None) -> str:
+    """Execute a Kusto query via Azure Data Factory pipeline.
+    
+    Args:
+        kusto_query: The Kusto query to execute
+        timeout: Maximum wait time in seconds (default: 3600)
+        poll_interval: Status check interval in seconds (default: 30)
+        export_to_file: Optional file path to export full results in CSV format
+    """
+    return await execute_kusto_query(kusto_query, timeout, poll_interval, export_to_file)
 
 def main():
     """Main entry point for the MCP server."""
