@@ -1,0 +1,12 @@
+let startDate = datetime(@{pipeline().parameters.startDateTime});
+let endDate = datetime(@{pipeline().parameters.endDateTime});
+let newSubCreatedDateLimit = datetime_add("day", -30, startDate);
+Unionizer("Requests", "HttpIncomingRequests")
+| where TIMESTAMP >= startDate and TIMESTAMP < endDate
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where (userAgent has "azure-sdk-for-go" or userAgent has "azsdk-go-") and userAgent !has "terraform"
+| summarize counts = count() by userAgent, subscriptionId
+| extend ExtractPackages = split(extract("Azure-SDK-[Ff]or-Go\\/[\\w\\d\\.-]+\\s[\\w\\d-]+\\/[\\w\\d-]*|azsdk-go-[\\w\\d\\.\\/-]+", 0, userAgent), " ")
+| extend PackageSplits = iif(array_length(ExtractPackages)==1, split(ExtractPackages[0], "/"), split(ExtractPackages[1], "/"))
+| project RequestCounts = counts, RequestsDate = startDate, SubscriptionID = subscriptionId, GoVersion = extract("go1\\.[\\d]+", 0, userAgent), PackageName = PackageSplits[0], PackageVersion = PackageSplits[1],
+IsTrack2 = userAgent has "azsdk-go-"

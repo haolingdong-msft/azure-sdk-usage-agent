@@ -1,0 +1,13 @@
+// 1️⃣ 定义普通字符串（需要转义 \）
+let str1 = "GoVersion: go1.20.1";
+let matched1 = extract("go1\\.\\d+", 0, str1);
+
+// 2️⃣ 定义 verbatim 字符串 @"..."（无需双重转义）
+let str2 = @"GoVersion: go1.20.1";
+let matched2 = extract(@"go1\.\d+", 0, str2);
+
+// 3️⃣ 测试复杂正则
+let str3 = @"Azure-SDK-For-Go/arm-resources/1.0 go1.19.5";
+let matched3 = extract(@"Azure-SDK-[Ff]or-Go/[\w\-]+/[\d\.]+", 0, str3);
+
+print matched1, matched2, matched3

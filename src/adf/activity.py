@@ -3,6 +3,9 @@ Activity run operations for Azure Data Factory.
 """
 
 from typing import Dict, Any, List
+import json
+from pathlib import Path
+from datetime import datetime
 
 import requests
 
@@ -58,52 +61,19 @@ def get_activity_runs(
     response.raise_for_status()
     
     result = response.json()
+    
+    # Save result to JSON file
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_file = output_dir / f"activity_runs_{timestamp}_{run_id}.json"
+    
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+    
+    print(f"Activity runs result saved to: {output_file}")
+    
     activity_runs = result.get("value", [])
     
     print(f"Retrieved {len(activity_runs)} activity runs")
     return activity_runs
-
-
-def print_activity_details(activity_runs: List[Dict[str, Any]]) -> None:
-    """
-    Print detailed information about activity runs including outputs.
-    
-    Args:
-        activity_runs: List of activity run dictionaries
-    """
-    if not activity_runs:
-        print("No activity runs found.")
-        return
-    
-    for idx, activity in enumerate(activity_runs, 1):
-        print(f"\n{'=' * 80}")
-        print(f"Activity #{idx}: {activity.get('activityName')}")
-        print(f"{'=' * 80}")
-        print(f"Type:     {activity.get('activityType')}")
-        print(f"Status:   {activity.get('status')}")
-        print(f"Start:    {activity.get('activityRunStart')}")
-        print(f"End:      {activity.get('activityRunEnd')}")
-        print(f"Duration: {activity.get('durationInMs')} ms")
-        
-        # Display output if available
-        output = activity.get('output')
-        if output:
-            print(f"\nOutput:")
-            import json
-            print(json.dumps(output, indent=2))
-        
-        # Display error if failed
-        if activity.get('status') == 'Failed':
-            error = activity.get('error', {})
-            print(f"\n❌ Error:")
-            print(f"  Code:    {error.get('errorCode', 'Unknown')}")
-            print(f"  Message: {error.get('message', 'Unknown error')}")
-            if error.get('failureType'):
-                print(f"  Type:    {error.get('failureType')}")
-        
-        # Display input if available
-        input_data = activity.get('input')
-        if input_data:
-            print(f"\nInput:")
-            import json
-            print(json.dumps(input_data, indent=2))

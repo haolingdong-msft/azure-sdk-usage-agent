@@ -7,23 +7,27 @@ import json
 import csv
 from pathlib import Path
 from typing import Any, Optional, Dict, List
+from datetime import datetime
 from azure.identity import DefaultAzureCredential
 
 from ..adf import ADFClient
-from .config import (
+from ..adf.config import (
     SUBSCRIPTION_ID,
     RESOURCE_GROUP_NAME,
     FACTORY_NAME,
-    PIPELINE_NAME
+    PIPELINE_NAME,
+    KUSTO_QUERY_PARAM_KEY
 )
+from ..utils.utils import format_pipeline_status_failed, format_activity_runs
 
 
-def export_to_csv(data: List[Dict[str, Any]], output_file: str) -> str:
+def export_to_csv(data: List[Dict[str, Any]], output_file: Optional[str] = None) -> str:
     """Export data to CSV file.
     
     Args:
         data: List of dictionaries to export
-        output_file: Path to output CSV file
+        output_file: Optional path to output CSV file. If not provided, generates a default filename
+                     in the format 'output/kusto_query_results_YYYYMMDD_HHMMSS.csv'
     
     Returns:
         str: Status message with file path
@@ -41,6 +45,11 @@ def export_to_csv(data: List[Dict[str, Any]], output_file: str) -> str:
     if not keys:
         return "No data to export."
     
+    # Generate default filename if not provided
+    if not output_file:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = f"output/kusto_query_results_{timestamp}.csv"
+    
     # Write to CSV
     output_path = Path(output_file)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -53,149 +62,216 @@ def export_to_csv(data: List[Dict[str, Any]], output_file: str) -> str:
     return f"Exported {len(data)} rows to: {output_path.absolute()}"
 
 
-def format_table(data: List[Dict[str, Any]], max_rows: Optional[int] = None) -> str:
-    """Format a list of dictionaries as a readable table.
+def get_kusto_schema() -> str:
+    """Get the Kusto schema with essential query patterns.
     
-    Args:
-        data: List of dictionaries to format
-        max_rows: Maximum number of rows to display (None for all)
-    
-    Returns:
-        str: Formatted table as string
-    """
-    if not data:
-        return "No data to display."
-    
-    # Limit rows if specified
-    display_data = data[:max_rows] if max_rows else data
-    total_rows = len(data)
-    
-    # Get all unique keys from all dictionaries
-    keys = []
-    for item in display_data:
-        for key in item.keys():
-            if key not in keys:
-                keys.append(key)
-    
-    if not keys:
-        return "No data to display."
-    
-    # Calculate column widths
-    col_widths = {}
-    for key in keys:
-        col_widths[key] = len(str(key))
-    
-    for item in display_data:
-        for key in keys:
-            value = str(item.get(key, ''))
-            col_widths[key] = max(col_widths[key], len(value))
-    
-    # Build table
-    lines = []
-    
-    # Header
-    header = " | ".join(str(key).ljust(col_widths[key]) for key in keys)
-    lines.append(header)
-    
-    # Separator
-    separator = "-+-".join("-" * col_widths[key] for key in keys)
-    lines.append(separator)
-    
-    # Data rows
-    for item in display_data:
-        row = " | ".join(str(item.get(key, '')).ljust(col_widths[key]) for key in keys)
-        lines.append(row)
-    
-    result = "\n".join(lines)
-    
-    # Add summary if truncated
-    if max_rows and total_rows > max_rows:
-        result += f"\n\n... {total_rows - max_rows} more rows (showing {max_rows} of {total_rows})"
-    else:
-        result += f"\n\nTotal rows: {total_rows}"
-    
-    return result
-
-
-def format_query_results(output: Dict[str, Any], show_raw: bool = False) -> str:
-    """Format Kusto query results for display.
-    
-    Args:
-        output: Activity output containing query results
-        show_raw: Whether to show raw JSON output
+    Returns core schema, fields, and basic examples. For SDK analysis queries,
+    the AI should call get_kusto_helper_functions() to get complete function definitions.
     
     Returns:
-        str: Formatted results
+        str: Schema context
     """
-    parts = []
-    
-    # Extract result count and data
-    count = output.get('count', 0)
-    value = output.get('value', [])
-    
-    parts.append(f"Result count: {count}")
-    
-    if isinstance(value, list) and value:
-        # Format as table
-        parts.append("\nResults:\n")
-        parts.append(format_table(value, max_rows=100))
-    elif value:
-        parts.append(f"\nResults:\n{json.dumps(value, indent=2)}")
-    else:
-        parts.append("\nNo results returned.")
-    
-    # Add billing and runtime info if available
-    if 'effectiveIntegrationRuntime' in output:
-        parts.append(f"\nIntegration Runtime: {output['effectiveIntegrationRuntime']}")
-    
-    if 'billingReference' in output:
-        billing = output['billingReference']
-        if 'billableDuration' in billing:
-            for duration in billing['billableDuration']:
-                meter = duration.get('meterType', 'Unknown')
-                time = duration.get('duration', 0)
-                unit = duration.get('unit', 'Hours')
-                parts.append(f"Billing: {meter} - {time} {unit}")
-    
-    if 'durationInQueue' in output:
-        queue_time = output['durationInQueue'].get('integrationRuntimeQueue', 0)
-        parts.append(f"Queue time: {queue_time}s")
-    
-    # Optionally show raw JSON
-    if show_raw:
-        parts.append(f"\n{'=' * 80}")
-        parts.append("RAW OUTPUT")
-        parts.append(f"{'=' * 80}")
-        parts.append(json.dumps(output, indent=2))
-    
-    return "\n".join(parts)
+    return """
+Kusto Query Language (KQL) Base Schema:
 
-async def generate_kql_from_query(user_query: str) -> str:
-    """Generate KQL (Kusto Query Language) from a natural language query.
+REQUIRED:
+- Table: Unionizer("Requests", "HttpIncomingRequests")
+- Filter: where TaskName == "HttpIncomingRequestEndWithSuccess"
+- Time filter: where TIMESTAMP > ago(Xd) [ALWAYS required]
+
+KEY FIELDS:
+- TIMESTAMP, operationName, httpMethod, userAgent, apiVersion, subscriptionId
+- targetResourceProvider, targetResourceType, tenantId, principalOid, RoleLocation
+
+QUERY PATTERNS:
+- Time: `where TIMESTAMP > ago(24h)` or `ago(7d)`
+- Provider: `where tolower(targetResourceProvider) == "microsoft.compute"`
+- Aggregate: `summarize count() by field` or `dcount(subscriptionId)`
+- Sort: `order by count_ desc` or `top 10 by count_ desc`
+
+AVAILABLE HELPER FUNCTIONS (call get_kusto_helper_functions() tool if needed):
+- GetProduct(userAgent) - Extract SDK name (Python-SDK, Java-SDK, .NET-SDK, etc.)
+- GetTrackInfo(userAgent) - Extract Track1/Track2
+- GetOSInfo(userAgent) - Extract OS (Windows, Linux, MacOS)
+- GetResource(operationName) - Extract resource type
+- GetLanguageVersion(userAgent, Product, Track) - Extract language version
+
+NOTE: If your query needs SDK analysis, OS detection, or resource type extraction,
+call get_kusto_helper_functions() to get the complete function definitions.
+
+BASIC EXAMPLES:
+
+
+1. Total API calls for a resource provider:
+```kql
+Unionizer("Requests", "HttpIncomingRequests")
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where TIMESTAMP > ago(24h)
+| where tolower(targetResourceProvider) == "microsoft.compute"
+| summarize TotalCalls = count()
+```
+
+2. Top 10 operations by subscription count:
+```kql
+Unionizer("Requests", "HttpIncomingRequests")
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where TIMESTAMP > ago(7d)
+| where tolower(targetResourceProvider) == "microsoft.compute"
+| summarize UniqueSubscriptions = dcount(subscriptionId) by operationName
+| top 10 by UniqueSubscriptions desc
+```
+
+3. API calls by HTTP method:
+```kql
+Unionizer("Requests", "HttpIncomingRequests")
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where TIMESTAMP > ago(24h)
+| where tolower(targetResourceProvider) == "microsoft.compute"
+| summarize count() by httpMethod
+| order by count_ desc
+```
+"""
+
+
+def get_kusto_helper_functions() -> str:
+    """Get complete KQL helper function definitions for SDK analysis.
     
-    This function converts a user's natural language question into a valid KQL query.
+    Returns all 5 helper functions with full implementation including:
+    - GetProduct() - Extract SDK/product name from UserAgent
+    - GetTrackInfo() - Extract Track1/Track2 from UserAgent
+    - GetOSInfo() - Extract operating system from UserAgent
+    - GetResource() - Extract resource type from operationName
+    - GetLanguageVersion() - Extract language version from UserAgent
+    
+    Returns:
+        str: Complete function definitions
+    """
+    return r"""
+KQL Helper Functions - Complete Definitions:
+
+USAGE: Copy these function definitions to the start of your query (before Unionizer).
+Define with `let FunctionName = ...` syntax.
+
+```kql
+let GetProduct = (UAString: string) {
+    let userAgent = tolower(trim(" ", UAString));
+    let goSdkException = dynamic(["kubernetes-cloudprovider", "custer-api-provider-azure", "cilium", "azure-metrics-exporter", "azure_prometheus_exporter", "cluster-image-registry-operator", "aad-pod-identity", "azure-service-operator"]);
+    let netReg = extract(@"(microsoft\.windowsazure\.management|microsoft\.azure\.management)", 1, userAgent);
+    let jsRlcReg = "azsdk-js-arm-[a-z0-9]+-rest";
+    case(
+        isempty(UAString), "",
+        userAgent has "terraform", "Terraform",
+        userAgent has "ansible", "Ansible",
+        (userAgent has "azure-sdk-for-java" or userAgent has "azsdk-java") and userAgent has "auto-generated", "Java Fluent Lite",
+        userAgent has "azure-sdk-for-java" or userAgent has "azsdk-java", "Java Fluent Premium",
+        netReg != "" and userAgent has "fluent", ".Net Fluent",
+        netReg != "" or userAgent has "azsdk-net", ".Net Code-gen",
+        userAgent has "azure-sdk-for-python" or userAgent has "azsdk-python", "Python-SDK",
+        userAgent has "azure-sdk-for-node", "JavaScript (Node.JS)",
+        userAgent matches regex jsRlcReg, "JavaScript RLC",
+        (userAgent has "ms-rest-js" and userAgent startswith "@azure/arm") or userAgent has "azsdk-js-arm", "JavaScript",
+        userAgent has "azure-sdk-for-ruby", "Ruby-SDK",
+        (userAgent has "azure-sdk-for-go" or userAgent has "azsdk-go") and array_index_of(goSdkException, userAgent) == -1, "Go-SDK",
+        userAgent has "azure-sdk-for-php", "PHP-SDK",
+        userAgent has "azsdk-rust-", "Rust",
+        ""
+    )
+};
+let GetTrackInfo = (UAString: string) {
+    let userAgent = tolower(trim(" ", UAString));
+    case(
+        userAgent has "azsdk-net", "Track2",
+        userAgent has "azsdk-python", "Track2",
+        userAgent has "azsdk-java", "Track2",
+        userAgent has "azsdk-go", "Track2",
+        userAgent has "azsdk-js", "Track2",
+        "Track1"
+    )
+};
+let GetOSInfo = (UAString: string) {
+    let userAgent = tolower(trim(" ", UAString));
+    case(
+        userAgent has "windows", "Windows",
+        userAgent has "linux", "Linux",
+        userAgent has "macos", "MacOS",
+        userAgent has "mac os", "MacOS",
+        "Unknown"
+    )
+};
+let GetResource = (operationName: string) {
+    let lowerOperationName = tolower(operationName);
+    let resourceMatch = extract("/providers/microsoft.([a-z]+)/([a-z]+)/", 2, lowerOperationName);
+    let entityName = iff(resourceMatch != "", resourceMatch, "");
+    let elements = split(lowerOperationName, "/");
+    let entityName2 = iif(entityName == "", elements[-1], entityName);
+    tolower(entityName2)
+};
+let GetLanguageVersion = (UAString: string, Product: string, Track: string) {
+    let userAgent = tolower(trim(" ", UAString));
+    case(
+        isempty(userAgent), '',
+        (Product == '.Net Fluent' or Product == '.Net Code-gen') and Track == "Track1", extract("(?i)FxVersion/(\\d+.\\d+)", 1, userAgent),
+        (Product == '.Net Fluent' or Product == '.Net Code-gen') and Track == "Track2", extract("(?i).NET\\s(\\d+.\\d+.\\d+)", 1, userAgent),
+        (Product == 'Java Fluent Lite' or Product == 'Java Fluent Premium') and Track == "Track1", extract("java:(\\d+.\\d+.\\d+(_\\d+)?)", 1, userAgent),
+        (Product == 'Java Fluent Lite' or Product == 'Java Fluent Premium') and Track == "Track2", extract("\\((\\d+.\\d+.\\d+(_\\d+)?)", 1, userAgent),
+        Product == 'Python-SDK', extract("(Python|python)/(\\d+.\\d+.\\d+)", 2, userAgent),
+        Product == 'Go-SDK', extract("go(\\d+.\\d+.\\d+)", 1, userAgent),
+        Product == 'JavaScript (Node.JS)' or Product == 'JavaScript RLC' or Product == 'JavaScript', extract("(?i)Node/(?:v)?(\\d+\\.\\d+\\.\\d+)", 1, userAgent),
+        Product == 'Rust', extract("\\((\\d+.\\d+.[^\\;]+);", 1, userAgent),
+        ''
+    )
+};
+```
+
+EXAMPLE: SDK usage analysis with Product, Track, and OS
+```kql
+let GetProduct = (UAString: string) { /* definition above */ };
+let GetTrackInfo = (UAString: string) { /* definition above */ };
+let GetOSInfo = (UAString: string) { /* definition above */ };
+
+Unionizer("Requests", "HttpIncomingRequests")
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where TIMESTAMP > ago(7d)
+| where tolower(targetResourceProvider) == "microsoft.compute"
+| extend Product = GetProduct(userAgent), Track = GetTrackInfo(userAgent), OS = GetOSInfo(userAgent)
+| where isnotempty(Product)
+| summarize count() by Product, Track, OS, RoleLocation
+| order by count_ desc
+```
+"""
+
+
+def generate_kql_from_question(user_query: str) -> str:
+    """Generate KQL query based on natural language question.
+    
+    This function provides schema, patterns, and context needed for generating
+    a valid KQL query. The calling AI agent will use this context to generate
+    the actual KQL query based on the user's question.
+    
+    Workflow:
+    1. AI calls this function with user's natural language question
+    2. Function returns schema and context
+    3. AI generates KQL query using the context
+    4. AI can then call execute_kusto_query_tool to run the generated query
     
     Args:
         user_query: Natural language question or request
     
     Returns:
-        str: Generated KQL query
-    
-    Examples:
-        >>> await generate_kql_from_query("Show me the top 10 errors from the last hour")
-        "Logs | where Level == 'Error' and Timestamp > ago(1h) | top 10 by Timestamp desc"
-        
-        >>> await generate_kql_from_query("Count users by country")
-        "Users | summarize count() by Country"
+        str: Schema context, patterns, and instructions for KQL generation
     """
-    # TODO: Implement KQL generation logic
-    # This could use an LLM (like GPT-4) to convert natural language to KQL
+    base_schema = get_kusto_schema()
     
-    logging.info(f"Generating KQL for query: {user_query}")
-    
-    # For now, return a simple example query
-    # In production, integrate with an LLM service here
-    return f"// Generated from: {user_query}\n// TODO: Implement LLM-based KQL generation"
+    return f"""User Query: {user_query}
+
+Generate a KQL query based on the schema below.
+
+{base_schema}
+
+IMPORTANT:
+- If your query needs SDK analysis, OS detection, resource type extraction, or language versions,
+  call get_kusto_helper_functions() to get complete function definitions.
+"""
 
 
 async def execute_kusto_query(
@@ -230,7 +306,7 @@ async def execute_kusto_query(
         
         # Prepare pipeline parameters
         parameters: Dict[str, Any] = {
-            "KustoQuery": kusto_query
+            KUSTO_QUERY_PARAM_KEY: kusto_query
         }
         
         logging.info(f"Triggering pipeline: {PIPELINE_NAME} with query: {kusto_query[:100]}...")
@@ -250,9 +326,9 @@ async def execute_kusto_query(
         duration_ms = final_status.get("durationInMs", 0)
         
         if status != "Succeeded":
-            error_msg = f"Pipeline execution failed with status: {status}"
-            logging.error(error_msg)
-            return f"Error: {error_msg}\nRun ID: {run_id}"
+            error_output = format_pipeline_status_failed(final_status)
+            logging.error(error_output)
+            return error_output
         
         # Get activity runs to extract query results
         start_time = final_status.get("runStart")
@@ -268,97 +344,29 @@ async def execute_kusto_query(
             end_time=end_time
         )
         
-        # Format results
-        result_parts = [
-            f"Query executed successfully in {duration_ms}ms",
-            f"Run ID: {run_id}",
-            f"\n{'=' * 80}",
-            "QUERY RESULTS",
-            f"{'=' * 80}\n"
-        ]
+        # Format activity results and extract data
+        result_message, full_data = format_activity_runs(activity_runs, duration_ms, run_id)
         
-        # Extract output from Kusto activity
-        full_data = []  # Store all data for export
+        # Export logic:
+        # 1. Always export if user explicitly specified export_to_file
+        # 2. Auto-export if data > 100 rows (even if export_to_file not specified)
+        # 3. Don't export if data <= 100 rows and export_to_file not specified
+        should_export = False
+        if full_data:
+            if export_to_file:
+                # User explicitly requested export
+                should_export = True
+            elif len(full_data) > 100:
+                # Auto-export for large result sets
+                should_export = True
         
-        for activity in activity_runs:
-            activity_type = activity.get('activityType', '')
-            activity_name = activity.get('activityName', 'Unknown')
-            activity_status = activity.get('status', 'Unknown')
-            
-            result_parts.append(f"\nActivity: {activity_name} ({activity_type})")
-            result_parts.append(f"Status: {activity_status}")
-            
-            if activity_status == 'Succeeded':
-                output = activity.get('output', {})
-                if output:
-                    # Store full data for export
-                    value = output.get('value', [])
-                    if isinstance(value, list):
-                        full_data.extend(value)
-                    
-                    result_parts.append("\n" + format_query_results(output, show_raw=False))
-            elif activity_status == 'Failed':
-                error = activity.get('error', {})
-                result_parts.append(f"\n❌ Error: {error.get('message', 'Unknown error')}")
-                result_parts.append(f"Error Code: {error.get('errorCode', 'Unknown')}")
-        
-        # Export to file if requested
-        if export_to_file and full_data:
+        if should_export:
             export_msg = export_to_csv(full_data, export_to_file)
-            result_parts.append(f"\n{'=' * 80}")
-            result_parts.append(export_msg)
+            result_message += f"\n\n{'=' * 80}\n{export_msg}"
         
-        return "\n".join(result_parts)
+        return result_message
         
     except Exception as e:
         error_msg = f"Error executing Kusto query via ADF: {str(e)}"
-        logging.error(error_msg, exc_info=True)
-        return f"Error: {error_msg}"
-
-
-async def query_kusto_with_natural_language(
-    user_query: str,
-    database: Optional[str] = None,
-    timeout: int = 3600,
-    poll_interval: int = 30
-) -> str:
-    """Execute a Kusto query using natural language.
-    
-    This is a convenience function that combines KQL generation from natural language
-    and query execution into a single operation.
-    
-    Args:
-        user_query: Natural language question or request
-        database: Optional Kusto database name (if required by pipeline)
-        timeout: Maximum wait time in seconds (default: 3600)
-        poll_interval: Status check interval in seconds (default: 30)
-    
-    Returns:
-        str: Query results or error message
-    
-    Examples:
-        >>> await query_kusto_with_natural_language(
-        ...     user_query="Show me errors from the last hour"
-        ... )
-    """
-    try:
-        # Step 1: Generate KQL from natural language
-        logging.info(f"Generating KQL from user query: {user_query}")
-        kusto_query = await generate_kql_from_query(user_query=user_query)
-        
-        logging.info(f"Generated KQL: {kusto_query}")
-        
-        # Step 2: Execute the generated KQL
-        result = await execute_kusto_query(
-            kusto_query=kusto_query,
-            database=database,
-            timeout=timeout,
-            poll_interval=poll_interval
-        )
-        
-        return f"Natural Language Query: {user_query}\n\nGenerated KQL:\n{kusto_query}\n\n{result}"
-        
-    except Exception as e:
-        error_msg = f"Error processing natural language query: {str(e)}"
         logging.error(error_msg, exc_info=True)
         return f"Error: {error_msg}"

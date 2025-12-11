@@ -1,0 +1,7 @@
+Unionizer("Requests", "HttpIncomingRequests")
+| where TIMESTAMP > ago(1d)
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where tolower(targetResourceProvider) == "microsoft.compute"
+| summarize subcount = dcount(subscriptionId) by Operation = operationName, HttpMethod = httpMethod
+| extend TargetResourceProvider = "MICROSOFT.COMPUTE"
+| project TargetResourceProvider, Operation, HttpMethod, subcount

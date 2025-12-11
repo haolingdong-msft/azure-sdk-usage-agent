@@ -3,6 +3,7 @@ Authentication utilities for Azure Data Factory.
 """
 
 from typing import Optional
+
 from azure.identity import DefaultAzureCredential
 
 from .config import MANAGEMENT_SCOPE

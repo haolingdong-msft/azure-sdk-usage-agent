@@ -1,5 +1,5 @@
 """
-Configuration constants for Azure Data Factory REST API.
+Configuration constants for Azure Data Factory REST API and Kusto query tools.
 """
 
 # import os
@@ -19,6 +19,16 @@ DEFAULT_POLL_INTERVAL = 30
 
 # Default timeout in seconds
 DEFAULT_TIMEOUT = 3600
+
+# Azure Data Factory Kusto Query Configuration
+SUBSCRIPTION_ID = "a18897a6-7e44-457d-9260-f2854c0aca42"
+RESOURCE_GROUP_NAME = "sdk-mgmt-bi-data"
+FACTORY_NAME = "azuremgmtsdkbi-datafactory"
+PIPELINE_NAME = "QueryARMProd-Parm"
+PIPELINE_NAME_NO_PARAMS = "RegExp"
+
+# Pipeline parameter keys
+KUSTO_QUERY_PARAM_KEY = "KustoQuery"
 
 # @dataclass
 # class AzureSettings:

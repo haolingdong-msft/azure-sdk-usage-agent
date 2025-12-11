@@ -7,7 +7,7 @@ using the REST API (api-version=2018-06-01) with DefaultAzureCredential authenti
 
 from .auth import get_token
 from .pipeline import trigger_pipeline, wait_for_pipeline, get_pipeline_run_status
-from .activity import get_activity_runs, print_activity_details
+from .activity import get_activity_runs
 from .client import ADFClient
 
 __all__ = [
@@ -16,7 +16,6 @@ __all__ = [
     "wait_for_pipeline",
     "get_pipeline_run_status",
     "get_activity_runs",
-    "print_activity_details",
     "ADFClient",
 ]
 

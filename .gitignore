@@ -29,8 +29,10 @@ x86/
 [Aa][Rr][Mm]64/
 [Aa][Rr][Mm]64[Ee][Cc]/
 bld/
+build/
 [Oo]bj/
 [Oo]ut/
+output/
 [Ll]og/
 [Ll]ogs/
 
