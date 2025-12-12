@@ -1,8 +1,12 @@
 import sys
 import warnings
 import logging
+import asyncio
+from typing import Any
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp.types import Tool, TextContent, ImageContent, EmbeddedResource
 
 from src.tools import (
     execute_kusto_query,
@@ -19,124 +23,138 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="websockets.legacy")
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="uvicorn.protocols.websockets")
 
-# Initialize FastMCP server
-mcp = FastMCP("sdk-usage-kusto", stateless_http=True)
+# Initialize MCP server
+server = Server("sdk-usage-kusto")
 
-# Register tools using decorator syntax
-@mcp.tool()
-async def generate_kql_query_tool(user_query: str, execute: bool = False, export_to_file: str = None) -> str:
-    """
-    Purpose:
-        Convert a natural-language question into a valid KQL query.
 
-    When to Use:
-        Use this tool when the user asks a question requiring the creation of a KQL query.
+# ============================================================================
+# TOOL DEFINITIONS
+# ============================================================================
 
-    Inputs:
-      - user_query: The natural-language question to convert.
-      - execute: If True, the model must run the generated query.
-      - export_to_file: Optional CSV export path when executing the query.
+@server.list_tools()
+async def list_tools() -> list[Tool]:
+    """List all available tools."""
+    return [
+        Tool(
+            name="generate_kql_query_tool",
+            description="Convert a natural-language question into a valid KQL query for Azure SDK usage data.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "user_query": {
+                        "type": "string",
+                        "description": "The natural-language question to convert into a KQL query",
+                    },
+                    "execute": {
+                        "type": "boolean",
+                        "description": "If True, the model must run the generated query",
+                        "default": False,
+                    },
+                    "export_to_file": {
+                        "type": "string",
+                        "description": "Optional CSV export path when executing the query",
+                    },
+                },
+                "required": ["user_query"],
+            },
+        ),
+        Tool(
+            name="execute_kusto_query_tool",
+            description="Execute a KQL query and retrieve results from Azure SDK usage data.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "kusto_query": {
+                        "type": "string",
+                        "description": "The complete KQL query string to execute",
+                    },
+                    "timeout": {
+                        "type": "integer",
+                        "description": "Maximum seconds to wait for completion",
+                        "default": 3600,
+                    },
+                    "poll_interval": {
+                        "type": "integer",
+                        "description": "Seconds between status checks",
+                        "default": 30,
+                    },
+                    "export_to_file": {
+                        "type": "string",
+                        "description": "Optional CSV file path to save all results",
+                    },
+                },
+                "required": ["kusto_query"],
+            },
+        ),
+        Tool(
+            name="get_kusto_helper_functions_tool",
+            description="Retrieve KQL helper function definitions for advanced SDK usage analysis (SDK identification, version tracking, OS detection, etc.).",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
+    ]
 
-    Model Behavior:
-      - Call this tool to obtain schema and context.
-      - Generate a valid KQL query using the returned schema.
-      - If execute=True, immediately call execute_kusto_query_tool with
-        the generated query and optional export_to_file.
 
-    Limitations:
-      - Do not call this tool when the user already supplies a complete KQL query.
-      - Do not invent parameters that are not part of the input schema.
-    """
-    result = generate_kql_from_question(user_query)
+@server.call_tool()
+async def call_tool(name: str, arguments: Any) -> list[TextContent | ImageContent | EmbeddedResource]:
+    """Handle tool calls."""
+    logger = logging.getLogger("sdk-usage-kusto")
+    logger.info(f"Tool called: {name} with arguments: {arguments}")
     
-    if execute:
-        result += "\n\n" + "=" * 80
-        result += "\nNOTE: execute=True was specified."
-        result += "\nAfter generating the KQL query based on the schema above, "
-        result += "you MUST call execute_kusto_query_tool() with the generated query to return results."
-        if export_to_file:
-            result += f"\nExport results to: {export_to_file}"
-        result += "\n" + "=" * 80
-    
-    return result
-
-
-@mcp.tool()
-async def execute_kusto_query_tool(kusto_query: str, timeout: int = 3600, poll_interval: int = 30, export_to_file: str = None) -> str:
-    """
-    Purpose:
-        Execute a KQL query and retrieve results from Azure SDK usage data.
-
-    When to Use:
-        Use this tool after you have generated a valid KQL query string (either from 
-        generate_kql_query_tool or constructed manually following the schema).
-
-    Inputs:
-      - kusto_query: The complete KQL query string to execute
-      - timeout: Maximum seconds to wait for completion (default: 3600)
-      - poll_interval: Seconds between status checks (default: 30)
-      - export_to_file: Optional CSV file path to save all results
-
-    Output:
-        Returns formatted query results including:
-        - Row count summary
-        - Data table (displays up to 100 rows)
-        - Billing and runtime information
+    if name == "generate_kql_query_tool":
+        user_query = arguments.get("user_query")
+        execute = arguments.get("execute", False)
+        export_to_file = arguments.get("export_to_file")
         
-        Note: The response displays up to 100 rows. Only use export_to_file parameter 
-        when the user explicitly requests to save results to a file, or when you need 
-        to preserve all rows from large result sets.
-
-    Limitations:
-      - Do not call this tool without a valid KQL query string.
-      - Query must follow the schema requirements (Unionizer table, TaskName filter, TIMESTAMP filter).
-    """
-    return await execute_kusto_query(kusto_query, timeout, poll_interval, export_to_file)
-
-
-@mcp.tool()
-async def get_kusto_helper_functions_tool() -> str:
-    """
-    Purpose:
-        Retrieve KQL helper function definitions for advanced SDK usage analysis.
-
-    When to Use:
-        Call this tool when the user's query requires analyzing SDK-specific information:
-        - SDK/tool identification (Python, Java, .NET, Terraform, etc.)
-        - SDK version tracking (Track1 vs Track2)
-        - Operating system detection (Windows, Linux, MacOS)
-        - Resource type extraction from operation names
-        - Programming language version parsing
-
-    Output:
-        Returns 5 complete KQL function definitions:
-        - GetProduct(userAgent): Extract SDK/product name
-        - GetTrackInfo(userAgent): Determine Track1 or Track2
-        - GetOSInfo(userAgent): Extract operating system
-        - GetResource(operationName): Extract resource type
-        - GetLanguageVersion(userAgent, Product, Track): Extract language version
-
-    Model Behavior:
-      - Include these function definitions at the START of your KQL query
-      - Place them BEFORE the main Unionizer query
-      - Use `let FunctionName = ...` syntax for each function
-      - Then extend your query results using these functions (e.g., | extend Product = GetProduct(userAgent))
-
-    Limitations:
-      - Only call this tool when SDK analysis is actually needed for the user's question.
-      - Do not call this for simple queries that don't involve SDK/tool analysis.
-    """
-    return get_kusto_helper_functions()
+        result = generate_kql_from_question(user_query)
+        
+        if execute:
+            result += "\n\n" + "=" * 80
+            result += "\nNOTE: execute=True was specified."
+            result += "\nAfter generating the KQL query based on the schema above, "
+            result += "you MUST call execute_kusto_query_tool() with the generated query to return results."
+            if export_to_file:
+                result += f"\nExport results to: {export_to_file}"
+            result += "\n" + "=" * 80
+        
+        return [TextContent(type="text", text=result)]
+    
+    elif name == "execute_kusto_query_tool":
+        kusto_query = arguments.get("kusto_query")
+        timeout = arguments.get("timeout", 3600)
+        poll_interval = arguments.get("poll_interval", 30)
+        export_to_file = arguments.get("export_to_file")
+        
+        result = await execute_kusto_query(kusto_query, timeout, poll_interval, export_to_file)
+        return [TextContent(type="text", text=result)]
+    
+    elif name == "get_kusto_helper_functions_tool":
+        result = get_kusto_helper_functions()
+        return [TextContent(type="text", text=result)]
+    
+    else:
+        raise ValueError(f"Unknown tool: {name}")
 
 
-def main():
+# ============================================================================
+# MAIN ENTRY POINT
+# ============================================================================
+
+async def main():
     """Main entry point for the MCP server."""
-    try:
-        print("Starting MCP server...")
-        mcp.run(transport="streamable-http")
-    except Exception as e:
-        print(f"Error while running MCP server: {e}", file=sys.stderr)
+    logger = logging.getLogger("sdk-usage-kusto")
+    logger.info("Starting MCP STDIO Server...")
+    
+    async with stdio_server() as (read_stream, write_stream):
+        logger.info("Server initialized, waiting for requests...")
+        await server.run(
+            read_stream,
+            write_stream,
+            server.create_initialization_options(),
+        )
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

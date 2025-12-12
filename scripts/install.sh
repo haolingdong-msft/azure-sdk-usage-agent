@@ -9,8 +9,6 @@ NC='\033[0m' # No Color
 
 # Required versions
 REQUIRED_AZ_VERSION="2.65.0"
-REQUIRED_AZD_VERSION="1.17.2"
-REQUIRED_FUNC_VERSION="4.5.0"
 
 # Installation tracking
 declare -A TO_INSTALL
@@ -371,17 +369,8 @@ perform_installation() {
             az)
                 install_az
                 ;;
-            azd)
-                install_azd
-                ;;
-            func)
-                install_func
-                ;;
             vscode)
                 install_vscode
-                ;;
-            vscode-extension)
-                install_vscode_extension
                 ;;
             uv)
                 install_uv
@@ -398,26 +387,17 @@ perform_installation() {
             az)
                 update_az
                 ;;
-            azd)
-                update_azd
-                ;;
-            func)
-                update_func
-                ;;
         esac
     done
 }
 
 # Main script
 main() {
-    print_header "Prerequisites Check for Azure SDK Usage Agent"
+    print_header "Prerequisites Check for MCP SDK Usage Kusto Server"
     
     # Check all prerequisites
     check_az
-    check_azd
-    check_func
     check_vscode
-    check_vscode_extension
     check_uv
     
     # Summary
@@ -461,10 +441,7 @@ main() {
     # Final verification
     print_header "Final Verification"
     check_az
-    check_azd
-    check_func
     check_vscode
-    check_vscode_extension
     check_uv
     
     print_header "Installation Complete"

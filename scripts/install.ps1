@@ -7,8 +7,6 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Required versions
 $REQUIRED_AZ_VERSION = "2.65.0"
-$REQUIRED_AZD_VERSION = "1.17.2"
-$REQUIRED_FUNC_VERSION = "4.5.0"
 
 # Installation tracking
 $script:ToInstall = @{}
@@ -536,10 +534,7 @@ function Start-Installation {
         
         switch ($package) {
             "az" { Install-AzureCLI }
-            "azd" { Install-AzureDeveloperCLI }
-            "func" { Install-AzureFunctionsCoreTools }
             "vscode" { Install-VSCode }
-            "vscode-extension" { Install-VSCodeExtension }
             "uv" { Install-UV }
         }
     }
@@ -551,15 +546,13 @@ function Start-Installation {
         
         switch ($package) {
             "az" { Update-AzureCLI }
-            "azd" { Update-AzureDeveloperCLI }
-            "func" { Update-AzureFunctionsCoreTools }
         }
     }
 }
 
 # Main script
 function Main {
-    Write-Header "Prerequisites Check for Azure SDK Usage Agent"
+    Write-Header "Prerequisites Check for MCP SDK Usage Kusto Server"
     
     # Check if running as Administrator
     if (-not (Test-Administrator)) {
@@ -570,10 +563,7 @@ function Main {
     
     # Check all prerequisites
     Test-AzureCLI
-    Test-AzureDeveloperCLI
-    Test-AzureFunctionsCoreTools
     Test-VSCode
-    Test-VSCodeExtension
     Test-UV
     
     # Summary
@@ -616,10 +606,7 @@ function Main {
     # Final verification
     Write-Header "Final Verification"
     Test-AzureCLI
-    Test-AzureDeveloperCLI
-    Test-AzureFunctionsCoreTools
     Test-VSCode
-    Test-VSCodeExtension
     Test-UV
     
     Write-Header "Installation Complete"
