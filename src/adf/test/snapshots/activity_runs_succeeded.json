@@ -1,0 +1,2726 @@
+{
+  "value": [
+    {
+      "activityRunEnd": "2025-12-10T13:48:21.658444Z",
+      "activityName": "Lookup1",
+      "activityRunStart": "2025-12-10T13:47:56.056468Z",
+      "activityType": "Lookup",
+      "durationInMs": 25601,
+      "retryAttempt": null,
+      "error": {
+        "errorCode": "",
+        "message": "",
+        "failureType": "",
+        "target": "Lookup1",
+        "details": ""
+      },
+      "activityRunId": "827ae53a-cb3b-4512-8bcb-e68d1bf8d43e",
+      "iterationHash": "",
+      "input": {
+        "source": {
+          "type": "AzureDataExplorerSource",
+          "query": "Unionizer(\"Requests\", \"HttpIncomingRequests\")\n| where TIMESTAMP > ago(1d)\n| where TaskName == \"HttpIncomingRequestEndWithSuccess\"\n| where tolower(targetResourceProvider) == \"microsoft.compute\"\n| summarize subcount = dcount(subscriptionId) by Operation = operationName, HttpMethod = httpMethod\n| extend TargetResourceProvider = \"MICROSOFT.COMPUTE\"\n| project TargetResourceProvider, Operation, HttpMethod, subcount\n",
+          "queryTimeout": "01:00:00",
+          "noTruncation": true
+        },
+        "dataset": {
+          "referenceName": "SourceDataset_sdkRequests",
+          "type": "DatasetReference",
+          "parameters": {}
+        },
+        "firstRowOnly": false
+      },
+      "linkedServiceName": "",
+      "output": {
+        "count": 441,
+        "value": [
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/EXTENSIONS",
+            "HttpMethod": "GET",
+            "subcount": 971580
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/VMSIZES",
+            "HttpMethod": "GET",
+            "subcount": 203260
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/INSTANCEVIEW",
+            "HttpMethod": "GET",
+            "subcount": 223122
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/INSTANCEVIEW",
+            "HttpMethod": "GET",
+            "subcount": 130917
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/",
+            "HttpMethod": "GET",
+            "subcount": 1172065
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/NETWORKINTERFACES",
+            "HttpMethod": "GET",
+            "subcount": 254652
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES",
+            "HttpMethod": "GET",
+            "subcount": 371140
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/OPERATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 563791
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES",
+            "HttpMethod": "GET",
+            "subcount": 955
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES",
+            "HttpMethod": "GET",
+            "subcount": 302737
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/USAGES",
+            "HttpMethod": "GET",
+            "subcount": 1874458
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 661619
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "GET",
+            "subcount": 14971
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/EXTENSIONS",
+            "HttpMethod": "GET",
+            "subcount": 187253
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/",
+            "HttpMethod": "GET",
+            "subcount": 1044559
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS",
+            "HttpMethod": "GET",
+            "subcount": 223103
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/SKUS",
+            "HttpMethod": "GET",
+            "subcount": 431278
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS/ARTIFACTTYPES/OFFERS/SKUS/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 57886
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS",
+            "HttpMethod": "GET",
+            "subcount": 4086780
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/NETWORKINTERFACES/",
+            "HttpMethod": "GET",
+            "subcount": 27104
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/DISKOPERATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 247627
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/",
+            "HttpMethod": "GET",
+            "subcount": 189989
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES",
+            "HttpMethod": "GET",
+            "subcount": 4114536
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EXTENSIONS",
+            "HttpMethod": "GET",
+            "subcount": 262625
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/",
+            "HttpMethod": "GET",
+            "subcount": 299781
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/",
+            "HttpMethod": "GET",
+            "subcount": 95737
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/METRICDEFINITIONS",
+            "HttpMethod": "GET",
+            "subcount": 1708
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 91487
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/",
+            "HttpMethod": "PUT",
+            "subcount": 91124
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/ENDGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 32640
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/",
+            "HttpMethod": "PUT",
+            "subcount": 86370
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/",
+            "HttpMethod": "DELETE",
+            "subcount": 80489
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/PUBLICIPADDRESSES",
+            "HttpMethod": "GET",
+            "subcount": 267173
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/MANUALUPGRADE",
+            "HttpMethod": "POST",
+            "subcount": 38909
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/INSTANCEVIEW",
+            "HttpMethod": "GET",
+            "subcount": 44756
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE",
+            "HttpMethod": "GET",
+            "subcount": 855619
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS",
+            "HttpMethod": "GET",
+            "subcount": 852205
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS",
+            "HttpMethod": "GET",
+            "subcount": 179036
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS",
+            "HttpMethod": "GET",
+            "subcount": 69309
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/DISKS",
+            "HttpMethod": "GET",
+            "subcount": 2014007
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RUNCOMMANDS",
+            "HttpMethod": "GET",
+            "subcount": 276780
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/IMAGES",
+            "HttpMethod": "GET",
+            "subcount": 817400
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/NETWORKINTERFACES",
+            "HttpMethod": "GET",
+            "subcount": 5397
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/",
+            "HttpMethod": "GET",
+            "subcount": 51659
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/DEALLOCATE",
+            "HttpMethod": "POST",
+            "subcount": 125607
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/",
+            "HttpMethod": "PUT",
+            "subcount": 72141
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/RETRIEVESASURIS",
+            "HttpMethod": "POST",
+            "subcount": 316990
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/OSUPGRADEHISTORY",
+            "HttpMethod": "GET",
+            "subcount": 1260
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/BEGINGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 26653
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/",
+            "HttpMethod": "PATCH",
+            "subcount": 45780
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/VIRTUALMACHINES",
+            "HttpMethod": "GET",
+            "subcount": 44975
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS",
+            "HttpMethod": "GET",
+            "subcount": 824021
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/",
+            "HttpMethod": "DELETE",
+            "subcount": 54743
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS/ARTIFACTTYPES/OFFERS/SKUS",
+            "HttpMethod": "GET",
+            "subcount": 1769
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PLACEMENTSCORES/GENERATE",
+            "HttpMethod": "POST",
+            "subcount": 30682
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/",
+            "HttpMethod": "PUT",
+            "subcount": 58191
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS",
+            "HttpMethod": "GET",
+            "subcount": 863302
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/SKUS",
+            "HttpMethod": "GET",
+            "subcount": 19308
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/NETWORKINTERFACES/IPCONFIGURATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 2504
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/CAPACITYRESERVATIONS",
+            "HttpMethod": "GET",
+            "subcount": 4025
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/VMSIZES",
+            "HttpMethod": "GET",
+            "subcount": 21508
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/",
+            "HttpMethod": "DELETE",
+            "subcount": 72197
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/IMAGES/",
+            "HttpMethod": "GET",
+            "subcount": 63640
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/",
+            "HttpMethod": "GET",
+            "subcount": 383502
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/SHAREDIDENTITY",
+            "HttpMethod": "PUT",
+            "subcount": 1210
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES",
+            "HttpMethod": "GET",
+            "subcount": 1648026
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/DISKRESTOREPOINTS/ENDGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 138089
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS/ARTIFACTTYPES/OFFERS/SKUS/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 30416
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS",
+            "HttpMethod": "GET",
+            "subcount": 2157
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/",
+            "HttpMethod": "DELETE",
+            "subcount": 307005
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 20826
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/DISKRESTOREPOINTS/BEGINGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 138169
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS/ARTIFACTTYPES/TYPES/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 9461
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/",
+            "HttpMethod": "PATCH",
+            "subcount": 28999
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES",
+            "HttpMethod": "GET",
+            "subcount": 841742
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/DISKRESTOREPOINTS",
+            "HttpMethod": "GET",
+            "subcount": 137412
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/DELETE",
+            "HttpMethod": "POST",
+            "subcount": 62563
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/",
+            "HttpMethod": "GET",
+            "subcount": 107367
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/",
+            "HttpMethod": "PUT",
+            "subcount": 31036
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 66977
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS/ARTIFACTTYPES/OFFERS",
+            "HttpMethod": "GET",
+            "subcount": 1509
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/",
+            "HttpMethod": "PUT",
+            "subcount": 317968
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/IMAGES",
+            "HttpMethod": "GET",
+            "subcount": 8876
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RUNCOMMAND",
+            "HttpMethod": "POST",
+            "subcount": 29797
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/SSHPUBLICKEYS",
+            "HttpMethod": "GET",
+            "subcount": 731552
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/REIMAGE",
+            "HttpMethod": "POST",
+            "subcount": 1456
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS",
+            "HttpMethod": "GET",
+            "subcount": 639724
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/START",
+            "HttpMethod": "POST",
+            "subcount": 120740
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES",
+            "HttpMethod": "GET",
+            "subcount": 4651
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES",
+            "HttpMethod": "GET",
+            "subcount": 750887
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/CSOPERATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 1734
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/CAPSOPERATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 6066
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EXTENSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 51940
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/",
+            "HttpMethod": "GET",
+            "subcount": 7728
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/DISKRESTOREPOINTS/",
+            "HttpMethod": "GET",
+            "subcount": 4329
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RUNCOMMANDS",
+            "HttpMethod": "GET",
+            "subcount": 63327
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES",
+            "HttpMethod": "GET",
+            "subcount": 40434
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "DELETE",
+            "subcount": 1020
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/",
+            "HttpMethod": "PATCH",
+            "subcount": 8362
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/",
+            "HttpMethod": "GET",
+            "subcount": 81684
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/",
+            "HttpMethod": "DELETE",
+            "subcount": 14733
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "PUT",
+            "subcount": 3055
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EXTENSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 36907
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/",
+            "HttpMethod": "GET",
+            "subcount": 72742
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS",
+            "HttpMethod": "GET",
+            "subcount": 5448
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SSHPUBLICKEYS/",
+            "HttpMethod": "GET",
+            "subcount": 258918
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/REIMAGEALL",
+            "HttpMethod": "POST",
+            "subcount": 6056
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS",
+            "HttpMethod": "GET",
+            "subcount": 3385
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLES/",
+            "HttpMethod": "GET",
+            "subcount": 1016
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/OPERATIONS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 60
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS/",
+            "HttpMethod": "GET",
+            "subcount": 145815
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/PROXIMITYPLACEMENTGROUPS",
+            "HttpMethod": "GET",
+            "subcount": 659620
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS",
+            "HttpMethod": "GET",
+            "subcount": 24091
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/VMSIZES",
+            "HttpMethod": "GET",
+            "subcount": 5700
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/ROLLINGUPGRADES/",
+            "HttpMethod": "GET",
+            "subcount": 2594
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/PROXIMITYPLACEMENTGROUPS",
+            "HttpMethod": "GET",
+            "subcount": 11767
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RESTART",
+            "HttpMethod": "POST",
+            "subcount": 18852
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLES",
+            "HttpMethod": "GET",
+            "subcount": 7508
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/",
+            "HttpMethod": "GET",
+            "subcount": 9448
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/DIAGNOSTICS/GENERATE",
+            "HttpMethod": "POST",
+            "subcount": 14073
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/REGISTER",
+            "HttpMethod": "POST",
+            "subcount": 21533
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/NETWORKINTERFACES/IPCONFIGURATIONS/PUBLICIPADDRESSES/",
+            "HttpMethod": "GET",
+            "subcount": 1214
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/",
+            "HttpMethod": "PUT",
+            "subcount": 1908
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 36967
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/",
+            "HttpMethod": "PUT",
+            "subcount": 3030
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/SERVICEARTIFACTS/",
+            "HttpMethod": "GET",
+            "subcount": 68
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/REIMAGE",
+            "HttpMethod": "POST",
+            "subcount": 16813
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS/ARTIFACTTYPES/TYPES",
+            "HttpMethod": "GET",
+            "subcount": 763
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SSHPUBLICKEYS",
+            "HttpMethod": "GET",
+            "subcount": 3104
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/VMAPPLICATIONS",
+            "HttpMethod": "GET",
+            "subcount": 6757
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/POWEROFF",
+            "HttpMethod": "POST",
+            "subcount": 7104
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/",
+            "HttpMethod": "GET",
+            "subcount": 5973
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/BEGINGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 1382
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RETRIEVEBOOTDIAGNOSTICSDATA",
+            "HttpMethod": "POST",
+            "subcount": 5103
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RUNCOMMAND",
+            "HttpMethod": "POST",
+            "subcount": 1899
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/",
+            "HttpMethod": "PUT",
+            "subcount": 1633
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES",
+            "HttpMethod": "PUT",
+            "subcount": 94
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/ENDGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 1460
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/INSTANCEVIEW",
+            "HttpMethod": "GET",
+            "subcount": 118
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/PROXIMITYPLACEMENTGROUPS/",
+            "HttpMethod": "GET",
+            "subcount": 17397
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RESTART",
+            "HttpMethod": "POST",
+            "subcount": 2669
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PLACEMENTSCORES/GENERATE",
+            "HttpMethod": "POST",
+            "subcount": 404
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/",
+            "HttpMethod": "PUT",
+            "subcount": 1072
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/",
+            "HttpMethod": "GET",
+            "subcount": 1119
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/SHAREDIDENTITY",
+            "HttpMethod": "GET",
+            "subcount": 940
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/DEALLOCATE",
+            "HttpMethod": "POST",
+            "subcount": 198
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 3570
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/",
+            "HttpMethod": "DELETE",
+            "subcount": 829
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES",
+            "HttpMethod": "GET",
+            "subcount": 592553
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/ASSESSPATCHES",
+            "HttpMethod": "POST",
+            "subcount": 3618
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/INSTANCEVIEW",
+            "HttpMethod": "GET",
+            "subcount": 843
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS",
+            "HttpMethod": "GET",
+            "subcount": 28159
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES",
+            "HttpMethod": "GET",
+            "subcount": 5914
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLES/SKUS",
+            "HttpMethod": "GET",
+            "subcount": 978
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/CAPACITYRESERVATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 5072
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS",
+            "HttpMethod": "GET",
+            "subcount": 664913
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/DIAGNOSTICS/GENERATE",
+            "HttpMethod": "POST",
+            "subcount": 13127
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/REIMAGE",
+            "HttpMethod": "POST",
+            "subcount": 1350
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/",
+            "HttpMethod": "GET",
+            "subcount": 657
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/RUNCOMMANDS/",
+            "HttpMethod": "GET",
+            "subcount": 3571
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/START",
+            "HttpMethod": "POST",
+            "subcount": 3801
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/AUTOUPGRADABLEEXTENSIONS",
+            "HttpMethod": "GET",
+            "subcount": 6819
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/VIRTUALMACHINESCALESETS",
+            "HttpMethod": "GET",
+            "subcount": 12949
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/RUNCOMMANDS",
+            "HttpMethod": "GET",
+            "subcount": 5020
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/",
+            "HttpMethod": "DELETE",
+            "subcount": 1570
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 1648
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES",
+            "HttpMethod": "GET",
+            "subcount": 2766
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/DIAGNOSTICOPERATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 14
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/NETWORKINTERFACES/IPCONFIGURATIONS/PUBLICIPADDRESSES",
+            "HttpMethod": "GET",
+            "subcount": 36
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/SERVICEARTIFACTS",
+            "HttpMethod": "GET",
+            "subcount": 32245
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS",
+            "HttpMethod": "GET",
+            "subcount": 6947
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/IMAGES/",
+            "HttpMethod": "PUT",
+            "subcount": 2021
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/",
+            "HttpMethod": "PUT",
+            "subcount": 913
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/RESTART",
+            "HttpMethod": "POST",
+            "subcount": 4716
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/INSTALLPATCHES",
+            "HttpMethod": "POST",
+            "subcount": 2274
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/POWEROFF",
+            "HttpMethod": "POST",
+            "subcount": 847
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/IMAGES/",
+            "HttpMethod": "DELETE",
+            "subcount": 1350
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/",
+            "HttpMethod": "PUT",
+            "subcount": 2362
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/",
+            "HttpMethod": "PATCH",
+            "subcount": 671
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/VERSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 4858
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/START",
+            "HttpMethod": "POST",
+            "subcount": 279
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS",
+            "HttpMethod": "GET",
+            "subcount": 397
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/ASSOCIATEDRESOURCES",
+            "HttpMethod": "GET",
+            "subcount": 20222
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/VMAPPLICATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 4909
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EXTENSIONS/SETEXACTVERSIONONINSTANCES",
+            "HttpMethod": "POST",
+            "subcount": 21
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/",
+            "HttpMethod": "DELETE",
+            "subcount": 624
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/DEALLOCATE",
+            "HttpMethod": "POST",
+            "subcount": 3770
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/REAPPLY",
+            "HttpMethod": "POST",
+            "subcount": 260
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 1214
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SHAREDGALLERIES",
+            "HttpMethod": "GET",
+            "subcount": 5708
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SSHPUBLICKEYS/",
+            "HttpMethod": "DELETE",
+            "subcount": 1160
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/GENERALIZE",
+            "HttpMethod": "POST",
+            "subcount": 4084
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/OSROLLINGUPGRADE",
+            "HttpMethod": "POST",
+            "subcount": 55
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SSHPUBLICKEYS/",
+            "HttpMethod": "PUT",
+            "subcount": 3267
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONS",
+            "HttpMethod": "GET",
+            "subcount": 2239
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS",
+            "HttpMethod": "GET",
+            "subcount": 594893
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/",
+            "HttpMethod": "DELETE",
+            "subcount": 54
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/SERVICEARTIFACTS/",
+            "HttpMethod": "PUT",
+            "subcount": 34
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SYSTEMINFO",
+            "HttpMethod": "GET",
+            "subcount": 40
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/CAPACITYRESERVATIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 739
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/SIMULATEEVICTION",
+            "HttpMethod": "POST",
+            "subcount": 108
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/NETWORKINTERFACES/",
+            "HttpMethod": "GET",
+            "subcount": 178
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS",
+            "HttpMethod": "GET",
+            "subcount": 4559
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/REIMAGEALL",
+            "HttpMethod": "POST",
+            "subcount": 62
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 84
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "PATCH",
+            "subcount": 767
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/POWEROFF",
+            "HttpMethod": "POST",
+            "subcount": 47
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES",
+            "HttpMethod": "GET",
+            "subcount": 28170
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/CAPACITYRESERVATIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 692
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SSHPUBLICKEYS/GENERATEKEYPAIR",
+            "HttpMethod": "POST",
+            "subcount": 2748
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/VERSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 2258
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMEXTENSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 125
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES",
+            "HttpMethod": "GET",
+            "subcount": 2872
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/NETWORKINTERFACES",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/DIAGNOSTICS/RUN",
+            "HttpMethod": "POST",
+            "subcount": 14
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SHAREDGALLERIES/IMAGES/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 491
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 2167
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/",
+            "HttpMethod": "DELETE",
+            "subcount": 173
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/",
+            "HttpMethod": "PATCH",
+            "subcount": 39
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/RECOMMENDATIONS/BULKQUERY",
+            "HttpMethod": "POST",
+            "subcount": 67
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/",
+            "HttpMethod": "PATCH",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES/",
+            "HttpMethod": "GET",
+            "subcount": 86
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLES/",
+            "HttpMethod": "PATCH",
+            "subcount": 507
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMEXTENSIONS/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 121
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONPROXIES/VALIDATE",
+            "HttpMethod": "POST",
+            "subcount": 163
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/ATTACHDETACHDATADISKS",
+            "HttpMethod": "POST",
+            "subcount": 224
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/CAPACITYRESERVATIONS/",
+            "HttpMethod": "PATCH",
+            "subcount": 83
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/ROLLINGUPGRADES/",
+            "HttpMethod": "POST",
+            "subcount": 222
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/",
+            "HttpMethod": "DELETE",
+            "subcount": 934
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/SETORCHESTRATIONSERVICESTATE",
+            "HttpMethod": "POST",
+            "subcount": 258
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/REFRESHDELEGATEDRESOURCEIDENTITY",
+            "HttpMethod": "POST",
+            "subcount": 13
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/",
+            "HttpMethod": "DELETE",
+            "subcount": 776
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/",
+            "HttpMethod": "PATCH",
+            "subcount": 410
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/REDEPLOY",
+            "HttpMethod": "POST",
+            "subcount": 649
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/COMMUNITYGALLERIES/IMAGES/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 287
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/REDEPLOY",
+            "HttpMethod": "POST",
+            "subcount": 439
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "PATCH",
+            "subcount": 7
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/CONVERTTOMANAGEDDISKS",
+            "HttpMethod": "POST",
+            "subcount": 41
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RETRIEVEBOOTDIAGNOSTICSDATA",
+            "HttpMethod": "POST",
+            "subcount": 62
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/",
+            "HttpMethod": "DELETE",
+            "subcount": 88
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/CONFIGUREPATCHING",
+            "HttpMethod": "POST",
+            "subcount": 27
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/COMMUNITYGALLERIES/IMAGES/",
+            "HttpMethod": "GET",
+            "subcount": 203
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/UPGRADEVMAGENT",
+            "HttpMethod": "POST",
+            "subcount": 28
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/SOFTDELETEDARTIFACTTYPES/ARTIFACTS/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 2177
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/",
+            "HttpMethod": "PUT",
+            "subcount": 102
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/PROXIMITYPLACEMENTGROUPS/",
+            "HttpMethod": "PUT",
+            "subcount": 320
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/GETPRIVILEGEDPROPERTIES",
+            "HttpMethod": "POST",
+            "subcount": 8
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 915
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EXTENSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 945
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "PUT",
+            "subcount": 1488
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SHAREDGALLERIES/IMAGES/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 128
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONPROXIES/",
+            "HttpMethod": "GET",
+            "subcount": 146
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/REMOTEDESKTOPFILE",
+            "HttpMethod": "GET",
+            "subcount": 61
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/ATTACHDETACHDATADISKS",
+            "HttpMethod": "POST",
+            "subcount": 71
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/OSUPGRADEINTERNAL",
+            "HttpMethod": "POST",
+            "subcount": 87
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/GETCREDENTIAL",
+            "HttpMethod": "POST",
+            "subcount": 31
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/SERVICEARTIFACTS/",
+            "HttpMethod": "DELETE",
+            "subcount": 30
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/DIAGNOSTICS/VALIDATESTORAGECONFIGURATION",
+            "HttpMethod": "POST",
+            "subcount": 32
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/VERSIONS/",
+            "HttpMethod": "PATCH",
+            "subcount": 1298
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/DELETEPRESERVEDOSDISK",
+            "HttpMethod": "POST",
+            "subcount": 66
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONPROXIES/",
+            "HttpMethod": "PUT",
+            "subcount": 146
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/COMMUNITYGALLERIES/IMAGES/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 47
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RETRIEVEVMCONSOLESERIALLOGS",
+            "HttpMethod": "POST",
+            "subcount": 24
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/SCALEOUT",
+            "HttpMethod": "POST",
+            "subcount": 5
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/CAPTURE",
+            "HttpMethod": "POST",
+            "subcount": 44
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/ROLLBACKOSDISK",
+            "HttpMethod": "POST",
+            "subcount": 41
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/RESTART",
+            "HttpMethod": "POST",
+            "subcount": 131
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/BOOKMARKS/",
+            "HttpMethod": "DELETE",
+            "subcount": 15
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 150
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/",
+            "HttpMethod": "PUT",
+            "subcount": 325
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/",
+            "HttpMethod": "GET",
+            "subcount": 202
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/FORCERECOVERYSERVICEFABRICPLATFORMUPDATEDOMAINWALK",
+            "HttpMethod": "POST",
+            "subcount": 19
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES",
+            "HttpMethod": "PATCH",
+            "subcount": 89
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PUBLISHERS/ARTIFACTTYPES/TYPES/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 20
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/",
+            "HttpMethod": "PATCH",
+            "subcount": 123
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 40
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/AUTOEXTENSIONUPGRADE",
+            "HttpMethod": "POST",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/MIGRATEVMAVAILABILITYZONE",
+            "HttpMethod": "POST",
+            "subcount": 19
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/REBUILD",
+            "HttpMethod": "POST",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "GET",
+            "subcount": 1489
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES/",
+            "HttpMethod": "GET",
+            "subcount": 56
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/BOOKMARKS/",
+            "HttpMethod": "PUT",
+            "subcount": 15
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/RESTART",
+            "HttpMethod": "POST",
+            "subcount": 35
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SHAREDGALLERIES/IMAGES",
+            "HttpMethod": "GET",
+            "subcount": 53
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/PROXIMITYPLACEMENTGROUPS/",
+            "HttpMethod": "DELETE",
+            "subcount": 123
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/AUTOIMAGESKUGENUPDATE",
+            "HttpMethod": "POST",
+            "subcount": 20
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/GETPRIVILEGEDPROPERTIES",
+            "HttpMethod": "POST",
+            "subcount": 13
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/DELETE",
+            "HttpMethod": "POST",
+            "subcount": 6
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/BOOKMARKS/",
+            "HttpMethod": "GET",
+            "subcount": 15
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/BOOKMARKS",
+            "HttpMethod": "GET",
+            "subcount": 15
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONPROXIES/",
+            "HttpMethod": "DELETE",
+            "subcount": 124
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/NETWORKINTERFACES",
+            "HttpMethod": "GET",
+            "subcount": 161
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/",
+            "HttpMethod": "DELETE",
+            "subcount": 134
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATELINKRESOURCES",
+            "HttpMethod": "GET",
+            "subcount": 22
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS",
+            "HttpMethod": "DELETE",
+            "subcount": 33
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 25
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/DIAGNOSTICS/REGISTERSTORAGECONFIGURATION",
+            "HttpMethod": "POST",
+            "subcount": 17
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS",
+            "HttpMethod": "DELETE",
+            "subcount": 30
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/VMAPPLICATIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 230
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/CLOUDSERVICEOSVERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 22
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/",
+            "HttpMethod": "PUT",
+            "subcount": 196
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/UPGRADEVMAGENT",
+            "HttpMethod": "POST",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/UPDATEDOMAINS/",
+            "HttpMethod": "PUT",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/VERSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 21
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/NETWORKINTERFACES/GETEFFECTIVESECURITYGROUPS",
+            "HttpMethod": "POST",
+            "subcount": 23
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/",
+            "HttpMethod": "PUT",
+            "subcount": 285
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS/",
+            "HttpMethod": "PUT",
+            "subcount": 56
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 19
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/REIMAGE",
+            "HttpMethod": "POST",
+            "subcount": 20
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/EDGEZONES/PUBLISHERS/ARTIFACTTYPES/OFFERS/SKUS/VERSIONS/",
+            "HttpMethod": "GET",
+            "subcount": 5
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/",
+            "HttpMethod": "DELETE",
+            "subcount": 222
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/VERSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 45
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "DELETE",
+            "subcount": 1471
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/UPDATEDOMAINS/",
+            "HttpMethod": "GET",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/",
+            "HttpMethod": "PUT",
+            "subcount": 81
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/POWEROFF",
+            "HttpMethod": "POST",
+            "subcount": 149
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKENCRYPTIONSETS/SHAREDIDENTITY/",
+            "HttpMethod": "POST",
+            "subcount": 12
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/REDEPLOY",
+            "HttpMethod": "POST",
+            "subcount": 58
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RETRIEVEVMCONSOLESCREENSHOT",
+            "HttpMethod": "POST",
+            "subcount": 24
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES",
+            "HttpMethod": "DELETE",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SHAREDGALLERIES/IMAGES/",
+            "HttpMethod": "GET",
+            "subcount": 84
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 15
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/RESOURCETYPES",
+            "HttpMethod": "GET",
+            "subcount": 271
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/EDGEZONES/PUBLISHERS/ARTIFACTTYPES/OFFERS/SKUS/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 5
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/NETWORKINTERFACES/GETEFFECTIVEROUTETABLE",
+            "HttpMethod": "POST",
+            "subcount": 14
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/REMOTECONTAINERIMAGES/",
+            "HttpMethod": "GET",
+            "subcount": 12
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/UPGRADEVMEXTENSIONS",
+            "HttpMethod": "POST",
+            "subcount": 26
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EXTENSIONS/",
+            "HttpMethod": "PATCH",
+            "subcount": 90
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/START",
+            "HttpMethod": "POST",
+            "subcount": 113
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/VMSIZERECOMMENDATIONS/GENERATE",
+            "HttpMethod": "POST",
+            "subcount": 42
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/CONVERTTOVIRTUALMACHINESCALESET",
+            "HttpMethod": "POST",
+            "subcount": 18
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/COMMUNITYGALLERIES/IMAGES",
+            "HttpMethod": "GET",
+            "subcount": 33
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/ROLEINSTANCES/",
+            "HttpMethod": "DELETE",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/DEFERREDBLOCKSTATUS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS",
+            "HttpMethod": "GET",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 12
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/EXTENSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 20
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/AUTOOSUPGRADE",
+            "HttpMethod": "POST",
+            "subcount": 20
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 14
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/SIMULATEEVICTION",
+            "HttpMethod": "POST",
+            "subcount": 66
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/COMMUNITYGALLERIES/",
+            "HttpMethod": "GET",
+            "subcount": 21
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/INTERNALDATA",
+            "HttpMethod": "PUT",
+            "subcount": 11
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/SHARE",
+            "HttpMethod": "POST",
+            "subcount": 13
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/REDEPLOY",
+            "HttpMethod": "POST",
+            "subcount": 30
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/PUBLICIPADDRESSES",
+            "HttpMethod": "GET",
+            "subcount": 5
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/RESTART",
+            "HttpMethod": "POST",
+            "subcount": 23
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/IMAGES/",
+            "HttpMethod": "PUT",
+            "subcount": 21
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/EXTENSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/",
+            "HttpMethod": "PATCH",
+            "subcount": 14
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYRESERVATIONGROUPS/",
+            "HttpMethod": "PATCH",
+            "subcount": 31
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/UPDATEDOMAINS",
+            "HttpMethod": "GET",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/BOOKMARKS/BEGINGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 14
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES/",
+            "HttpMethod": "PUT",
+            "subcount": 25
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/PROXIMITYPLACEMENTGROUPS/",
+            "HttpMethod": "PUT",
+            "subcount": 8
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/REIMAGE",
+            "HttpMethod": "POST",
+            "subcount": 12
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/CLOUDSERVICEOSFAMILIES",
+            "HttpMethod": "GET",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/APPROVEROLLINGUPGRADE",
+            "HttpMethod": "POST",
+            "subcount": 16
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/PROXIMITYPLACEMENTGROUPS/",
+            "HttpMethod": "PATCH",
+            "subcount": 5
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/IMAGES/",
+            "HttpMethod": "PATCH",
+            "subcount": 88
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SSHPUBLICKEYS/",
+            "HttpMethod": "PATCH",
+            "subcount": 45
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/",
+            "HttpMethod": "PUT",
+            "subcount": 17
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKS/BOOKMARKS/ENDGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 14
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/UNREGISTER",
+            "HttpMethod": "POST",
+            "subcount": 180
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES",
+            "HttpMethod": "PUT",
+            "subcount": 9
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/DISKACCESSES/PRIVATEENDPOINTCONNECTIONS/",
+            "HttpMethod": "GET",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/",
+            "HttpMethod": "PATCH",
+            "subcount": 9
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/IMAGES/",
+            "HttpMethod": "PATCH",
+            "subcount": 10
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS",
+            "HttpMethod": "PATCH",
+            "subcount": 7
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SHAREDGALLERIES/",
+            "HttpMethod": "GET",
+            "subcount": 19
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/",
+            "HttpMethod": "PUT",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/SKUS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/AUTOEXTENSIONUPGRADE",
+            "HttpMethod": "POST",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMEXTENSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 16
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/PAYLOADGROUPS/PAYLOADS/LISTURIS",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/HOSTSIZES",
+            "HttpMethod": "GET",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/PAYLOADGROUPS/PAYLOADS/",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/ARTIFACTPUBLISHERS/",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/FEATURECONFIGURATIONS/REGISTRATIONS/APPROVE",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/REMOTECONTAINERIMAGES/BEGINGETACCESS",
+            "HttpMethod": "POST",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES/VERSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 8
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/LIFECYCLEHOOKEVENTS",
+            "HttpMethod": "GET",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/SERVICEARTIFACTS/SETVERSION",
+            "HttpMethod": "POST",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/PAYLOADGROUPS/CAPSOPERATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/SELFSERVICEREREGISTER",
+            "HttpMethod": "POST",
+            "subcount": 1642
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES/VERSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 31
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/SETVMHEALTH",
+            "HttpMethod": "POST",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/PAYLOADGROUPS/CREATEPAYLOAD",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES/VERSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/PLACEMENTRECOMMENDATIONS/GENERATE",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/",
+            "HttpMethod": "PATCH",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMEXTENSIONS/VERSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 19
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/REMOTECONTAINERIMAGES/",
+            "HttpMethod": "PUT",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES/VERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/SETVMHEALTH",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/FEATURECONFIGURATIONS/REGISTRATIONS/REJECT",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/PAYLOADGROUPS/PAYLOADS/UPDATESKUREFERENCES",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/APPLICATIONS/VERSIONS/",
+            "HttpMethod": "PATCH",
+            "subcount": 9
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/CAPACITYBLOCKS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMEXTENSIONS/VERSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 8
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/PAYLOADGROUPS/GETPAYLOADCOLLECTION",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMIMAGES/",
+            "HttpMethod": "DELETE",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES/",
+            "HttpMethod": "DELETE",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/CONFIGUREPATCHING",
+            "HttpMethod": "POST",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES/VERSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 6
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/METRICDEFINITIONS/",
+            "HttpMethod": "GET",
+            "subcount": 20
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/GALLERIES/TARGETREGIONS",
+            "HttpMethod": "GET",
+            "subcount": 4
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/RESTOREPOINTCOLLECTIONS/RESTOREPOINTS",
+            "HttpMethod": "DELETE",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SNAPSHOTS",
+            "HttpMethod": "PUT",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMEXTENSIONS/",
+            "HttpMethod": "DELETE",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/REMOTECONTAINERIMAGES",
+            "HttpMethod": "PUT",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/INVMACCESSCONTROLPROFILES/",
+            "HttpMethod": "PUT",
+            "subcount": 6
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/SUBSCRIPTIONREGISTRATION",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/EXTENSIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/FEATURECONFIGURATIONS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/PROVIDERS/MICROSOFT.COMPUTE/SHAREDVMEXTENSIONS",
+            "HttpMethod": "GET",
+            "subcount": 19
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EXTENSIONROLLINGUPGRADE",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/REMOTECONTAINERIMAGES",
+            "HttpMethod": "DELETE",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/REBUILD",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/VIRTUALMACHINES/RUNCOMMANDS/",
+            "HttpMethod": "PATCH",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/GALLERIES/REMOTECONTAINERIMAGES",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/MANIFESTS/LOCATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/HOSTS/",
+            "HttpMethod": "PATCH",
+            "subcount": 2
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/RESOURCEPROVIDERSKUS",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/FEATURECONFIGURATIONS/REGISTRATIONS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/ARTIFACTPUBLISHERS/",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "VALIDATION/PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/CLOUDSERVICES/",
+            "HttpMethod": "PUT",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/FEATURECONFIGURATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/UPGRADEVMAPPLICATIONS",
+            "HttpMethod": "POST",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/ARTIFACTPUBLISHERS/SUBSCRIPTIONS/CAPSOPERATIONS/",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINESCALESETS/EVENTGRIDFILTERS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "DELETE/PROVIDERS/MICROSOFT.COMPUTE/LOCATIONS/ARTIFACTPUBLISHERS/",
+            "HttpMethod": "DELETE",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "GET/PROVIDERS/MICROSOFT.COMPUTE/GETMANIFESTVERSIONS",
+            "HttpMethod": "GET",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/UPGRADEVMAPPLICATIONS",
+            "HttpMethod": "POST",
+            "subcount": 3
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/SYNCHRONIZERESOURCES",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "POST/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/AVAILABILITYSETS/VALIDATEMIGRATIONTOVIRTUALMACHINESCALESET",
+            "HttpMethod": "POST",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PATCH/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/HOSTGROUPS/",
+            "HttpMethod": "PATCH",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/PROVIDERS/MICROSOFT.COMPUTE/FEATURECONFIGURATIONS/",
+            "HttpMethod": "PUT",
+            "subcount": 1
+          },
+          {
+            "TargetResourceProvider": "MICROSOFT.COMPUTE",
+            "Operation": "PUT/SUBSCRIPTIONS/RESOURCEGROUPS/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/RUNCOMMANDS",
+            "HttpMethod": "PUT",
+            "subcount": 7
+          }
+        ],
+        "effectiveIntegrationRuntime": "AutoResolveIntegrationRuntime (East US)",
+        "billingReference": {
+          "activityType": "PipelineActivity",
+          "billableDuration": [
+            {
+              "meterType": "AzureIR",
+              "duration": 0.016666666666666666,
+              "unit": "Hours"
+            }
+          ],
+          "totalBillableDuration": [
+            {
+              "meterType": "AzureIR",
+              "duration": 0.016666666666666666,
+              "unit": "Hours"
+            }
+          ]
+        },
+        "durationInQueue": {
+          "integrationRuntimeQueue": 10
+        }
+      },
+      "userProperties": {},
+      "pipelineName": "QueryARMProd-Parm",
+      "pipelineRunId": "71e19f75-9e43-499f-921e-22862e37d971",
+      "status": "Succeeded",
+      "recoveryStatus": "None",
+      "integrationRuntimeNames": [
+        "autoresolveintegrationruntime"
+      ],
+      "executionDetails": {
+        "integrationRuntime": [
+          {
+            "name": "AutoResolveIntegrationRuntime",
+            "type": "Managed",
+            "location": "East US"
+          }
+        ]
+      },
+      "id": "/SUBSCRIPTIONS/A18897A6-7E44-457D-9260-F2854C0ACA42/RESOURCEGROUPS/SDK-MGMT-BI-DATA/PROVIDERS/MICROSOFT.DATAFACTORY/FACTORIES/AZUREMGMTSDKBI-DATAFACTORY/pipelineruns/71e19f75-9e43-499f-921e-22862e37d971/activityruns/827ae53a-cb3b-4512-8bcb-e68d1bf8d43e"
+    }
+  ]
+}
