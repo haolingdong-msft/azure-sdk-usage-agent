@@ -7,6 +7,18 @@ This repo contains an MCP (Model Context Protocol) server for querying Azure SDK
 - **Formatted Results**: Returns well-formatted query results with execution details
 - **Robust Error Handling**: Comprehensive error handling and informative error messages
 
+## 🆕 Azure Data Factory Implementations
+
+This project includes **two implementations** for Azure Data Factory operations:
+
+### 🔵 REST API (`src/adf/`)
+Traditional HTTP REST API-based implementation with manual control over requests.
+
+### 🟢 Azure SDK (`src/adfSDK/`) - **Recommended**
+Modern SDK-based implementation with automatic authentication and type safety.
+
+📖 **[View detailed comparison and migration guide](PROJECT_STRUCTURE.md)**
+
 ## Prerequisites
 
 Ensure you have the following:

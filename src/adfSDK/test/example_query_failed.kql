@@ -1,0 +1,41 @@
+let GetProduct = (UAString: string) {
+    let userAgent = tolower(trim(" ", UAString));
+    let goSdkException = dynamic(["kubernetes-cloudprovider", "custer-api-provider-azure", "cilium", "azure-metrics-exporter", "azure_prometheus_exporter", "cluster-image-registry-operator", "aad-pod-identity", "azure-service-operator"]);
+    let netReg = extract(@"(microsoft\\.windowsazure\\.management|microsoft\\.azure\\.management)", 1, userAgent);
+    let jsRlcReg = "azsdk-js-arm-[a-z0-9]+-rest";
+    case(
+        isempty(UAString), "",
+        userAgent has "terraform", "Terraform",
+        userAgent has "ansible", "Ansible",
+        (userAgent has "azure-sdk-for-java" or userAgent has "azsdk-java") and userAgent has "auto-generated", "Java Fluent Lite",
+        userAgent has "azure-sdk-for-java" or userAgent has "azsdk-java", "Java Fluent Premium",
+        netReg != "" and userAgent has "fluent", ".Net Fluent",
+        netReg != "" or userAgent has "azsdk-net", ".Net Code-gen",
+        userAgent has "azure-sdk-for-python" or userAgent has "azsdk-python", "Python-SDK",
+        userAgent has "azure-sdk-for-node", "JavaScript (Node.JS)",
+        userAgent matches regex jsRlcReg, "JavaScript RLC",
+        (userAgent has "ms-rest-js" and userAgent startswith "@azure/arm") or userAgent has "azsdk-js-arm", "JavaScript",
+        userAgent has "azure-sdk-for-ruby", "Ruby-SDK",
+        (userAgent has "azure-sdk-for-go" or userAgent has "azsdk-go") and array_index_of(goSdkException, userAgent) == -1, "Go-SDK",
+        userAgent has "azure-sdk-for-php", "PHP-SDK",
+        userAgent has "azsdk-rust-", "Rust",
+        ""
+    )
+};
+let GetOSInfo = (UAString: string) {
+    let userAgent = tolower(trim(" ", UAString));
+    case(
+        userAgent has "windows", "Windows",
+        userAgent has "linux", "Linux",
+        userAgent has "macos", "MacOS",
+        userAgent has "mac os", "MacOS",
+        "Unknown"
+    )
+};
+Unionizer("Requests", "HttpIncomingRequests")
+| where TaskName == "HttpIncomingRequestEndWithSuccess"
+| where TIMESTAMP > ago(7d)
+| extend Product = GetProduct(userAgent), OS = GetOSInfo(userAgent)
+| where Product in ("JavaScript", "JavaScript RLC", "JavaScript (Node.JS)")
+| where OS == "MacOS"
+| summarize UniqueSubscriptions = dcount(subscriptionId)

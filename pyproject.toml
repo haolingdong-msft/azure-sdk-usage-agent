@@ -8,5 +8,6 @@ dependencies = [
     "httpx>=0.28.1",
     "mcp[cli]>=1.14.1",
     "azure-identity>=1.25.0",
-    "requests>=2.32.0"
+    "requests>=2.32.0",
+    "azure-mgmt-datafactory>=9.2.0",
 ]

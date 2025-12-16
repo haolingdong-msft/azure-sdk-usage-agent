@@ -1,0 +1,25 @@
+{
+  "id": "/SUBSCRIPTIONS/A18897A6-7E44-457D-9260-F2854C0ACA42/RESOURCEGROUPS/SDK-MGMT-BI-DATA/PROVIDERS/MICROSOFT.DATAFACTORY/FACTORIES/AZUREMGMTSDKBI-DATAFACTORY/pipelineruns/38a241a1-082a-4082-9654-af5e5cb20b01",
+  "runId": "38a241a1-082a-4082-9654-af5e5cb20b01",
+  "debugRunId": null,
+  "runGroupId": "38a241a1-082a-4082-9654-af5e5cb20b01",
+  "pipelineName": "QueryARMProd-Parm",
+  "parameters": {
+    "KustoQuery": "let GetProduct = (UAString: string) {\n    let userAgent = tolower(trim(\" \", UAString));\n    let goSdkException = dynamic([\"kubernetes-cloudprovider\", \"custer-api-provider-azure\", \"cilium\", \"azure-metrics-exporter\", \"azure_prometheus_exporter\", \"cluster-image-registry-operator\", \"aad-pod-identity\", \"azure-service-operator\"]);\n    let netReg = extract(@\"(microsoft\\\\.windowsazure\\\\.management|microsoft\\\\.azure\\\\.management)\", 1, userAgent);\n    let jsRlcReg = \"azsdk-js-arm-[a-z0-9]+-rest\";\n    case(\n        isempty(UAString), \"\",\n        userAgent has \"terraform\", \"Terraform\",\n        userAgent has \"ansible\", \"Ansible\",\n        (userAgent has \"azure-sdk-for-java\" or userAgent has \"azsdk-java\") and userAgent has \"auto-generated\", \"Java Fluent Lite\",\n        userAgent has \"azure-sdk-for-java\" or userAgent has \"azsdk-java\", \"Java Fluent Premium\",\n        netReg != \"\" and userAgent has \"fluent\", \".Net Fluent\",\n        netReg != \"\" or userAgent has \"azsdk-net\", \".Net Code-gen\",\n        userAgent has \"azure-sdk-for-python\" or userAgent has \"azsdk-python\", \"Python-SDK\",\n        userAgent has \"azure-sdk-for-node\", \"JavaScript (Node.JS)\",\n        userAgent matches regex jsRlcReg, \"JavaScript RLC\",\n        (userAgent has \"ms-rest-js\" and userAgent startswith \"@azure/arm\") or userAgent has \"azsdk-js-arm\", \"JavaScript\",\n        userAgent has \"azure-sdk-for-ruby\", \"Ruby-SDK\",\n        (userAgent has \"azure-sdk-for-go\" or userAgent has \"azsdk-go\") and array_index_of(goSdkException, userAgent) == -1, \"Go-SDK\",\n        userAgent has \"azure-sdk-for-php\", \"PHP-SDK\",\n        userAgent has \"azsdk-rust-\", \"Rust\",\n        \"\"\n    )\n};\nlet GetOSInfo = (UAString: string) {\n    let userAgent = tolower(trim(\" \", UAString));\n    case(\n        userAgent has \"windows\", \"Windows\",\n        userAgent has \"linux\", \"Linux\",\n        userAgent has \"macos\", \"MacOS\",\n        userAgent has \"mac os\", \"MacOS\",\n        \"Unknown\"\n    )\n};\nUnionizer(\"Requests\", \"HttpIncomingRequests\")\n| where TaskName == \"HttpIncomingRequestEndWithSuccess\"\n| where TIMESTAMP > ago(7d)\n| extend Product = GetProduct(userAgent), OS = GetOSInfo(userAgent)\n| where Product in (\"JavaScript\", \"JavaScript RLC\", \"JavaScript (Node.JS)\")\n| where OS == \"MacOS\"\n| summarize UniqueSubscriptions = dcount(subscriptionId)\n"
+  },
+  "invokedBy": {
+    "id": "bdfb245a454f44e2bc7cf3a36e1d18b4",
+    "name": "Manual",
+    "invokedByType": "Manual"
+  },
+  "runStart": "2025-12-10T17:05:07.6936376Z",
+  "runEnd": "2025-12-10T17:10:26.1479179Z",
+  "durationInMs": 318454,
+  "status": "Failed",
+  "message": "Operation on target Lookup1 failed: Failure happened on 'Source' side. 'Type=Kusto.Data.Exceptions.KustoServicePartialQueryFailureException,Message=Query timed out\r\n[0]Kusto.Data.Exceptions.KustoServiceTimeoutException: Query timed out\r\nTimestamp=2025-12-10T17:10:23.5326361Z\r\nClientRequestId=AzureDataFactory.Copy.QueryKusto;0decf284-a1c3-4088-93a3-2a92a4d9a11b\r\nActivityId=f0c89b68-2125-442e-8e85-dd47b903515b\r\nActivityType=GW.Http.CallContext\r\nServiceAlias=ARMPRODGBL\r\nMachineName=KENGINE00001H\r\nProcessName=Kusto.WinSvc.Svc\r\nProcessId=12508\r\nThreadId=4108\r\nActivityStack=(Activity stack: CRID=AzureDataFactory.Copy.QueryKusto;0decf284-a1c3-4088-93a3-2a92a4d9a11b ARID=f0c89b68-2125-442e-8e85-dd47b903515b > GW.Http.CallContext/f0c89b68-2125-442e-8e85-dd47b903515b)\r\nMonitoredActivityContext=(ActivityType=GW.Http.CallContext, Timestamp=2025-12-10T17:05:23.0348960Z, ParentActivityId=f0c89b68-2125-442e-8e85-dd47b903515b, TimeSinceStarted=300497.7417 [ms])ErrorCode=\r\nErrorReason=\r\nErrorMessage=\r\nDataSource=\r\nDatabaseName=\r\nClientRequestId=\r\nActivityId=00000000-0000-0000-0000-000000000000\r\n\r\n,Source=Kusto.Data,'",
+  "pipelineReturnValue": {},
+  "lastUpdated": "2025-12-10T17:10:26.1481157Z",
+  "annotations": [],
+  "runDimension": {},
+  "isLatest": true
+}
