@@ -16,7 +16,7 @@ from ..adf.config import (
     RESOURCE_GROUP_NAME,
     FACTORY_NAME,
     PIPELINE_NAME,
-    KUSTO_QUERY_PARAM_KEY
+    ADF_QUERY_PARAM_KEY
 )
 from ..utils.utils import format_pipeline_status_failed, format_activity_runs
 
@@ -306,7 +306,7 @@ async def execute_kusto_query(
         
         # Prepare pipeline parameters
         parameters: Dict[str, Any] = {
-            KUSTO_QUERY_PARAM_KEY: kusto_query
+            ADF_QUERY_PARAM_KEY: kusto_query
         }
         
         logging.info(f"Triggering pipeline: {PIPELINE_NAME} with query: {kusto_query[:100]}...")

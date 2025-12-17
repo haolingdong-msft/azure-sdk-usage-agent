@@ -1,22 +1,87 @@
 """
-Azure Data Factory Pipeline Runner
+Azure Data Factory SDK - Modern Python SDK for Azure Data Factory operations.
 
-This package provides utilities to interact with Azure Data Factory pipelines
-using the REST API (api-version=2018-06-01) with DefaultAzureCredential authentication.
+This package provides a high-level interface for interacting with Azure Data Factory
+using the official Azure SDK, with enhanced type safety, logging, and error handling.
+
+Example:
+    Basic usage:
+    >>> from adfSDK import ADFClient
+    >>> client = ADFClient(
+    ...     subscription_id="your-subscription-id",
+    ...     resource_group_name="your-rg",
+    ...     factory_name="your-factory"
+    ... )
+    >>> run_id = client.trigger_pipeline("my-pipeline")
+    
+    Using environment variables:
+    >>> client = ADFClient.new()
+    >>> result = client.run_pipeline("my-pipeline", wait=True)
+    
+    Using context manager:
+    >>> with ADFClient.new() as client:
+    ...     activities = client.get_activity_runs(run_id, start_time, end_time)
 """
 
-from .auth import get_token
-from .pipeline import trigger_pipeline, wait_for_pipeline, get_pipeline_run_status
-from .activity import get_activity_runs
+from .__version__ import __version__, __author__, __license__, __description__
 from .client import ADFClient
+from .models import (
+    RunStatus,
+    ActivityType,
+    PipelineRunInfo,
+    ActivityRunInfo,
+    is_terminal_status,
+    is_successful_status
+)
+from .exceptions import (
+    ADFError,
+    PipelineError,
+    PipelineNotFoundError,
+    PipelineTimeoutError,
+    PipelineTriggerError,
+    PipelineExecutionError,
+    ActivityError,
+    ActivityRunNotFoundError,
+    ActivityQueryError,
+    AuthenticationError,
+    ConfigurationError
+)
+from .config import ADFConfig, DEFAULT_POLL_INTERVAL, DEFAULT_TIMEOUT
 
 __all__ = [
-    "get_token",
-    "trigger_pipeline",
-    "wait_for_pipeline",
-    "get_pipeline_run_status",
-    "get_activity_runs",
+    # Version info
+    "__version__",
+    "__author__",
+    "__license__",
+    "__description__",
+    
+    # Main client
     "ADFClient",
+    
+    # Configuration
+    "ADFConfig",
+    "DEFAULT_POLL_INTERVAL",
+    "DEFAULT_TIMEOUT",
+    
+    # Models and types
+    "RunStatus",
+    "ActivityType",
+    "PipelineRunInfo",
+    "ActivityRunInfo",
+    "is_terminal_status",
+    "is_successful_status",
+    
+    # Exceptions
+    "ADFError",
+    "PipelineError",
+    "PipelineNotFoundError",
+    "PipelineTimeoutError",
+    "PipelineTriggerError",
+    "PipelineExecutionError",
+    "ActivityError",
+    "ActivityRunNotFoundError",
+    "ActivityQueryError",
+    "AuthenticationError",
+    "ConfigurationError",
 ]
 
-__version__ = "0.1.0"
