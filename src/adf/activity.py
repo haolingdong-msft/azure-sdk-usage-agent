@@ -12,7 +12,7 @@ from datetime import datetime
 from azure.mgmt.datafactory import DataFactoryManagementClient
 from azure.mgmt.datafactory.models import RunFilterParameters, ActivityRun
 
-from .exceptions import ActivityQueryError
+from .exceptions import ActivityError
 from .utils import get_logger, save_to_json, sdk_object_to_dict, validate_run_id
 
 
@@ -46,7 +46,7 @@ def get_activity_runs(
         list[ActivityRun]: List of Azure SDK ActivityRun objects
     
     Raises:
-        ActivityQueryError: If the query fails
+        ActivityError: If the query fails
     """
     # Validate run_id
     validate_run_id(run_id)
@@ -88,7 +88,7 @@ def get_activity_runs(
         
     except Exception as e:
         logger.error(f"Failed to query activity runs for {run_id}: {e}")
-        raise ActivityQueryError(run_id, str(e)) from e
+        raise ActivityError(f"Failed to query activity runs for {run_id}: {e}") from e
 
 
 def _save_activity_runs(
