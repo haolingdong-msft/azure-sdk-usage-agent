@@ -10,13 +10,7 @@ from datetime import datetime
 from azure.identity import DefaultAzureCredential
 
 from ..adf import ADFClient
-from ..adf.config import (
-    SUBSCRIPTION_ID,
-    RESOURCE_GROUP_NAME,
-    FACTORY_NAME,
-    PIPELINE_NAME,
-    ADF_QUERY_PARAM_KEY
-)
+from ..adf.config import config
 from ..utils.utils import format_pipeline_status_failed, format_activity_runs
 
 
@@ -275,8 +269,8 @@ IMPORTANT:
 
 async def execute_kusto_query(
     kusto_query: str,
-    timeout: int = 3600,
-    poll_interval: int = 30,
+    timeout: Optional[int] = None,
+    poll_interval: Optional[int] = None,
     export_to_file: Optional[str] = None
 ) -> str:
     """Execute a Kusto query via Azure Data Factory pipeline.
@@ -286,84 +280,73 @@ async def execute_kusto_query(
     
     Args:
         kusto_query: The Kusto query to execute
-        timeout: Maximum wait time in seconds (default: 3600)
-        poll_interval: Status check interval in seconds (default: 30)
+        timeout: Maximum wait time in seconds (default: uses config.timeout)
+        poll_interval: Status check interval in seconds (default: uses config.poll_interval)
         export_to_file: Optional file path to export full results (CSV format)
     
     Returns:
         str: Formatted query results or error message
     """
+    # Use config defaults if not provided
+    timeout = timeout if timeout is not None else config.timeout
+    poll_interval = poll_interval if poll_interval is not None else config.poll_interval
+    
     try:
-        # Create ADF client with DefaultAzureCredential
-        logging.info(f"Creating ADF client for factory: {FACTORY_NAME}")
-        client = ADFClient(
-            subscription_id=SUBSCRIPTION_ID,
-            resource_group_name=RESOURCE_GROUP_NAME,
-            factory_name=FACTORY_NAME,
+        # Create ADF client using context manager
+        with ADFClient(
+            subscription_id=config.subscription_id,
+            resource_group_name=config.resource_group_name,
+            factory_name=config.factory_name,
             credential=DefaultAzureCredential()
-        )
-        
-        # Prepare pipeline parameters
-        parameters: Dict[str, Any] = {
-            ADF_QUERY_PARAM_KEY: kusto_query
-        }
-        
-        logging.info(f"Triggering pipeline: {PIPELINE_NAME} with query: {kusto_query[:100]}...")
-        
-        # Trigger and wait for pipeline completion
-        final_status = client.run_pipeline(
-            pipeline_name=PIPELINE_NAME,
-            parameters=parameters,
-            wait=True,
-            poll_interval=poll_interval,
-            timeout=timeout
-        )
-        
-        # Extract results
-        run_id = final_status.get("runId")
-        status = final_status.get("status")
-        duration_ms = final_status.get("durationInMs", 0)
-        
-        if status != "Succeeded":
-            error_output = format_pipeline_status_failed(final_status)
-            logging.error(error_output)
-            return error_output
-        
-        # Get activity runs to extract query results
-        start_time = final_status.get("runStart")
-        end_time = final_status.get("runEnd")
-        
-        if not (run_id and start_time and end_time):
-            return f"Pipeline succeeded but missing timing information.\nStatus: {status}\nRun ID: {run_id}"
-        
-        logging.info(f"Fetching activity runs for run_id: {run_id}")
-        activity_runs = client.get_activity_runs(
-            run_id=run_id,
-            start_time=start_time,
-            end_time=end_time
-        )
-        
-        # Format activity results and extract data
-        result_message, full_data = format_activity_runs(activity_runs, duration_ms, run_id)
-        
-        # Export logic:
-        # 1. Always export if user explicitly specified export_to_file
-        # 2. Auto-export if data > 100 rows (even if export_to_file not specified)
-        # 3. Don't export if data <= 100 rows and export_to_file not specified
-        should_export = False
-        if full_data:
-            if export_to_file:
-                # User explicitly requested export
-                should_export = True
-            elif len(full_data) > 100:
-                # Auto-export for large result sets
-                should_export = True
-        
-        if should_export:
-            export_msg = export_to_csv(full_data, export_to_file)
-            result_message += f"\n\n{'=' * 80}\n{export_msg}"
-        
-        return result_message
+        ) as client:
+            # Prepare pipeline parameters
+            parameters: Dict[str, Any] = {
+                config.pipeline_parameter_key: kusto_query
+            }
+            
+            # Trigger and wait for pipeline completion
+            final_status = client.run_pipeline(
+                pipeline_name=config.pipeline_name,
+                parameters=parameters,
+                wait=True,
+                poll_interval=poll_interval,
+                timeout=timeout,
+                save_to_file=True
+            )
+            
+            # Extract results
+            run_id = final_status.get("run_id")
+            status = final_status.get("status")
+            duration_ms = final_status.get("duration_in_ms", 0)
+            
+            if status != "Succeeded":
+                error_output = format_pipeline_status_failed(final_status)
+                logging.error(f"Pipeline execution failed for run_id {run_id}")
+                return error_output
+            
+            # Get activity runs to extract query results
+            start_time = final_status.get("run_start")
+            end_time = final_status.get("run_end")
+            
+            if not (run_id and start_time and end_time):
+                return f"Pipeline succeeded but missing timing information.\nStatus: {status}\nRun ID: {run_id}"
+            
+            activity_runs = client.get_activity_runs(
+                run_id=run_id,
+                start_time=start_time,
+                end_time=end_time,
+                save_to_file=True
+            )
+            
+            # Format activity results and extract data
+            result_message, full_data = format_activity_runs(activity_runs, duration_ms, run_id)
+            
+            # Export to CSV if user requested or if result set is large (> 100 rows)
+            if full_data and (export_to_file or len(full_data) > 100):
+                export_msg = export_to_csv(full_data, export_to_file)
+                result_message += f"\n\n{'=' * 80}\n{export_msg}"
+            
+            return result_message
         
     except Exception as e:
         error_msg = f"Error executing Kusto query via ADF: {str(e)}"

@@ -45,26 +45,6 @@ uv sync
 
 This will create a virtual environment and install all required Python packages.
 
-### Step 1.5: Code Formatting (Development)
-
-This project uses [Ruff](https://docs.astral.sh/ruff/) for code formatting and linting to maintain consistent code style.
-
-**Format code:**
-```bash
-uv run ruff format .
-```
-
-**Check code style:**
-```bash
-uv run ruff check .
-```
-
-**Fix auto-fixable issues:**
-```bash
-uv run ruff check --fix .
-```
-
-The Ruff configuration is defined in `pyproject.toml`.
 
 ### Step 2: Login to Azure
 ```bash
