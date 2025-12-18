@@ -3,7 +3,6 @@ Kusto query execution tool via Azure Data Factory
 """
 
 import logging
-import json
 import csv
 from pathlib import Path
 from typing import Any, Optional, Dict, List

@@ -1,12 +1,12 @@
 """Exception hierarchy for ADF SDK."""
 
-from typing import Optional, Any
+from typing import Optional
 
 
 class ADFError(Exception):
     """Base exception for all ADF SDK errors."""
     
-    def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str, details: Optional[dict[str, object]] = None):
         """
         Initialize ADF error.
         
@@ -27,23 +27,6 @@ class ADFError(Exception):
 class PipelineError(ADFError):
     """Base exception for pipeline-related errors."""
     pass
-
-
-class PipelineNotFoundError(PipelineError):
-    """Exception raised when a pipeline is not found."""
-    
-    def __init__(self, pipeline_name: str):
-        """
-        Initialize PipelineNotFoundError.
-        
-        Args:
-            pipeline_name: Name of the pipeline that was not found
-        """
-        self.pipeline_name = pipeline_name
-        super().__init__(
-            f"Pipeline '{pipeline_name}' not found",
-            {"pipeline_name": pipeline_name}
-        )
 
 
 class PipelineTimeoutError(PipelineError):
@@ -90,81 +73,9 @@ class PipelineTriggerError(PipelineError):
         super().__init__(message, {"pipeline_name": pipeline_name, "reason": reason})
 
 
-class PipelineExecutionError(PipelineError):
-    """Exception raised when a pipeline execution fails."""
-    
-    def __init__(self, run_id: str, status: str, message: Optional[str] = None):
-        """
-        Initialize PipelineExecutionError.
-        
-        Args:
-            run_id: Pipeline run ID
-            status: Final status of the pipeline run
-            message: Optional error message from the pipeline
-        """
-        self.run_id = run_id
-        self.status = status
-        error_msg = f"Pipeline run '{run_id}' failed with status: {status}"
-        if message:
-            error_msg += f" - {message}"
-        super().__init__(
-            error_msg,
-            {"run_id": run_id, "status": status, "message": message}
-        )
-
-
 class ActivityError(ADFError):
     """Base exception for activity-related errors."""
     pass
-
-
-class ActivityRunNotFoundError(ActivityError):
-    """Exception raised when activity runs are not found."""
-    
-    def __init__(self, run_id: str):
-        """
-        Initialize ActivityRunNotFoundError.
-        
-        Args:
-            run_id: Pipeline run ID
-        """
-        self.run_id = run_id
-        super().__init__(
-            f"No activity runs found for pipeline run '{run_id}'",
-            {"run_id": run_id}
-        )
-
-
-class ActivityQueryError(ActivityError):
-    """Exception raised when querying activity runs fails."""
-    
-    def __init__(self, run_id: str, reason: Optional[str] = None):
-        """
-        Initialize ActivityQueryError.
-        
-        Args:
-            run_id: Pipeline run ID
-            reason: Optional reason for the failure
-        """
-        self.run_id = run_id
-        self.reason = reason
-        message = f"Failed to query activity runs for pipeline run '{run_id}'"
-        if reason:
-            message += f": {reason}"
-        super().__init__(message, {"run_id": run_id, "reason": reason})
-
-
-class AuthenticationError(ADFError):
-    """Exception raised for authentication failures."""
-    
-    def __init__(self, message: str = "Authentication failed"):
-        """
-        Initialize AuthenticationError.
-        
-        Args:
-            message: Error message
-        """
-        super().__init__(message)
 
 
 class ConfigurationError(ADFError):

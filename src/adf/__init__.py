@@ -27,26 +27,24 @@ from .__version__ import __version__, __author__, __license__, __description__
 from .client import ADFClient
 from .models import (
     RunStatus,
-    ActivityType,
-    PipelineRunInfo,
-    ActivityRunInfo,
+
+    KustoQuery,
+    KustoQueryFile,
+    KustoQueryPipelineParameters,
     is_terminal_status,
     is_successful_status
 )
+# Re-export Azure SDK types for convenience
+from azure.mgmt.datafactory.models import PipelineRun, ActivityRun
 from .exceptions import (
     ADFError,
     PipelineError,
-    PipelineNotFoundError,
     PipelineTimeoutError,
     PipelineTriggerError,
-    PipelineExecutionError,
     ActivityError,
-    ActivityRunNotFoundError,
-    ActivityQueryError,
-    AuthenticationError,
     ConfigurationError
 )
-from .config import ADFConfig, DEFAULT_POLL_INTERVAL, DEFAULT_TIMEOUT
+from .config import Config, DEFAULT_POLL_INTERVAL, DEFAULT_TIMEOUT
 
 __all__ = [
     # Version info
@@ -59,29 +57,28 @@ __all__ = [
     "ADFClient",
     
     # Configuration
-    "ADFConfig",
+    "Config",
     "DEFAULT_POLL_INTERVAL",
     "DEFAULT_TIMEOUT",
     
     # Models and types
     "RunStatus",
-    "ActivityType",
-    "PipelineRunInfo",
-    "ActivityRunInfo",
+    "KustoQuery",
+    "KustoQueryFile",
+    "KustoQueryPipelineParameters",
     "is_terminal_status",
     "is_successful_status",
+    
+    # Azure SDK types (re-exported for convenience)
+    "PipelineRun",
+    "ActivityRun",
     
     # Exceptions
     "ADFError",
     "PipelineError",
-    "PipelineNotFoundError",
     "PipelineTimeoutError",
     "PipelineTriggerError",
-    "PipelineExecutionError",
     "ActivityError",
-    "ActivityRunNotFoundError",
-    "ActivityQueryError",
-    "AuthenticationError",
     "ConfigurationError",
 ]
 

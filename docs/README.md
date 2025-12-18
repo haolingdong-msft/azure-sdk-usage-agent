@@ -225,21 +225,6 @@ class ADFSDKConfig:
 
 ## 🔧 高级功能
 
-### 列出所有 Pipelines
-
-```python
-client = ADFClientSDK.from_environment()
-pipelines = client.list_pipelines()
-print(f"Found {len(pipelines)} pipelines: {pipelines}")
-```
-
-### 获取 Pipeline 定义
-
-```python
-pipeline_def = client.get_pipeline("my-pipeline")
-print(pipeline_def)
-```
-
 ### 自定义日志
 
 ```python
@@ -309,8 +294,6 @@ except PipelineTimeoutError as e:
 - `wait_for_pipeline(run_id, poll_interval=None, timeout=None)` - 等待完成
 - `get_activity_runs(run_id, start_time, end_time, save_to_file=None)` - 获取 activity runs
 - `run_pipeline(pipeline_name, parameters=None, wait=True, ...)` - 触发并等待
-- `list_pipelines()` - 列出所有 pipelines
-- `get_pipeline(pipeline_name)` - 获取 pipeline 定义
 - `close()` - 关闭客户端
 
 ### 异常类型

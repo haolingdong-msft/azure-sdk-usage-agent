@@ -10,4 +10,5 @@ dependencies = [
     "azure-identity>=1.25.0",
     "requests>=2.32.0",
     "azure-mgmt-datafactory>=9.2.0",
+    "ruff>=0.14.9",
 ]
